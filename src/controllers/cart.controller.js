@@ -33,6 +33,11 @@ const addItemToCart = async (req, res) => {
     const { productId, quantity } = req.body;
     const userId = req.user.id;
 
+    // --- ADDED VALIDATION ---
+    if (!productId || !quantity || typeof quantity !== 'number' || quantity <= 0) {
+        return res.status(400).json({ message: 'Valid productId and quantity are required.' });
+    }
+
     // Find user's cart (or create it)
     let cart = await prisma.cart.findUnique({ where: { userId } });
     if (!cart) {
@@ -48,7 +53,7 @@ const addItemToCart = async (req, res) => {
       // If item exists, update its quantity
       await prisma.cartItem.update({
         where: { id: existingItem.id },
-        data: { quantity: existingItem.quantity + quantity },
+        data: { quantity: existing.quantity + quantity },
       });
     } else {
       // If item does not exist, create a new cart item
