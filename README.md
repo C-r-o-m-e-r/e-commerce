@@ -1,51 +1,53 @@
-# E-Commerce Marketplace API
+# Full-Stack E-Commerce Marketplace
 
-This is the backend API for a full-featured e-commerce marketplace, similar to Etsy or Amazon. It is built with a modern tech stack including Node.js, Express, PostgreSQL, and Prisma, and is fully containerized with Docker for easy setup and deployment.
+This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy or Amazon. It includes a **React (Vite)** frontend and a **Node.js (Express)** backend API. The entire backend environment is containerized with Docker for easy and consistent setup.
 
 ## Features
 
--   **Authentication:** JWT-based user registration and login.
--   **Authorization:** Protected routes and role-based access control (`BUYER`, `SELLER`).
--   **Product Management:** Full CRUD (Create, Read, Update, Delete) functionality for products.
--   **Shopping Cart:** Persistent, server-side cart management for authenticated users.
--   **Order Management:** Functionality to convert a cart into a persistent order and view order history.
--   **Payment Integration:** Secure payment processing using Stripe Payment Intents and Webhooks to handle payment confirmation.
--   **Security:** Password hashing with `bcryptjs` and ownership checks to ensure sellers can only manage their own products.
--   **Containerized:** Fully dockerized environment for consistent setup and easy deployment.
+- **Monorepo Structure:** Backend and frontend code are managed in a single repository.
+- **Authentication:** JWT-based user registration and login.
+- **Authorization:** Protected routes and role-based access control (`BUYER`, `SELLER`).
+- **Product Management:** Full CRUD (Create, Read, Update, Delete) functionality for products.
+- **Shopping Cart:** Persistent, server-side cart management for authenticated users.
+- **Order Management:** Functionality to convert a cart into a persistent order and view order history.
+- **Payment Integration:** Secure payment processing using Stripe Payment Intents and Webhooks.
 
 ## Tech Stack
 
--   **Backend:** Node.js, Express.js
--   **Database:** PostgreSQL
--   **ORM:** Prisma
--   **Payments:** Stripe
--   **Authentication:** JSON Web Tokens (JWT)
--   **Containerization:** Docker & Docker Compose
--   **Development:** Nodemon for live reloading
+### Frontend
+- **Framework:** React
+- **Build Tool:** Vite
 
-## Getting Started
+### Backend
+- **Runtime:** Node.js, Express.js
+- **Database:** PostgreSQL
+- **ORM:** Prisma
+- **Payments:** Stripe
+- **Authentication:** JSON Web Tokens (JWT)
+- **Containerization:** Docker & Docker Compose
+- **Middleware:** CORS (Cross-Origin Resource Sharing)
 
-Follow these instructions to get the project up and running on your local machine.
+## Local Development Setup
+
+Follow these instructions to get both the backend and frontend services running on your local machine.
 
 ### Prerequisites
 
 Make sure you have the following software installed:
--   [Node.js](https://nodejs.org/) (LTS version recommended)
--   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (with WSL 2 enabled on Windows)
--   [Git](https://git-scm.com/)
--   [Stripe CLI](https://stripe.com/docs/stripe-cli) (for testing payments locally)
+- [Node.js](https://nodejs.org/) (LTS version recommended)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (with WSL 2 enabled on Windows)
+- [Git](https://git-scm.com/)
+- [Stripe CLI](https://stripe.com/docs/stripe-cli) (for testing payments locally)
 
-### Installation & Setup
+### Backend Setup
 
-1.  **Clone the repository:**
+1. **Navigate to the backend directory:**
     ```bash
-    git clone <your-repository-url>
-    cd e-commerce
+    cd backend
     ```
 
-2.  **Create the environment file:**
-    Create a file named `.env` in the project root and add the following variables.
-
+2. **Create the environment file:**
+    Create a file named `backend/.env` and add the following variables:
     ```env
     # PostgreSQL settings
     POSTGRES_USER=myuser
@@ -66,82 +68,107 @@ Make sure you have the following software installed:
     STRIPE_WEBHOOK_SECRET=whsec_...
     ```
 
-3.  **Install project dependencies:**
+3. **Install backend dependencies:**
+    ```bash
+    npm install
+    npm install cors
+    ```
+    *We specifically need `cors` to resolve cross-origin request issues.*
+
+4. **Run the Database Migration:**
+    **This is a critical step to create the tables in your database.** The application will fail without it.
+    
+    a. **Temporarily change the `DATABASE_URL` in `backend/.env`** to point to `localhost`.
+       `DATABASE_URL="postgresql://myuser:mypassword@localhost:5432/ecommerce_db?schema=public"`
+    b. **Start only the database** container: `docker-compose up -d db`.
+    c. **Run the migration from your local terminal**: `npx prisma migrate dev`. Follow the prompts.
+    d. **IMPORTANT: Change the `DATABASE_URL` back to use `db`** in `backend/.env`.
+       `DATABASE_URL="postgresql://myuser:mypassword@db:5432/ecommerce_db?schema=public"`
+
+### Frontend Setup
+
+1. **Navigate to the frontend directory** (from the root folder):
+    ```bash
+    cd frontend
+    ```
+2. **Install frontend dependencies:**
     ```bash
     npm install
     ```
 
-4.  **Run the Database Migration:**
-    This is a critical step to create the tables in your database.
-    
-    a. **Temporarily change the `DATABASE_URL` in your `.env` file** to point to `localhost`.
-    b. **Start only the database** container: `docker-compose up -d db`.
-    c. **Run the migration** from your local terminal: `npx prisma migrate dev`.
-    d. **IMPORTANT: Change the `DATABASE_URL` back to use `db`** in your `.env` file.
+### Running the Application
 
-5.  **Run the application:**
+You need **two separate terminals** to run both the backend and frontend concurrently.
+
+1. **Terminal 1: Start the Backend**
     ```bash
+    cd backend
     docker-compose up --build
     ```
     The API will be available at `http://127.0.0.1:3000`.
 
-### Testing Stripe Webhooks Locally
-To test the payment confirmation flow, you need two terminals running simultaneously with your application:
-
-1.  **Terminal 1: Your Application**
+2. **Terminal 2: Start the Frontend**
     ```bash
-    docker-compose up
+    cd frontend
+    npm run dev
     ```
+    The React application will be available at `http://localhost:5173` (or another port specified by Vite).
 
-2.  **Terminal 2: Stripe CLI**
-    Run the `listen` command to forward Stripe events to your local server. This will also give you the `STRIPE_WEBHOOK_SECRET` to put in your `.env` file.
+### Testing Stripe Webhooks Locally
+To test the payment confirmation flow, you need a **third terminal**.
+
+1. **Terminal 3: Stripe CLI**
+    Run the `listen` command to forward Stripe events to your local server.
     ```bash
+    # Make sure you are in the `backend` directory
+    cd backend
     stripe listen --forward-to [http://127.0.0.1:3000/api/payments/webhook](http://127.0.0.1:3000/api/payments/webhook)
     ```
-3.  **Terminal 3 (or any other): Payment Confirmation**
-    After creating a Payment Intent via the API, use its ID to confirm the payment.
+2. **Payment Confirmation**
+    After creating a Payment Intent via the API, use its ID in this command (in a 4th terminal or after stopping `listen`):
     ```bash
     stripe payment_intents confirm <payment_intent_id> --payment-method=pm_card_visa --return-url="[https://example.com/success](https://example.com/success)"
     ```
 
 ## API Endpoints
+*(API endpoints remain the same and are served from the backend)*
 
 ### Auth
-| Method | Path                 | Protected | Role | Description                  |
-|:-------|:---------------------|:----------|:-----|:-----------------------------|
-| `POST` | `/api/auth/register` | No        | -    | Register a new user.         |
-| `POST` | `/api/auth/login`    | No        | -    | Login and receive a JWT.     |
-| `GET`  | `/api/auth/me`       | Yes       | Any  | Get the current user's profile.|
+| Method | Path | Protected | Role | Description |
+|:---|:---|:---|:---|:---|
+| `POST` | `/api/auth/register` | No | - | Register a new user. |
+| `POST` | `/api/auth/login` | No | - | Login and receive a JWT. |
+| `GET` | `/api/auth/me` | Yes | Any | Get the current user's profile. |
 
 ### Products
-| Method   | Path                  | Protected | Role     | Description                     |
-|:---------|:----------------------|:----------|:---------|:--------------------------------|
-| `GET`    | `/api/products`       | No        | -        | Get a list of all products.     |
-| `GET`    | `/api/products/:id`   | No        | -        | Get a single product by ID.     |
-| `POST`   | `/api/products`       | Yes       | `SELLER` | Create a new product.           |
-| `PUT`    | `/api/products/:id`   | Yes       | `SELLER` | Update your own product.        |
-| `DELETE` | `/api/products/:id`   | Yes       | `SELLER` | Delete your own product.        |
+| Method | Path | Protected | Role | Description |
+|:---|:---|:---|:---|:---|
+| `GET` | `/api/products` | No | - | Get a list of all products. |
+| `GET` | `/api/products/:id` | No | - | Get a single product by ID. |
+| `POST` | `/api/products` | Yes | `SELLER` | Create a new product. |
+| `PUT` | `/api/products/:id` | Yes | `SELLER` | Update your own product. |
+| `DELETE`| `/api/products/:id` | Yes | `SELLER` | Delete your own product. |
 
 ### Cart
-| Method   | Path                         | Protected | Role    | Description                  |
-|:---------|:-----------------------------|:----------|:--------|:-----------------------------|
-| `GET`    | `/api/cart`                  | Yes       | `BUYER` | Get the user's current cart. |
-| `POST`   | `/api/cart/items`            | Yes       | `BUYER` | Add an item to the cart.     |
-| `DELETE` | `/api/cart/items/:itemId`    | Yes       | `BUYER` | Remove an item from the cart.|
+| Method | Path | Protected | Role | Description |
+|:---|:---|:---|:---|:---|
+| `GET` | `/api/cart` | Yes | `BUYER` | Get the user's current cart. |
+| `POST` | `/api/cart/items` | Yes | `BUY-ER` | Add an item to the cart. |
+| `DELETE`| `/api/cart/items/:itemId` | Yes | `BUYER` | Remove an item from the cart. |
 
 ### Orders
-| Method | Path            | Protected | Role    | Description                       |
-|:-------|:----------------|:----------|:--------|:----------------------------------|
-| `POST` | `/api/orders`   | Yes       | `BUYER` | Create an order from the cart.    |
-| `GET`  | `/api/orders`   | Yes       | `BUYER` | Get the user's order history.     |
+| Method | Path | Protected | Role | Description |
+|:---|:---|:---|:---|:---|
+| `POST` | `/api/orders` | Yes | `BUYER` | Create an order from the cart. |
+| `GET` | `/api/orders` | Yes | `BUYER` | Get the user's order history. |
 
 ### Payments
-| Method | Path                           | Protected | Role    | Description                       |
-|:-------|:-------------------------------|:----------|:--------|:----------------------------------|
-| `POST` | `/api/payments/create-intent`  | Yes       | `BUYER` | Create a Stripe Payment Intent.   |
-| `POST` | `/api/payments/webhook`        | No        | -       | Stripe webhook for payment events.|
+| Method | Path | Protected | Role | Description |
+|:---|:---|:---|:---|:---|
+| `POST` | `/api/payments/create-intent` | Yes | `BUYER` | Create a Stripe Payment Intent. |
+| `POST` | `/api/payments/webhook` | No | - | Stripe webhook for payment events. |
 
 ### Users (for Testing)
-| Method | Path                 | Protected | Role | Description                  |
-|:-------|:---------------------|:----------|:-----|:-----------------------------|
-| `PUT`  | `/api/users/:id/role`| Yes       | Any  | Update a user's role (e.g., to `SELLER`). |
+| Method | Path | Protected | Role | Description |
+|:---|:---|:---|:---|:---|
+| `PUT` | `/api/users/:id/role` | Yes | Any | Update a user's role (e.g., to `SELLER`). |
