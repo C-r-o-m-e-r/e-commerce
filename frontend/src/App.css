@@ -1,42 +1,83 @@
+/* frontend/src/App.css */
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 2rem;
-  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.header, .container {
+  width: 100%;
+  max-width: 1280px; /* Однакова максимальна ширина для хедера і контенту */
+  box-sizing: border-box;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/*
+ * Правильні стилі для хедера
+ */
+.header {
+  margin-bottom: 2rem;
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.header nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
 }
 
-.card {
-  padding: 2em;
+.header .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
 }
 
-.read-the-docs {
-  color: #888;
+/* Знайдіть цей блок у вашому App.css */
+.header .nav-links {
+  display: flex;
+  align-items: center;
+  /* gap: 1.5rem;  <-- ВИДАЛІТЬ ЦЕЙ РЯДОК */
+}
+
+/* І додайте margin-left до цього блоку */
+.header .nav-link {
+  color: #e0e0e0;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.2s;
+  margin-left: 1.5rem; /* <-- ДОДАЙТЕ ЦЕЙ РЯДОК */
+}
+
+.header .nav-link:hover {
+  color: #646cff;
+}
+
+.header .user-email {
+  color: #a0a0a0;
+  cursor: default;
+}
+
+.header .button-logout {
+  background-color: transparent;
+  border: 1px solid #646cff;
+  color: #646cff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1em;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.header .button-logout:hover {
+  background-color: #646cff;
+  color: #fff;
 }
