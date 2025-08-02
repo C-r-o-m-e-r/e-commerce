@@ -1,0 +1,52 @@
+/* frontend/src/pages/ProductsPage.css */
+
+.products-container {
+  width: 100%;
+}
+
+.products-container h2 {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.products-list {
+  display: grid;
+  /* This creates a responsive grid that adjusts the number of columns based on screen width */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.product-card {
+  background-color: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: left;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.product-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  color: #ffffff;
+}
+
+.product-card p {
+  margin: 0.5rem 0;
+  color: #a0a0a0;
+  line-height: 1.6;
+}
+
+.product-card .product-price {
+  font-weight: bold;
+  color: #8c9eff; /* A slightly lighter blue for price */
+  margin-top: 1rem;
+  font-size: 1.1rem;
+}

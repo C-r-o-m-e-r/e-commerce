@@ -1,5 +1,9 @@
+// src/pages/RegisterPage.jsx
+
 import React, { useState } from 'react';
-import { registerUser } from '../api/auth'; // Імпортуємо функцію
+import { Link } from 'react-router-dom';
+import { registerUser } from '../api/auth';
+import './Form.css';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -37,10 +41,10 @@ const RegisterPage = () => {
 
   return (
     <div className="form-container">
-      <h2>Реєстрація</h2>
+      <h2>Register</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="email">Електронна пошта</label>
+          <label htmlFor="email">Email</label>
           <input
             type="email"
             id="email"
@@ -48,11 +52,12 @@ const RegisterPage = () => {
             value={formData.email}
             onChange={handleChange}
             required
+            autoComplete="email"
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Пароль</label>
+          <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
@@ -60,22 +65,27 @@ const RegisterPage = () => {
             value={formData.password}
             onChange={handleChange}
             required
+            autoComplete="new-password"
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="role">Роль</label>
+          <label htmlFor="role">Role</label>
           <select id="role" name="role" value={formData.role} onChange={handleChange}>
-            <option value="BUYER">Покупець</option>
-            <option value="SELLER">Продавець</option>
+            <option value="BUYER">Buyer</option>
+            <option value="SELLER">Seller</option>
           </select>
         </div>
 
         <button type="submit" disabled={loading}>
-          {loading ? 'Реєстрація...' : 'Зареєструватися'}
+          {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
-      {success && <p className="success-message">Реєстрація успішна!</p>}
+      {success && (
+        <p className="success-message">
+          Registration successful! You can now <Link to="/login">log in</Link>.
+        </p>
+      )}
       {error && <p className="error-message">{error}</p>}
     </div>
   );
