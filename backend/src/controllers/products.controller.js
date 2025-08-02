@@ -1,18 +1,24 @@
+// backend/src/controllers/products.controller.js
+
 const prisma = require('../config/prisma');
 
-// Controller to create a new product
 const createProduct = async (req, res) => {
   try {
-    const { title, description, price, images } = req.body;
-    // The authenticated user's ID is available from req.user
+    const { title, description, price, images } = req.body; // <== ЗМІНЕНО 'name' на 'title'
     const sellerId = req.user.id;
 
-    // For now, we'll assume the user is a SELLER.
-    // Later we can add a role check here.
+    if (req.user.role !== 'SELLER') {
+      return res.status(403).json({ message: 'Forbidden: Only sellers can create products' });
+    }
+    
+    // <== ЗМІНЕНО 'name' на 'title' у перевірці
+    if (!title || !description || !price) {
+      return res.status(400).json({ message: 'Product title, description, and price are required' });
+    }
 
     const newProduct = await prisma.product.create({
       data: {
-        title,
+        title, // <== ЗМІНЕНО 'name' на 'title'
         description,
         price,
         images,
@@ -29,11 +35,9 @@ const createProduct = async (req, res) => {
   }
 };
 
-// Controller to get all products
 const getAllProducts = async (req, res) => {
   try {
     const products = await prisma.product.findMany({
-      // Optionally, include seller info
       include: {
         seller: {
           select: {
@@ -51,7 +55,6 @@ const getAllProducts = async (req, res) => {
   }
 };
 
-// --- NEW --- Get a single product by its ID
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -69,28 +72,25 @@ const getProductById = async (req, res) => {
   }
 };
 
-// --- NEW --- Update a product
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, price, images } = req.body;
+    const { title, description, price, images } = req.body; // <== ЗМІНЕНО 'name' на 'title'
     const userId = req.user.id;
 
-    // First, find the product to ensure it exists and belongs to the user
     const product = await prisma.product.findUnique({ where: { id } });
 
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Ownership check
     if (product.sellerId !== userId) {
       return res.status(403).json({ message: 'Forbidden: You can only update your own products' });
     }
 
     const updatedProduct = await prisma.product.update({
       where: { id },
-      data: { title, description, price, images },
+      data: { title, description, price, images }, // <== ЗМІНЕНО 'name' на 'title'
     });
 
     res.status(200).json(updatedProduct);
@@ -99,7 +99,6 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// --- NEW --- Delete a product
 const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -111,14 +110,13 @@ const deleteProduct = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Ownership check
     if (product.sellerId !== userId) {
       return res.status(403).json({ message: 'Forbidden: You can only delete your own products' });
     }
 
     await prisma.product.delete({ where: { id } });
 
-    res.status(204).send(); // 204 No Content is standard for successful deletion
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }

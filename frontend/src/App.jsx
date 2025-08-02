@@ -1,20 +1,22 @@
-// src/App.jsx (Правильна версія)
+// src/App.jsx
 
-import { Routes, Route } from 'react-router-dom'; // Видалено імпорт BrowserRouter
+import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
-import HomePage from './pages/HomePage';
+import ProductsPage from './pages/ProductsPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import './App.css'; // Додаємо імпорт стилів для App, якщо він потрібен
+import AddProductPage from './pages/AddProductPage'; // Імпортуємо нову сторінку
+import './App.css';
 
 function App() {
   return (
-    // Видалено обгортку <BrowserRouter>
     <>
       <Header />
       <main className="container">
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<ProductsPage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/products/add" element={<AddProductPage />} /> {/* Новий маршрут */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Routes>

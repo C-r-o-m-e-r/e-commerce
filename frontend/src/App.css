@@ -81,3 +81,32 @@
   background-color: #646cff;
   color: #fff;
 }
+
+.logout-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: #fff;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-family: inherit;
+}
+
+.logout-btn:hover {
+  color: #ff9800;
+}
+
+.input-large {
+  height: 100px; /* Задає бажану висоту для поля опису */
+  box-sizing: border-box; /* Забезпечує, що висота включає padding і border */
+  padding: 10px; /* Трохи відступу всередині */
+}
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: none; /* ВИПРАВЛЕНО: Забороняємо зміну розміру */
+}

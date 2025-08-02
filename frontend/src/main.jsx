@@ -4,9 +4,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext.jsx'; // Corrected extension
+import { AuthProvider } from './context/AuthContext.jsx'; // Виправлено розширення на .jsx
 
 import './index.css';
+import './App.css'; // Додаємо цей рядок, бо він важливий для стилів
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

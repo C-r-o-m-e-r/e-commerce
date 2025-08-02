@@ -17,8 +17,7 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 ### Frontend
 - **Framework:** React
 - **Build Tool:** Vite
-
-### Backend
+- **Routing:** React Router DOM - **State Management:** React Context ### Backend
 - **Runtime:** Node.js, Express.js
 - **Database:** PostgreSQL
 - **ORM:** Prisma
@@ -26,6 +25,11 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 - **Authentication:** JSON Web Tokens (JWT)
 - **Containerization:** Docker & Docker Compose
 - **Middleware:** CORS (Cross-Origin Resource Sharing)
+
+## Project Structure
+The repository is organized as a monorepo with two main directories:
+- **/backend**: Contains the Node.js/Express.js API, Prisma schema, Docker configuration, and all server-side logic.
+- **/frontend**: Contains the React (Vite) application, including all components, pages, API services, and styling.
 
 ## Local Development Setup
 
@@ -35,19 +39,19 @@ Follow these instructions to get both the backend and frontend services running 
 
 Make sure you have the following software installed:
 - [Node.js](https://nodejs.org/) (LTS version recommended)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (with WSL 2 enabled on Windows)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Git](https://git-scm.com/)
 - [Stripe CLI](https://stripe.com/docs/stripe-cli) (for testing payments locally)
 
 ### Backend Setup
 
-1. **Navigate to the backend directory:**
+1.  **Navigate to the backend directory:**
     ```bash
     cd backend
     ```
 
-2. **Create the environment file:**
-    Create a file named `backend/.env` and add the following variables:
+2.  **Create the environment file:**
+    Create a file named `backend/.env` and add the required variables (see example below). Make sure to replace placeholders with your actual keys.
     ```env
     # PostgreSQL settings
     POSTGRES_USER=myuser
@@ -68,14 +72,11 @@ Make sure you have the following software installed:
     STRIPE_WEBHOOK_SECRET=whsec_...
     ```
 
-3. **Install backend dependencies:**
+3.  **Install backend dependencies:**
     ```bash
     npm install
-    npm install cors
     ```
-    *We specifically need `cors` to resolve cross-origin request issues.*
-
-4. **Run the Database Migration:**
+    4.  **Run the Database Migration:**
     **This is a critical step to create the tables in your database.** The application will fail without it.
     
     a. **Temporarily change the `DATABASE_URL` in `backend/.env`** to point to `localhost`.
@@ -87,11 +88,11 @@ Make sure you have the following software installed:
 
 ### Frontend Setup
 
-1. **Navigate to the frontend directory** (from the root folder):
+1.  **Navigate to the frontend directory** (from the root folder):
     ```bash
     cd frontend
     ```
-2. **Install frontend dependencies:**
+2.  **Install frontend dependencies:**
     ```bash
     npm install
     ```
@@ -100,14 +101,15 @@ Make sure you have the following software installed:
 
 You need **two separate terminals** to run both the backend and frontend concurrently.
 
-1. **Terminal 1: Start the Backend**
+1.  **Terminal 1: Start the Backend**
     ```bash
     cd backend
     docker-compose up --build
     ```
     The API will be available at `http://127.0.0.1:3000`.
 
-2. **Terminal 2: Start the Frontend**
+2.  **Terminal 2: Start the Frontend**
+    **Note:** Ensure the backend is running before starting the frontend.
     ```bash
     cd frontend
     npm run dev
@@ -117,21 +119,19 @@ You need **two separate terminals** to run both the backend and frontend concurr
 ### Testing Stripe Webhooks Locally
 To test the payment confirmation flow, you need a **third terminal**.
 
-1. **Terminal 3: Stripe CLI**
+1.  **Terminal 3: Stripe CLI**
     Run the `listen` command to forward Stripe events to your local server.
     ```bash
     # Make sure you are in the `backend` directory
-    cd backend
     stripe listen --forward-to [http://127.0.0.1:3000/api/payments/webhook](http://127.0.0.1:3000/api/payments/webhook)
     ```
-2. **Payment Confirmation**
-    After creating a Payment Intent via the API, use its ID in this command (in a 4th terminal or after stopping `listen`):
+2.  **Payment Confirmation**
+    After creating a Payment Intent via the API, use its ID in this command:
     ```bash
-    stripe payment_intents confirm <payment_intent_id> --payment-method=pm_card_visa --return-url="[https://example.com/success](https://example.com/success)"
+    stripe payment_intents confirm <payment_intent_id>
     ```
 
 ## API Endpoints
-*(API endpoints remain the same and are served from the backend)*
 
 ### Auth
 | Method | Path | Protected | Role | Description |
@@ -153,8 +153,7 @@ To test the payment confirmation flow, you need a **third terminal**.
 | Method | Path | Protected | Role | Description |
 |:---|:---|:---|:---|:---|
 | `GET` | `/api/cart` | Yes | `BUYER` | Get the user's current cart. |
-| `POST` | `/api/cart/items` | Yes | `BUY-ER` | Add an item to the cart. |
-| `DELETE`| `/api/cart/items/:itemId` | Yes | `BUYER` | Remove an item from the cart. |
+| `POST` | `/api/cart/items` | Yes | `BUYER` | Add an item to the cart. | | `DELETE`| `/api/cart/items/:itemId` | Yes | `BUYER` | Remove an item from the cart. |
 
 ### Orders
 | Method | Path | Protected | Role | Description |
@@ -167,8 +166,3 @@ To test the payment confirmation flow, you need a **third terminal**.
 |:---|:---|:---|:---|:---|
 | `POST` | `/api/payments/create-intent` | Yes | `BUYER` | Create a Stripe Payment Intent. |
 | `POST` | `/api/payments/webhook` | No | - | Stripe webhook for payment events. |
-
-### Users (for Testing)
-| Method | Path | Protected | Role | Description |
-|:---|:---|:---|:---|:---|
-| `PUT` | `/api/users/:id/role` | Yes | Any | Update a user's role (e.g., to `SELLER`). |

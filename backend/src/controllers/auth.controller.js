@@ -3,9 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const register = async (req, res) => {
-  // Your full registration logic should be here
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
@@ -18,11 +17,12 @@ const register = async (req, res) => {
       data: {
         email,
         password: hashedPassword,
+        role: role || 'BUYER', // Забезпечуємо встановлення ролі
       },
     });
     res.status(201).json({
       message: 'User created successfully',
-      user: { id: newUser.id, email: newUser.email, createdAt: newUser.createdAt },
+      user: { id: newUser.id, email: newUser.email, role: newUser.role, createdAt: newUser.createdAt },
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -31,7 +31,6 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  // Your full login logic should be here
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -46,13 +45,14 @@ const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
     res.status(200).json({
       message: 'Login successful',
       token: token,
+      user: { id: user.id, email: user.email, role: user.role, createdAt: user.createdAt }, // Додаємо об'єкт user у відповідь
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -61,8 +61,6 @@ const login = async (req, res) => {
 };
 
 const getMe = async (req, res) => {
-  // The user object is attached to the request by the authMiddleware
-  // We just need to send it back
   res.status(200).json(req.user);
 };
 
@@ -70,4 +68,4 @@ module.exports = {
   register,
   login,
   getMe,
-};  
+};
