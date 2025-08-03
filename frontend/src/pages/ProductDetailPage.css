@@ -1,0 +1,123 @@
+/* frontend/src/pages/ProductDetailPage.css */
+
+.product-detail-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  width: 100%;
+  max-width: 1100px;
+  margin: 2rem auto;
+  text-align: left;
+}
+
+.product-image-section .main-product-image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 8px;
+  background-color: #1a1a1a;
+  border: 1px solid #444;
+}
+
+/* New styles for thumbnails */
+.product-thumbnails-container {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.thumbnail-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.thumbnail-image:hover {
+  border-color: #535bf2;
+}
+
+.thumbnail-image.active {
+  border-color: #646cff;
+}
+/* End of new styles */
+
+.product-info-section h2 {
+  font-size: 2.5rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.product-info-section .product-description {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #a0a0a0;
+  margin-bottom: 2rem;
+}
+
+.product-info-section .product-price {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #8c9eff;
+  margin-bottom: 2rem;
+}
+
+.add-to-cart-btn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #646cff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #535bf2;
+}
+
+@media (max-width: 768px) {
+  .product-detail-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cart-notification {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  text-align: center;
+  font-weight: 500;
+}
+
+.add-to-cart-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.quantity-input {
+  width: 70px;
+  padding: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+/* Make the "Add to Cart" button flexible */
+.add-to-cart-controls .add-to-cart-btn {
+  flex-grow: 1; /* Allows the button to fill the remaining space */
+}

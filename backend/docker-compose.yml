@@ -9,6 +9,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - ./uploads:/app/uploads # <== ADD THIS LINE
     env_file:
       - .env
     depends_on:

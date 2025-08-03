@@ -3,15 +3,16 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
-import './Form.css'; // Make sure styles are connected
+import ImageDropzone from '../components/ImageDropzone.jsx'; // 1. Import the new component
+import './Form.css';
 
 const AddProductPage = () => {
   const [formData, setFormData] = useState({
-    title: '', // <== CHANGED 'name' to 'title'
+    title: '',
     description: '',
     price: '',
-    image: '',
   });
+  const [imageFiles, setImageFiles] = useState([]); // 2. New state to hold the actual files
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -34,22 +35,32 @@ const AddProductPage = () => {
     }));
   };
 
+  // 3. New submission logic using FormData
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (imageFiles.length === 0) {
+      setError('Please upload at least one image.');
+      return;
+    }
     setLoading(true);
     setError(null);
+
+    const data = new FormData();
+    data.append('title', formData.title);
+    data.append('description', formData.description);
+    data.append('price', formData.price);
+    imageFiles.forEach(file => {
+      data.append('images', file); // Append each file under the 'images' field name
+    });
 
     try {
       const response = await fetch('http://127.0.0.1:3000/api/products', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          // DO NOT set Content-Type, the browser does it automatically for FormData
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          ...formData,
-          price: parseFloat(formData.price),
-        }),
+        body: data, // Send the FormData object
       });
 
       if (!response.ok) {
@@ -57,7 +68,6 @@ const AddProductPage = () => {
         throw new Error(errorData.message || 'Error adding product');
       }
 
-      console.log('Product added successfully!');
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -70,14 +80,13 @@ const AddProductPage = () => {
     <div className="form-container">
       <h2>Add New Product</h2>
       <form onSubmit={handleSubmit}>
-        {/* Block for product title, which we are changing */}
         <div className="form-group">
-          <label htmlFor="title">Product Title</label> {/* <== CHANGED htmlFor */}
+          <label htmlFor="title">Product Title</label>
           <input
             type="text"
-            id="title" // <== CHANGED id
-            name="title" // <== CHANGED name
-            value={formData.title} // <== CHANGED value
+            id="title"
+            name="title"
+            value={formData.title}
             onChange={handleChange}
             required
           />
@@ -107,15 +116,10 @@ const AddProductPage = () => {
           />
         </div>
 
+        {/* 4. Replace the old image input with the ImageDropzone component */}
         <div className="form-group">
-          <label htmlFor="image">Image URL</label>
-          <input
-            type="text"
-            id="image"
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-          />
+          <label>Product Images</label>
+          <ImageDropzone onFilesChange={(files) => setImageFiles(files)} />
         </div>
 
         <button type="submit" disabled={loading}>

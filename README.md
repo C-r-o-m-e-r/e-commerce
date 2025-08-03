@@ -7,8 +7,8 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 - **Monorepo Structure:** Backend and frontend code are managed in a single repository.
 - **Authentication:** JWT-based user registration and login.
 - **Authorization:** Protected routes and role-based access control (`BUYER`, `SELLER`).
-- **Product Management:** Full CRUD (Create, Read, Update, Delete) functionality for products.
-- **Shopping Cart:** Persistent, server-side cart management for authenticated users.
+- **Product Management:** Full CRUD for products, including multi-image uploads. Sellers can manage their own listings.
+- **Shopping Cart:** Persistent, server-side cart with functionality to add, remove, and update item quantities.
 - **Order Management:** Functionality to convert a cart into a persistent order and view order history.
 - **Payment Integration:** Secure payment processing using Stripe Payment Intents and Webhooks.
 
@@ -17,9 +17,11 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 ### Frontend
 - **Framework:** React
 - **Build Tool:** Vite
-- **Routing:** React Router DOM - **State Management:** React Context ### Backend
+- **Routing:** React Router DOM
+- **State Management:** React Context
+- **File Uploads:** React Dropzone ### Backend
 - **Runtime:** Node.js, Express.js
-- **Database:** PostgreSQL
+- **File Uploads:** Multer - **Database:** PostgreSQL
 - **ORM:** Prisma
 - **Payments:** Stripe
 - **Authentication:** JSON Web Tokens (JWT)
@@ -28,7 +30,7 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 
 ## Project Structure
 The repository is organized as a monorepo with two main directories:
-- **/backend**: Contains the Node.js/Express.js API, Prisma schema, Docker configuration, and all server-side logic.
+- **/backend**: Contains the Node.js/Express.js API, Prisma schema, Docker configuration, and all server-side logic. Includes an `/uploads` directory for storing product images.
 - **/frontend**: Contains the React (Vite) application, including all components, pages, API services, and styling.
 
 ## Local Development Setup
@@ -51,44 +53,23 @@ Make sure you have the following software installed:
     ```
 
 2.  **Create the environment file:**
-    Create a file named `backend/.env` and add the required variables (see example below). Make sure to replace placeholders with your actual keys.
-    ```env
-    # PostgreSQL settings
-    POSTGRES_USER=myuser
-    POSTGRES_PASSWORD=mypassword
-    POSTGRES_DB=ecommerce_db
-
-    # Application Port
-    PORT=3000
-
-    # JWT Secret
-    JWT_SECRET=your-super-secret-key-that-is-long-and-random
-
-    # Prisma Database URL
-    DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public"
-
-    # Stripe Keys
-    STRIPE_SECRET_KEY=sk_test_...
-    STRIPE_WEBHOOK_SECRET=whsec_...
-    ```
+    Create a file named `backend/.env` with the necessary variables.
 
 3.  **Install backend dependencies:**
     ```bash
     npm install
     ```
-    4.  **Run the Database Migration:**
-    **This is a critical step to create the tables in your database.** The application will fail without it.
+4.  **Run the Database Migration:**
+    **This is a critical step.** The application will fail without it.
     
     a. **Temporarily change the `DATABASE_URL` in `backend/.env`** to point to `localhost`.
-       `DATABASE_URL="postgresql://myuser:mypassword@localhost:5432/ecommerce_db?schema=public"`
     b. **Start only the database** container: `docker-compose up -d db`.
-    c. **Run the migration from your local terminal**: `npx prisma migrate dev`. Follow the prompts.
-    d. **IMPORTANT: Change the `DATABASE_URL` back to use `db`** in `backend/.env`.
-       `DATABASE_URL="postgresql://myuser:mypassword@db:5432/ecommerce_db?schema=public"`
+    c. **Run the migration from your local terminal**: `npx prisma migrate dev`.
+    d. **IMPORTANT: Change the `DATABASE_URL` back** to use the service name `db`.
 
 ### Frontend Setup
 
-1.  **Navigate to the frontend directory** (from the root folder):
+1.  **Navigate to the frontend directory**:
     ```bash
     cd frontend
     ```
@@ -99,7 +80,7 @@ Make sure you have the following software installed:
 
 ### Running the Application
 
-You need **two separate terminals** to run both the backend and frontend concurrently.
+You need **two separate terminals** to run both services concurrently.
 
 1.  **Terminal 1: Start the Backend**
     ```bash
@@ -114,7 +95,7 @@ You need **two separate terminals** to run both the backend and frontend concurr
     cd frontend
     npm run dev
     ```
-    The React application will be available at `http://localhost:5173` (or another port specified by Vite).
+    The React application will be available at `http://localhost:5173`.
 
 ### Testing Stripe Webhooks Locally
 To test the payment confirmation flow, you need a **third terminal**.
@@ -122,7 +103,6 @@ To test the payment confirmation flow, you need a **third terminal**.
 1.  **Terminal 3: Stripe CLI**
     Run the `listen` command to forward Stripe events to your local server.
     ```bash
-    # Make sure you are in the `backend` directory
     stripe listen --forward-to [http://127.0.0.1:3000/api/payments/webhook](http://127.0.0.1:3000/api/payments/webhook)
     ```
 2.  **Payment Confirmation**
@@ -134,24 +114,21 @@ To test the payment confirmation flow, you need a **third terminal**.
 ## API Endpoints
 
 ### Auth
-| Method | Path | Protected | Role | Description |
-|:---|:---|:---|:---|:---|
-| `POST` | `/api/auth/register` | No | - | Register a new user. |
-| `POST` | `/api/auth/login` | No | - | Login and receive a JWT. |
-| `GET` | `/api/auth/me` | Yes | Any | Get the current user's profile. |
+*(No changes here)*
 
 ### Products
 | Method | Path | Protected | Role | Description |
 |:---|:---|:---|:---|:---|
 | `GET` | `/api/products` | No | - | Get a list of all products. |
 | `GET` | `/api/products/:id` | No | - | Get a single product by ID. |
-| `POST` | `/api/products` | Yes | `SELLER` | Create a new product. |
-| `PUT` | `/api/products/:id` | Yes | `SELLER` | Update your own product. |
+| `GET` | `/api/products/seller/my-products`| Yes | `SELLER` | Get all products for the current seller. | | `POST` | `/api/products` | Yes | `SELLER` | Create a new product (handles file uploads). |
+| `PUT` | `/api/products/:id` | Yes | `SELLER` | Update your own product (handles file uploads). |
 | `DELETE`| `/api/products/:id` | Yes | `SELLER` | Delete your own product. |
 
 ### Cart
 | Method | Path | Protected | Role | Description |
 |:---|:---|:---|:---|:---|
+| `GET` | `/api/cart` | Yes | Logged In | Get the user's current cart. | | `POST` | `/api/cart/items` | Yes | Logged In | Add an item to the cart. | | `PUT` | `/api/cart/items/:itemId` | Yes | Logged In | Update the quantity of an item in the cart. | | `DELETE`| `/api/cart items/:itemId` | Yes | Logged In | Remove an item from the cart. | ### Orders & Payments
 | `GET` | `/api/cart` | Yes | `BUYER` | Get the user's current cart. |
 | `POST` | `/api/cart/items` | Yes | `BUYER` | Add an item to the cart. | | `DELETE`| `/api/cart/items/:itemId` | Yes | `BUYER` | Remove an item from the cart. |
 

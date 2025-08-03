@@ -50,3 +50,8 @@
   margin-top: 1rem;
   font-size: 1.1rem;
 }
+
+.product-card-link {
+  text-decoration: none;
+  color: inherit;
+}

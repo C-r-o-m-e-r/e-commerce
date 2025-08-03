@@ -1,7 +1,8 @@
 // src/pages/ProductsPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import './ProductsPage.css'; // 1. Import the new CSS file
+import { Link } from 'react-router-dom'; // <== 1. Import the Link component
+import './ProductsPage.css';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -40,11 +41,14 @@ const ProductsPage = () => {
       <div className="products-list">
         {products.length > 0 ? (
           products.map((product) => (
-            <div key={product.id} className="product-card">
-              <h3>{product.title}</h3> 
-              <p>{product.description}</p>
-              <p className="product-price">Price: ${product.price}</p>
-            </div>
+            // 2. Wrap the entire card in a Link component
+            <Link to={`/products/${product.id}`} key={product.id} className="product-card-link">
+              <div className="product-card">
+                <h3>{product.title}</h3>
+                <p>{product.description}</p>
+                <p className="product-price">Price: ${product.price}</p>
+              </div>
+            </Link>
           ))
         ) : (
           <p>No products available at the moment.</p>

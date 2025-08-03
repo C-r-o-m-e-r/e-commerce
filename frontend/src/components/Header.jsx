@@ -27,11 +27,26 @@ const Header = () => {
           <Link to="/" className="nav-link">
             Products
           </Link>
-          {user?.role === 'SELLER' && (
-            <Link to="/products/add" className="nav-link">
-              Add Product
+          
+          {/* Link to Cart for any logged-in user */}
+          {user && ( // <== CHANGED: Now shows for any logged-in user
+            <Link to="/cart" className="nav-link">
+              Cart
             </Link>
           )}
+
+          {/* Links for Sellers */}
+          {user?.role === 'SELLER' && (
+            <>
+              <Link to="/my-products" className="nav-link">
+                My Products
+              </Link>
+              <Link to="/products/add" className="nav-link">
+                Add Product
+              </Link>
+            </>
+          )}
+          
           {!user ? (
             <>
               <Link to="/login" className="nav-link">
@@ -43,8 +58,8 @@ const Header = () => {
             </>
           ) : (
             <>
-              <span className="nav-link">Welcome, {user.email}!</span>
-              <button onClick={handleLogout} className="nav-link logout-btn">Logout</button>
+              <span className="nav-link user-email">Welcome, {user.email}!</span>
+              <button onClick={handleLogout} className="button-logout">Logout</button>
             </>
           )}
         </div>

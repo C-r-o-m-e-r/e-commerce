@@ -1,51 +1,55 @@
-// src/context/AuthContext.jsx
+// frontend/src/context/AuthContext.jsx
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [token, setToken] = useState(null);
+  const navigate = useNavigate();
 
+  // This effect now safely loads data from localStorage
   useEffect(() => {
-    try {
-      const storedToken = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
-      
-      if (storedToken && storedUser) {
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    
+    // Check if storedUser is a valid string before parsing
+    if (storedToken && storedUser && storedUser !== 'undefined') {
+      try {
+        setUser(JSON.parse(storedUser));
         setToken(storedToken);
-        // Додаємо перевірку, чи storedUser не є undefined або null
-        setUser(JSON.parse(storedUser)); 
+      } catch (e) {
+        // If parsing fails, the data is corrupt, so we clear it.
+        console.error("Failed to parse user data from localStorage", e);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
       }
-    } catch (e) {
-      console.error("Failed to parse user data from localStorage", e);
-      // Якщо дані пошкоджені, очищаємо localStorage
-      localStorage.clear();
-    } finally {
-      setIsAuthLoading(false);
     }
   }, []);
 
-  const login = (newToken, userData) => {
-    setToken(newToken);
-    setUser(userData);
-    localStorage.setItem('token', newToken);
-    localStorage.setItem('user', JSON.stringify(userData));
+  const login = (authData) => {
+    // Make sure we have valid data before setting it
+    if (authData && authData.token && authData.user) {
+      localStorage.setItem('token', authData.token);
+      localStorage.setItem('user', JSON.stringify(authData.user));
+      setToken(authData.token);
+      setUser(authData.user);
+    }
   };
 
   const logout = () => {
-    setToken(null);
-    setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    setToken(null);
+    setUser(null);
+    navigate('/login');
   };
 
   const value = {
-    token,
     user,
-    isAuthLoading,
+    token,
     login,
     logout,
   };
