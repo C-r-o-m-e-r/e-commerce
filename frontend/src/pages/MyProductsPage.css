@@ -1,0 +1,68 @@
+/* frontend/src/pages/MyProductsPage.css */
+
+.my-products-container {
+  width: 100%;
+  max-width: 900px;
+}
+
+.my-products-container h2 {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.product-card-manage {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.product-info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.product-info .product-price {
+  margin: 0.25rem 0 0;
+  color: #a0a0a0;
+}
+
+.product-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.btn-edit {
+  background-color: #3a3a3a;
+  color: #fff;
+  transition: background-color 0.2s;
+}
+
+.btn-edit:hover {
+  background-color: #4a4a4a;
+}
+
+.btn-delete {
+  background-color: #ff4d4d;
+  color: #fff;
+  transition: background-color 0.2s;
+}
+
+.btn-delete:hover {
+  background-color: #e63939;
+}

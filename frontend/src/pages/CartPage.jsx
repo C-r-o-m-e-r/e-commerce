@@ -1,0 +1,128 @@
+// frontend/src/pages/CartPage.jsx
+
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import { getCart, removeFromCart, updateCartItemQuantity } from '../api/cart.js'; // 1. Import the new function
+import './CartPage.css';
+
+const CartPage = () => {
+  const [cart, setCart] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { token } = useAuth();
+
+  useEffect(() => {
+    if (token) {
+      const fetchCart = async () => {
+        try {
+          const cartData = await getCart(token);
+          setCart(cartData);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchCart();
+    }
+  }, [token]);
+
+  const handleRemoveItem = async (itemId) => {
+    try {
+      await removeFromCart(itemId, token);
+      setCart(prevCart => ({
+        ...prevCart,
+        items: prevCart.items.filter(item => item.id !== itemId)
+      }));
+    } catch (err) {
+      console.error('Failed to remove item:', err);
+      setError('Failed to remove item. Please try again.');
+    }
+  };
+
+  // 2. Add a handler to update quantity
+  const handleQuantityChange = async (itemId, newQuantity) => {
+    const quantity = parseInt(newQuantity, 10);
+
+    // If the input is empty or not a number, do nothing yet
+    if (isNaN(quantity) || quantity <= 0) {
+      return;
+    }
+
+    try {
+      const updatedCart = await updateCartItemQuantity(itemId, quantity, token);
+      setCart(updatedCart); // Update the whole cart with the response from the server
+    } catch (err) {
+      console.error('Failed to update quantity:', err);
+      setError('Failed to update quantity. Please try again.');
+    }
+  };
+
+
+  if (loading) {
+    return <p>Loading your cart...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+  
+  const calculateTotal = () => {
+    if (!cart || !cart.items) return 0;
+    return cart.items.reduce((total, item) => total + item.quantity * item.product.price, 0).toFixed(2);
+  };
+
+  return (
+    <div className="cart-container">
+      <h2>Your Shopping Cart</h2>
+      {(!cart || cart.items.length === 0) ? (
+        <p>Your cart is empty.</p>
+      ) : (
+        <div className="cart-layout">
+          <div className="cart-items-list">
+            {cart.items.map(item => (
+              <div key={item.id} className="cart-item">
+                <Link to={`/products/${item.product.id}`}>
+                  <img 
+                    src={`http://127.0.0.1:3000${item.product.images[0]}`} 
+                    alt={item.product.title} 
+                    className="cart-item-image"
+                  />
+                </Link>
+                <div className="cart-item-details">
+                  <Link to={`/products/${item.product.id}`} className="cart-item-title-link">
+                    <h3>{item.product.title}</h3>
+                  </Link>
+                  
+                  {/* 3. Add the quantity input */}
+                  <div className="quantity-controls">
+                    <label htmlFor={`quantity-${item.id}`}>Quantity:</label>
+                    <input 
+                      type="number"
+                      id={`quantity-${item.id}`}
+                      value={item.quantity}
+                      onChange={(e) => handleQuantityChange(item.id, e.target.value)}
+                      min="1"
+                      className="quantity-input-cart"
+                    />
+                  </div>
+
+                  <p className="cart-item-price">${(item.product.price * item.quantity).toFixed(2)}</p>
+                </div>
+                <button onClick={() => handleRemoveItem(item.id)} className="remove-item-btn">Remove</button>
+              </div>
+            ))}
+          </div>
+          <div className="cart-summary">
+            <h3>Cart Total</h3>
+            <p className="total-price">${calculateTotal()}</p>
+            <button className="checkout-btn">Proceed to Checkout</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CartPage;

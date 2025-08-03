@@ -4,23 +4,24 @@ const prisma = require('../config/prisma');
 
 const createProduct = async (req, res) => {
   try {
-    const { title, description, price, images } = req.body; // <== ЗМІНЕНО 'name' на 'title'
+    const { title, description, price } = req.body;
     const sellerId = req.user.id;
 
     if (req.user.role !== 'SELLER') {
       return res.status(403).json({ message: 'Forbidden: Only sellers can create products' });
     }
     
-    // <== ЗМІНЕНО 'name' на 'title' у перевірці
     if (!title || !description || !price) {
       return res.status(400).json({ message: 'Product title, description, and price are required' });
     }
 
+    const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+
     const newProduct = await prisma.product.create({
       data: {
-        title, // <== ЗМІНЕНО 'name' на 'title'
+        title,
         description,
-        price,
+        price: parseFloat(price),
         images,
         seller: {
           connect: { id: sellerId },
@@ -42,8 +43,7 @@ const getAllProducts = async (req, res) => {
         seller: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            email: true, // <== FIX: Changed from firstName/lastName to email
           },
         },
       },
@@ -55,12 +55,28 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getSellerProducts = async (req, res) => {
+  try {
+    const sellerId = req.user.id;
+
+    const products = await prisma.product.findMany({
+      where: {
+        sellerId: sellerId,
+      },
+    });
+    res.status(200).json(products);
+  } catch (error) {
+    console.error('Get seller products error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
     const product = await prisma.product.findUnique({
       where: { id },
-      include: { seller: { select: { id: true, firstName: true } } },
+      include: { seller: { select: { id: true, email: true } } }, // <== FIX: Changed from firstName to email
     });
 
     if (!product) {
@@ -75,7 +91,7 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, price, images } = req.body; // <== ЗМІНЕНО 'name' на 'title'
+    const { title, description, price, existingImages } = req.body;
     const userId = req.user.id;
 
     const product = await prisma.product.findUnique({ where: { id } });
@@ -87,14 +103,30 @@ const updateProduct = async (req, res) => {
     if (product.sellerId !== userId) {
       return res.status(403).json({ message: 'Forbidden: You can only update your own products' });
     }
+    
+    let finalImages = [];
+    if (existingImages) {
+        finalImages = Array.isArray(existingImages) ? existingImages : JSON.parse(existingImages);
+    }
+    
+    if (req.files && req.files.length > 0) {
+      const newImages = req.files.map(file => `/uploads/${file.filename}`);
+      finalImages.push(...newImages);
+    }
 
     const updatedProduct = await prisma.product.update({
       where: { id },
-      data: { title, description, price, images }, // <== ЗМІНЕНО 'name' на 'title'
+      data: {
+        title,
+        description,
+        price: parseFloat(price),
+        images: finalImages,
+      },
     });
 
     res.status(200).json(updatedProduct);
   } catch (error) {
+    console.error('Update product error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -128,4 +160,5 @@ module.exports = {
   getProductById,
   updateProduct,
   deleteProduct,
+  getSellerProducts,
 };
