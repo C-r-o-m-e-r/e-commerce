@@ -1,36 +1,35 @@
 // frontend/src/context/AuthContext.jsx
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  const navigate = useNavigate();
-
-  // This effect now safely loads data from localStorage
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
+// Helper function to safely get the initial user from localStorage
+const getInitialUser = () => {
+  try {
     const storedUser = localStorage.getItem('user');
-    
-    // Check if storedUser is a valid string before parsing
-    if (storedToken && storedUser && storedUser !== 'undefined') {
-      try {
-        setUser(JSON.parse(storedUser));
-        setToken(storedToken);
-      } catch (e) {
-        // If parsing fails, the data is corrupt, so we clear it.
-        console.error("Failed to parse user data from localStorage", e);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-      }
+    if (storedUser && storedUser !== 'undefined') {
+      return JSON.parse(storedUser);
     }
-  }, []);
+  } catch (e) {
+    console.error("Failed to parse initial user from localStorage", e);
+    // If data is corrupt, clear it
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  }
+  return null;
+};
+
+export const AuthProvider = ({ children }) => {
+  // Initialize state directly from localStorage using a function
+  const [user, setUser] = useState(getInitialUser);
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const navigate = useNavigate();
+  
+  // The useEffect for initial loading is no longer needed
 
   const login = (authData) => {
-    // Make sure we have valid data before setting it
     if (authData && authData.token && authData.user) {
       localStorage.setItem('token', authData.token);
       localStorage.setItem('user', JSON.stringify(authData.user));

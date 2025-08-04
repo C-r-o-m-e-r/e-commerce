@@ -42,6 +42,7 @@
 }
 
 .thumb {
+  position: relative; /* This is required for positioning the button */
   display: inline-flex;
   border-radius: 2px;
   border: 1px solid #444;
@@ -65,3 +66,31 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* --- Corrected Styles for the remove button --- */
+.thumb .thumb-remove-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  transition: background-color 0.2s;
+}
+
+.thumb .thumb-remove-btn:hover {
+  background-color: #e63939;
+}
+/* --- END --- */

@@ -1,5 +1,6 @@
 /* frontend/src/App.css */
 
+/* --- GLOBAL LAYOUT --- */
 #root {
   display: flex;
   flex-direction: column;
@@ -9,16 +10,16 @@
   width: 100%;
 }
 
-.header, .container {
+.container {
   width: 100%;
-  max-width: 1280px; /* Однакова максимальна ширина для хедера і контенту */
+  max-width: 1280px;
   box-sizing: border-box;
 }
 
-/*
- * Правильні стилі для хедера
- */
+/* --- HEADER STYLES --- */
 .header {
+  width: 100%;
+  max-width: 1280px;
   margin-bottom: 2rem;
   background-color: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -29,7 +30,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1.5rem;
 }
 
 .header .logo {
@@ -39,74 +40,69 @@
   text-decoration: none;
 }
 
-/* Знайдіть цей блок у вашому App.css */
 .header .nav-links {
   display: flex;
   align-items: center;
-  /* gap: 1.5rem;  <-- ВИДАЛІТЬ ЦЕЙ РЯДОК */
+  gap: 1.5rem; /* Using gap for clean spacing */
 }
 
-/* І додайте margin-left до цього блоку */
 .header .nav-link {
   color: #e0e0e0;
   text-decoration: none;
   font-size: 1rem;
   transition: color 0.2s;
-  margin-left: 1.5rem; /* <-- ДОДАЙТЕ ЦЕЙ РЯДОК */
+  display: flex;
+  align-items: center;
 }
 
 .header .nav-link:hover {
   color: #646cff;
 }
 
-.header .user-email {
+/* --- NEW HEADER ELEMENT STYLES --- */
+.account-trigger {
+  cursor: pointer;
+  line-height: 1.2;
+  text-align: left; /* Aligns text inside the trigger */
+}
+
+.account-trigger span:first-child {
+  font-size: 0.8rem;
   color: #a0a0a0;
-  cursor: default;
 }
 
-.header .button-logout {
-  background-color: transparent;
-  border: 1px solid #646cff;
-  color: #646cff;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 1em;
-  font-weight: 500;
-  transition: background-color 0.2s, color 0.2s;
+.account-trigger .account-trigger-line2 {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  color: #e0e0e0;
 }
 
-.header .button-logout:hover {
-  background-color: #646cff;
-  color: #fff;
+.account-trigger .account-trigger-line2 svg {
+  fill: #e0e0e0;
+  margin-left: 4px;
 }
 
-.logout-btn {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  color: #fff;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  font-family: inherit;
+.cart-icon-link svg {
+  width: 28px;
+  height: 28px;
+  fill: #e0e0e0;
+  transition: fill 0.2s;
 }
 
-.logout-btn:hover {
-  color: #ff9800;
+.cart-icon-link:hover svg {
+  fill: #646cff;
 }
 
-.input-large {
-  height: 100px; /* Задає бажану висоту для поля опису */
-  box-sizing: border-box; /* Забезпечує, що висота включає padding і border */
-  padding: 10px; /* Трохи відступу всередині */
-}
+/* --- EXISTING FORM STYLES (UNCHANGED) --- */
 .form-group textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #444; /* Adjusted color for dark theme */
   border-radius: 4px;
   box-sizing: border-box;
   font-family: inherit;
-  resize: none; /* ВИПРАВЛЕНО: Забороняємо зміну розміру */
+  background-color: #2a2a2a; /* Added for dark theme */
+  color: #e0e0e0; /* Added for dark theme */
+  resize: none; /* Prevents resizing */
 }
