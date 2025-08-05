@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import ImageDropzone from '../components/ImageDropzone.jsx';
 import './Form.css';
-import './EditProductPage.css'; // Add new styles for the image previews
+import './EditProductPage.css';
 
 const EditProductPage = () => {
   const { id } = useParams();
@@ -17,6 +17,8 @@ const EditProductPage = () => {
   const [newImageFiles, setNewImageFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const TOTAL_IMAGE_LIMIT = 5; // Define the total limit
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -60,7 +62,7 @@ const EditProductPage = () => {
     data.append('existingImages', JSON.stringify(existingImages));
     
     newImageFiles.forEach(file => {
-      data.append('images', file);
+      data.append('images', file, file.name); 
     });
 
     try {
@@ -90,6 +92,9 @@ const EditProductPage = () => {
     return <p>Error: {error}</p>;
   }
 
+  // Calculate how many new images can be added
+  const remainingSlots = TOTAL_IMAGE_LIMIT - existingImages.length;
+
   return (
     <div className="form-container">
       <h2>Edit Product</h2>
@@ -108,7 +113,7 @@ const EditProductPage = () => {
         </div>
 
         <div className="form-group">
-          <label>Existing Images</label>
+          <label>Existing Images ({existingImages.length} / {TOTAL_IMAGE_LIMIT})</label>
           <div className="existing-images-container">
             {existingImages.length > 0 ? existingImages.map((imageUrl, index) => (
               <div key={index} className="existing-image-preview">
@@ -121,7 +126,11 @@ const EditProductPage = () => {
 
         <div className="form-group">
           <label>Upload New Images</label>
-          <ImageDropzone onFilesChange={(files) => setNewImageFiles(files)} />
+          {/* Pass the calculated remaining slots to the dropzone */}
+          <ImageDropzone 
+            onFilesChange={(files) => setNewImageFiles(files)}
+            maxFiles={remainingSlots}
+          />
         </div>
 
         <button type="submit" disabled={loading}>

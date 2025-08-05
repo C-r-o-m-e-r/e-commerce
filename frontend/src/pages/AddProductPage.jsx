@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
-import ImageDropzone from '../components/ImageDropzone.jsx'; // 1. Import the new component
+import ImageDropzone from '../components/ImageDropzone.jsx';
 import './Form.css';
 
 const AddProductPage = () => {
@@ -12,7 +12,7 @@ const AddProductPage = () => {
     description: '',
     price: '',
   });
-  const [imageFiles, setImageFiles] = useState([]); // 2. New state to hold the actual files
+  const [imageFiles, setImageFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -35,7 +35,6 @@ const AddProductPage = () => {
     }));
   };
 
-  // 3. New submission logic using FormData
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (imageFiles.length === 0) {
@@ -50,17 +49,16 @@ const AddProductPage = () => {
     data.append('description', formData.description);
     data.append('price', formData.price);
     imageFiles.forEach(file => {
-      data.append('images', file); // Append each file under the 'images' field name
+      data.append('images', file);
     });
 
     try {
       const response = await fetch('http://127.0.0.1:3000/api/products', {
         method: 'POST',
         headers: {
-          // DO NOT set Content-Type, the browser does it automatically for FormData
           'Authorization': `Bearer ${token}`,
         },
-        body: data, // Send the FormData object
+        body: data,
       });
 
       if (!response.ok) {
@@ -75,6 +73,8 @@ const AddProductPage = () => {
       setLoading(false);
     }
   };
+  
+  const TOTAL_IMAGE_LIMIT = 5;
 
   return (
     <div className="form-container">
@@ -115,11 +115,14 @@ const AddProductPage = () => {
             required
           />
         </div>
-
-        {/* 4. Replace the old image input with the ImageDropzone component */}
+        
         <div className="form-group">
           <label>Product Images</label>
-          <ImageDropzone onFilesChange={(files) => setImageFiles(files)} />
+          {/* Use the maxFiles prop here as well */}
+          <ImageDropzone 
+            onFilesChange={(files) => setImageFiles(files)} 
+            maxFiles={TOTAL_IMAGE_LIMIT}
+          />
         </div>
 
         <button type="submit" disabled={loading}>

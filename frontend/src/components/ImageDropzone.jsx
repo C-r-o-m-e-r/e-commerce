@@ -4,19 +4,25 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import './ImageDropzone.css';
 
-const ImageDropzone = ({ onFilesChange }) => {
+const ImageDropzone = ({ onFilesChange, maxFiles = 5 }) => {
   const [files, setFiles] = useState([]);
 
-  // useCallback allows adding more files instead of replacing them
   const onDrop = useCallback(acceptedFiles => {
-    const newFiles = acceptedFiles.map(file => Object.assign(file, {
+    const remainingSlots = maxFiles - files.length;
+    if (remainingSlots <= 0) return;
+
+    const filesToAdd = acceptedFiles.slice(0, remainingSlots);
+
+    // 1. Assign a unique ID and a preview to each new file
+    const newFiles = filesToAdd.map(file => Object.assign(file, {
+      id: `${file.name}-${file.lastModified}-${Math.random()}`, // Unique ID
       preview: URL.createObjectURL(file)
     }));
     
     const updatedFiles = [...files, ...newFiles];
     setFiles(updatedFiles);
     onFilesChange(updatedFiles);
-  }, [files, onFilesChange]);
+  }, [files, onFilesChange, maxFiles]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -24,27 +30,26 @@ const ImageDropzone = ({ onFilesChange }) => {
       'image/png': [],
       'image/gif': [],
     },
-    onDrop
+    onDrop,
+    disabled: files.length >= maxFiles
   });
 
-  // Function to remove a specific file from the preview
-  const handleRemoveFile = (fileName) => {
-    const updatedFiles = files.filter(file => file.name !== fileName);
+  // 2. Remove files by their unique ID, not their name
+  const handleRemoveFile = (fileId) => {
+    const updatedFiles = files.filter(file => file.id !== fileId);
     setFiles(updatedFiles);
     onFilesChange(updatedFiles);
   };
 
   const thumbs = files.map(file => (
-    <div className="thumb" key={file.name}>
+    <div className="thumb" key={file.id}> {/* 3. Use the unique ID for the key */}
       <div className="thumb-inner">
         <img
           src={file.preview}
           className="thumb-img"
-          onLoad={() => { URL.revokeObjectURL(file.preview) }}
         />
       </div>
-      {/* This is the remove button with the correct style class */}
-      <button type="button" className="thumb-remove-btn" onClick={() => handleRemoveFile(file.name)}>
+      <button type="button" className="thumb-remove-btn" onClick={() => handleRemoveFile(file.id)}>
         ×
       </button>
     </div>
@@ -54,12 +59,21 @@ const ImageDropzone = ({ onFilesChange }) => {
     return () => files.forEach(file => URL.revokeObjectURL(file.preview));
   }, [files]);
 
+  const isLimitReached = files.length >= maxFiles;
+  const remainingImages = maxFiles - files.length;
+
   return (
     <section className="dropzone-container">
-      <div {...getRootProps({ className: `dropzone ${isDragActive ? 'active' : ''}` })}>
+      <div {...getRootProps({ className: `dropzone ${isDragActive ? 'active' : ''} ${isLimitReached ? 'disabled' : ''}` })}>
         <input {...getInputProps()} />
-        <p>Drag 'n' drop some files here, or click to select files</p>
-        <em>(Up to 5 images will be accepted)</em>
+        {isLimitReached ? (
+          <p>You have reached the image limit.</p>
+        ) : (
+          <>
+            <p>Drag 'n' drop some files here, or click to select files</p>
+            <em>(Up to {remainingImages} more images can be added)</em>
+          </>
+        )}
       </div>
       <aside className="thumbs-container">
         {thumbs}

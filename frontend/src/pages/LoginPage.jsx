@@ -15,6 +15,7 @@ const LoginPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false); // 1. Add state for the toggle
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,11 +31,7 @@ const LoginPage = () => {
     setError(null);
     try {
       const data = await loginUser(formData);
-      console.log('Data received from backend:', data);
-      
-      // The login function in our context expects a single object
       login(data);
-
       navigate('/');
     } catch (err) {
       setError(err.message || 'Invalid email or password');
@@ -60,17 +57,27 @@ const LoginPage = () => {
           />
         </div>
 
+        {/* 2. Update the password field */}
         <div className="form-group">
           <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            autoComplete="current-password"
-          />
+          <div className="password-input-wrapper">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              autoComplete="current-password"
+            />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="password-toggle-btn">
+              {showPassword ? (
+                <svg width="20" height="20" viewBox="0 0 20 20" focusable="false" aria-hidden="true" role="presentation"><path d="M11.998 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"></path><path fillRule="evenodd" d="M16.175 7.567 18 10l-1.825 2.433a9.992 9.992 0 0 1-2.855 2.575l-.232.14a6 6 0 0 1-6.175 0 35.993 35.993 0 0 0-.233-.14 9.992 9.992 0 0 1-2.855-2.575L2 10l1.825-2.433A9.992 9.992 0 0 1 6.68 4.992l.233-.14a6 6 0 0 1 6.175 0l.232.14a9.992 9.992 0 0 1 2.855 2.575zm-1.6 3.666a7.99 7.99 0 0 1-2.28 2.058l-.24.144a4 4 0 0 1-4.11 0 38.552 38.552 0 0 0-.239-.144 7.994 7.994 0 0 1-2.28-2.058L4.5 10l.925-1.233a7.992 7.992 0 0 1 2.28-2.058 37.9 37.9 0 0 0 .24-.144 4 4 0 0 1 4.11 0l.239.144a7.996 7.996 0 0 1 2.28 2.058L15.5 10l-.925 1.233z" clipRule="evenodd"></path></svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 20 20" focusable="false" aria-hidden="true" role="presentation"><path fillRule="evenodd" d="m16.5 18 1.5-1.5-2.876-2.876a9.99 9.99 0 0 0 1.051-1.191L18 10l-1.825-2.433a9.992 9.992 0 0 0-2.855-2.575 35.993 35.993 0 0 1-.232-.14 6 6 0 0 0-6.175 0 35.993 35.993 0 0 1-.35.211L3.5 2 2 3.5 16.5 18zm-2.79-5.79a8 8 0 0 0 .865-.977L15.5 10l-.924-1.233a7.996 7.996 0 0 0-2.281-2.058 37.22 37.22 0 0 1-.24-.144 4 4 0 0 0-4.034-.044l1.53 1.53a2 2 0 0 1 2.397 2.397l1.762 1.762z" clipRule="evenodd"></path><path d="m11.35 15.85-1.883-1.883a3.996 3.996 0 0 1-1.522-.532 38.552 38.552 0 0 0-.239-.144 7.994 7.994 0 0 1-2.28-2.058L4.5 10l.428-.571L3.5 8 2 10l1.825 2.433a9.992 9.992 0 0 0 2.855 2.575c.077.045.155.092.233.14a6 6 0 0 0 4.437.702z"></path></svg>
+              )}
+            </button>
+          </div>
         </div>
         
         <button type="submit" disabled={loading}>
