@@ -9,7 +9,8 @@ import AddProductPage from './pages/AddProductPage';
 import ProductDetailPage from './pages/ProductDetailPage.jsx';
 import MyProductsPage from './pages/MyProductsPage.jsx';
 import EditProductPage from './pages/EditProductPage.jsx';
-import CartPage from './pages/CartPage.jsx'; // <== 1. Import the new Cart page
+import CartPage from './pages/CartPage.jsx';
+import AccountPage from './pages/AccountPage.jsx';
 
 import './App.css';
 
@@ -33,6 +34,7 @@ function App() {
           
           {/* Buyer Routes */}
           <Route path="/cart" element={<CartPage />} /> {/* <== 2. Add the route for the Cart page */}
+          <Route path="/account" element={<AccountPage />} />
         </Routes>
       </main>
     </>

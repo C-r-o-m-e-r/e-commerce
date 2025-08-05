@@ -3,6 +3,7 @@
 const prisma = require('../config/prisma');
 
 const createProduct = async (req, res) => {
+  // ... (no changes here)
   try {
     const { title, description, price } = req.body;
     const sellerId = req.user.id;
@@ -36,14 +37,37 @@ const createProduct = async (req, res) => {
   }
 };
 
+// <== START: Rewritten getAllProducts function
 const getAllProducts = async (req, res) => {
   try {
+    const { search } = req.query; // Get search term from query parameters
+
+    const whereClause = search
+      ? {
+          OR: [
+            {
+              title: {
+                contains: search,
+                mode: 'insensitive', // Case-insensitive search
+              },
+            },
+            {
+              description: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        }
+      : {}; // If no search term, whereClause is an empty object
+
     const products = await prisma.product.findMany({
+      where: whereClause,
       include: {
         seller: {
           select: {
             id: true,
-            email: true, // <== FIX: Changed from firstName/lastName to email
+            email: true,
           },
         },
       },
@@ -54,8 +78,11 @@ const getAllProducts = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+// <== END: Rewritten getAllProducts function
+
 
 const getSellerProducts = async (req, res) => {
+  // ... (no changes here)
   try {
     const sellerId = req.user.id;
 
@@ -72,11 +99,12 @@ const getSellerProducts = async (req, res) => {
 };
 
 const getProductById = async (req, res) => {
+  // ... (no changes here)
   try {
     const { id } = req.params;
     const product = await prisma.product.findUnique({
       where: { id },
-      include: { seller: { select: { id: true, email: true } } }, // <== FIX: Changed from firstName to email
+      include: { seller: { select: { id: true, email: true } } },
     });
 
     if (!product) {
@@ -89,6 +117,7 @@ const getProductById = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
+  // ... (no changes here)
   try {
     const { id } = req.params;
     const { title, description, price, existingImages } = req.body;
@@ -132,6 +161,7 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
+  // ... (no changes here)
   try {
     const { id } = req.params;
     const userId = req.user.id;

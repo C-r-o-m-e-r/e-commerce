@@ -26,7 +26,9 @@
   color: #e0e0e0;
 }
 
-.form-group input {
+.form-group input,
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: 12px;
   border-radius: 6px;
@@ -34,10 +36,10 @@
   background-color: #2a2a2a;
   color: #ffffff;
   font-size: 16px;
-  box-sizing: border-box; /* Важливо для правильного розрахунку ширини */
+  box-sizing: border-box;
 }
 
-.form-container button {
+.form-container button[type="submit"] {
   width: 100%;
   padding: 12px;
   border: none;
@@ -50,11 +52,11 @@
   transition: background-color 0.2s ease;
 }
 
-.form-container button:hover {
+.form-container button[type="submit"]:hover {
   background-color: #535bf2;
 }
 
-.form-container button:disabled {
+.form-container button[type="submit"]:disabled {
   background-color: #4a4a4a;
   cursor: not-allowed;
 }
@@ -65,31 +67,60 @@
   text-align: center;
 }
 
-.form-group select {
-  /* Спочатку копіюємо всі стилі з input, щоб вони були однаковими */
-  width: 100%;
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid #444;
-  background-color: #2a2a2a;
-  color: #ffffff;
-  font-size: 16px;
-  box-sizing: border-box;
+.success-message {
+  color: #2ecc71;
+  margin-top: 15px;
+  text-align: center;
+}
 
-  /* Магія починається тут: прибираємо стандартний вигляд */
+.form-group select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-
-  /* Додаємо нашу власну стрілочку як фонове зображення */
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 0.7rem center;
   background-size: 1em;
 }
 
-/* Стилі для опцій всередині списку */
 .form-group select option {
   background-color: #2a2a2a;
   color: #ffffff;
 }
+
+/* --- START: Styles for Password Toggle Button --- */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Add padding to the input to prevent text from going under the button */
+.password-input-wrapper input {
+  padding-right: 50px; 
+}
+
+.password-toggle-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: none;
+  border: none;
+  padding: 0 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle-btn svg {
+  fill: #a0a0a0;
+  width: 24px;
+  height: 24px;
+  transition: fill 0.2s;
+}
+
+.password-toggle-btn:hover svg {
+  fill: #ffffff;
+}
+/* --- END: Styles for Password Toggle Button --- */

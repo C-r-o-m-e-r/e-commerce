@@ -31,6 +31,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1.5rem;
+  gap: 1.5rem;
 }
 
 .header .logo {
@@ -43,7 +44,7 @@
 .header .nav-links {
   display: flex;
   align-items: center;
-  gap: 1.5rem; /* Using gap for clean spacing */
+  gap: 1.5rem;
 }
 
 .header .nav-link {
@@ -59,11 +60,11 @@
   color: #646cff;
 }
 
-/* --- NEW HEADER ELEMENT STYLES --- */
+/* --- ACCOUNT DROPDOWN & CART ICON STYLES --- */
 .account-trigger {
   cursor: pointer;
   line-height: 1.2;
-  text-align: left; /* Aligns text inside the trigger */
+  text-align: left;
 }
 
 .account-trigger span:first-child {
@@ -94,15 +95,54 @@
   fill: #646cff;
 }
 
+/* --- UPDATED SEARCH BAR STYLES --- */
+.search-form {
+  display: flex;
+  width: 100%;
+  max-width: 600px; /* Limits the width of the search bar */
+  border: 1px solid #444;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.search-input-header {
+  flex-grow: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  background-color: #2a2a2a;
+  color: #ffffff;
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-button {
+  background-color: transparent; /* Makes the button background invisible */
+  border: none;
+  padding: 0 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button svg {
+  fill: #a0a0a0; /* Makes the icon gray */
+  transition: fill 0.2s;
+}
+
+.search-button:hover svg {
+  fill: #ffffff; /* Makes the icon white on hover */
+}
+
 /* --- EXISTING FORM STYLES (UNCHANGED) --- */
 .form-group textarea {
   width: 100%;
   padding: 10px;
-  border: 1px solid #444; /* Adjusted color for dark theme */
+  border: 1px solid #444;
   border-radius: 4px;
   box-sizing: border-box;
   font-family: inherit;
-  background-color: #2a2a2a; /* Added for dark theme */
-  color: #e0e0e0; /* Added for dark theme */
-  resize: none; /* Prevents resizing */
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  resize: none;
 }

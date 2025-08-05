@@ -6,6 +6,7 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 
 - **Monorepo Structure:** Backend and frontend code are managed in a single repository.
 - **Authentication:** JWT-based user registration and login.
+- **User Account Management:** Users can update their profile, change their password, and delete their account.
 - **Authorization:** Protected routes and role-based access control (`BUYER`, `SELLER`).
 - **Product Management:** Full CRUD for products, including multi-image uploads. Sellers can manage their own listings.
 - **Shopping Cart:** Persistent, server-side cart with functionality to add, remove, and update item quantities.
@@ -19,9 +20,12 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 - **Build Tool:** Vite
 - **Routing:** React Router DOM
 - **State Management:** React Context
-- **File Uploads:** React Dropzone ### Backend
+- **File Uploads:** React Dropzone
+
+### Backend
 - **Runtime:** Node.js, Express.js
-- **File Uploads:** Multer - **Database:** PostgreSQL
+- **File Uploads:** Multer
+- **Database:** PostgreSQL
 - **ORM:** Prisma
 - **Payments:** Stripe
 - **Authentication:** JSON Web Tokens (JWT)
@@ -35,7 +39,7 @@ The repository is organized as a monorepo with two main directories:
 
 ## Local Development Setup
 
-Follow these instructions to get both the backend and frontend services running on your local machine.
+These instructions use Docker and are cross-platform. They will work on **Windows** (with WSL 2 for Docker Desktop), **macOS**, and **Linux**.
 
 ### Prerequisites
 
@@ -97,49 +101,46 @@ You need **two separate terminals** to run both services concurrently.
     ```
     The React application will be available at `http://localhost:5173`.
 
-### Testing Stripe Webhooks Locally
-To test the payment confirmation flow, you need a **third terminal**.
-
-1.  **Terminal 3: Stripe CLI**
-    Run the `listen` command to forward Stripe events to your local server.
-    ```bash
-    stripe listen --forward-to [http://127.0.0.1:3000/api/payments/webhook](http://127.0.0.1:3000/api/payments/webhook)
-    ```
-2.  **Payment Confirmation**
-    After creating a Payment Intent via the API, use its ID in this command:
-    ```bash
-    stripe payment_intents confirm <payment_intent_id>
-    ```
-
 ## API Endpoints
 
 ### Auth
-*(No changes here)*
+| Method | Path | Protected | Description |
+|:---    |:---                  |:---       |:---         |
+| `POST` | `/api/auth/register` | No        | Register a new user. |
+| `POST` | `/api/auth/login`    | No        | Login and receive a JWT. |
+| `GET`  | `/api/auth/me`       | Yes       | Get the current user's profile. |
+
+### Users
+| Method | Path | Protected | Description |
+|:---    |:---                         |:---       |:---         |
+| `PUT`  | `/api/users/me`             | Yes       | Update the current user's name. |
+| `POST` | `/api/users/me/change-password`| Yes       | Change the current user's password. |
+| `DELETE`| `/api/users/me`            | Yes       | Delete the current user's account. |
 
 ### Products
 | Method | Path | Protected | Role | Description |
-|:---|:---|:---|:---|:---|
-| `GET` | `/api/products` | No | - | Get a list of all products. |
-| `GET` | `/api/products/:id` | No | - | Get a single product by ID. |
-| `GET` | `/api/products/seller/my-products`| Yes | `SELLER` | Get all products for the current seller. | | `POST` | `/api/products` | Yes | `SELLER` | Create a new product (handles file uploads). |
-| `PUT` | `/api/products/:id` | Yes | `SELLER` | Update your own product (handles file uploads). |
-| `DELETE`| `/api/products/:id` | Yes | `SELLER` | Delete your own product. |
+|:---    |:---                               |:---       |:---      |:---         |
+| `GET`  | `/api/products`                   | No        | -        | Get a list of all products (accepts `?search=` query). |
+| `GET`  | `/api/products/:id`               | No        | -        | Get a single product by ID. |
+| `GET`  | `/api/products/seller/my-products`| Yes       | `SELLER` | Get all products for the current seller. |
+| `POST` | `/api/products`                   | Yes       | `SELLER` | Create a new product (handles file uploads). |
+| `PUT`  | `/api/products/:id`               | Yes       | `SELLER` | Update your own product (handles file uploads). |
+| `DELETE`| `/api/products/:id`              | Yes       | `SELLER` | Delete your own product. |
 
 ### Cart
-| Method | Path | Protected | Role | Description |
-|:---|:---|:---|:---|:---|
-| `GET` | `/api/cart` | Yes | Logged In | Get the user's current cart. | | `POST` | `/api/cart/items` | Yes | Logged In | Add an item to the cart. | | `PUT` | `/api/cart/items/:itemId` | Yes | Logged In | Update the quantity of an item in the cart. | | `DELETE`| `/api/cart items/:itemId` | Yes | Logged In | Remove an item from the cart. | ### Orders & Payments
-| `GET` | `/api/cart` | Yes | `BUYER` | Get the user's current cart. |
-| `POST` | `/api/cart/items` | Yes | `BUYER` | Add an item to the cart. | | `DELETE`| `/api/cart/items/:itemId` | Yes | `BUYER` | Remove an item from the cart. |
+| Method | Path | Protected | Description |
+|:---    |:---                         |:---       |:---         |
+| `GET`  | `/api/cart`                   | Yes       | Get the user's current cart. |
+| `POST` | `/api/cart/items`             | Yes       | Add an item to the cart. |
+| `PUT`  | `/api/cart/items/:itemId`     | Yes       | Update the quantity of an item in the cart. |
+| `DELETE`| `/api/cart/items/:itemId`    | Yes       | Remove an item from the cart. |
 
-### Orders
-| Method | Path | Protected | Role | Description |
-|:---|:---|:---|:---|:---|
-| `POST` | `/api/orders` | Yes | `BUYER` | Create an order from the cart. |
-| `GET` | `/api/orders` | Yes | `BUYER` | Get the user's order history. |
+### Orders & Payments
+*(Functionality exists on the backend but is not yet fully integrated into the frontend workflow)*
 
-### Payments
 | Method | Path | Protected | Role | Description |
-|:---|:---|:---|:---|:---|
-| `POST` | `/api/payments/create-intent` | Yes | `BUYER` | Create a Stripe Payment Intent. |
-| `POST` | `/api/payments/webhook` | No | - | Stripe webhook for payment events. |
+|:---    |:---                         |:---       |:---      |:---         |
+| `POST` | `/api/orders`                   | Yes       | `BUYER`  | Create an order from the cart. |
+| `GET`  | `/api/orders`                   | Yes       | `BUYER`  | Get the user's order history. |
+| `POST` | `/api/payments/create-intent`   | Yes       | `BUYER`  | Create a Stripe Payment Intent. |
+| `POST` | `/api/payments/webhook`         | No        | -        | Stripe webhook for payment events. |

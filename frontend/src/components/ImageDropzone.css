@@ -25,6 +25,15 @@
   border-color: #646cff;
 }
 
+/* --- START: New styles for disabled state --- */
+.dropzone.disabled {
+  cursor: not-allowed;
+  background-color: #222;
+  border-color: #333;
+  color: #666;
+}
+/* --- END: New styles --- */
+
 .dropzone p, .dropzone em {
   margin: 0;
 }
@@ -42,7 +51,7 @@
 }
 
 .thumb {
-  position: relative; /* This is required for positioning the button */
+  position: relative;
   display: inline-flex;
   border-radius: 2px;
   border: 1px solid #444;
@@ -67,7 +76,6 @@
   object-fit: cover;
 }
 
-/* --- Corrected Styles for the remove button --- */
 .thumb .thumb-remove-btn {
   position: absolute;
   top: -8px;
@@ -93,4 +101,3 @@
 .thumb .thumb-remove-btn:hover {
   background-color: #e63939;
 }
-/* --- END --- */
