@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate, Link } from 'react-router-dom';
-import './MyProductsPage.css'; // Створимо цей файл для стилів
+import './MyProductsPage.css';
 
 const MyProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -14,7 +14,7 @@ const MyProductsPage = () => {
 
   useEffect(() => {
     if (user?.role !== 'SELLER') {
-      navigate('/'); // Якщо не продавець, перенаправляємо на головну
+      navigate('/');
       return;
     }
 
@@ -22,7 +22,7 @@ const MyProductsPage = () => {
       try {
         const response = await fetch('http://127.0.0.1:3000/api/products/seller/my-products', {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`, // FIX: Added the authorization header
           },
         });
 
@@ -38,7 +38,9 @@ const MyProductsPage = () => {
       }
     };
 
-    fetchMyProducts();
+    if (token) { // Only fetch if the token is available
+      fetchMyProducts();
+    }
   }, [token, user, navigate]);
 
   const handleDelete = async (productId) => {
@@ -58,7 +60,6 @@ const MyProductsPage = () => {
         throw new Error('Failed to delete product');
       }
 
-      // Оновлюємо список товарів, видаливши видалений
       setProducts(products.filter(p => p.id !== productId));
     } catch (err) {
       setError(err.message);

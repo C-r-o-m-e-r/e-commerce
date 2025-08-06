@@ -10,26 +10,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Define an Enum for user roles
 enum Role {
   BUYER
   SELLER
   ADMIN
 }
 
+// User model
 model User {
   id        String    @id @default(cuid())
   email     String    @unique
   password  String
-  firstName String
-  lastName  String
+  firstName String?
+  lastName  String?
   role      Role      @default(BUYER)
   products  Product[]
   cart      Cart?
-  orders    Order[]
+  orders    Order[]   // A user can have many orders
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
 
+// Product model
 model Product {
   id          String     @id @default(cuid())
   title       String
@@ -44,6 +47,7 @@ model Product {
   cartItems   CartItem[]
 }
 
+// Cart model
 model Cart {
   id        String     @id @default(cuid())
   // When a User is deleted, their Cart will be deleted too.
@@ -54,11 +58,13 @@ model Cart {
   updatedAt DateTime   @updatedAt
 }
 
+// CartItem model
 model CartItem {
   id        String   @id @default(cuid())
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade) // Also cascade deletes from Cart
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   cartId    String
-  product   Product  @relation(fields: [productId], references: [id])
+  // When a Product is deleted, the corresponding CartItems will also be deleted
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
   quantity  Int
   createdAt DateTime @default(now())
@@ -66,6 +72,9 @@ model CartItem {
   @@unique([cartId, productId])
 }
 
+// --- NEW MODELS ADDED BELOW ---
+
+// Define an Enum for Order statuses
 enum OrderStatus {
   PENDING
   PAID
@@ -74,6 +83,7 @@ enum OrderStatus {
   CANCELLED
 }
 
+// Order model
 model Order {
   id        String      @id @default(cuid())
   // NOTE: We are NOT cascading deletes on Orders. It's good practice
@@ -87,13 +97,14 @@ model Order {
   updatedAt DateTime    @updatedAt
 }
 
+// OrderItem model
 model OrderItem {
   id        String   @id @default(cuid())
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order     Order    @relation(fields: [orderId], references: [id])
   orderId   String
   productId String
-  title     String
-  price     Float
+  title     String   // Store title at time of purchase
+  price     Float    // Store price at time of purchase
   quantity  Int
   createdAt DateTime @default(now())
 }
