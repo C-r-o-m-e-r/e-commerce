@@ -21,10 +21,22 @@
   margin-bottom: 1rem;
 }
 
+/* --- START: Corrected Styles --- */
+.product-info {
+  flex-grow: 1; /* Allows the info block to take available space */
+  min-width: 0;   /* CRITICAL fix: Allows the flex item to shrink */
+  margin-right: 1rem; /* Adds some space between text and buttons */
+}
+
 .product-info h3 {
   margin: 0;
   font-size: 1.2rem;
+  /* These three properties create the ellipsis effect */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+/* --- END: Corrected Styles --- */
 
 .product-info .product-price {
   margin: 0.25rem 0 0;
@@ -34,6 +46,7 @@
 .product-actions {
   display: flex;
   gap: 1rem;
+  flex-shrink: 0; /* Prevents buttons from shrinking */
 }
 
 .btn {

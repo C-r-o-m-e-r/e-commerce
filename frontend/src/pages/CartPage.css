@@ -33,15 +33,23 @@
   object-fit: cover;
   border-radius: 6px;
   margin-right: 1rem;
+  flex-shrink: 0; /* Prevents image from shrinking */
 }
 
 .cart-item-details {
   flex-grow: 1;
+  min-width: 0; /* Allows the container to shrink */
 }
 
 .cart-item-details h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
+  /* --- START: Styles for truncating long text --- */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50ch; /* Limits the title to about 50 characters wide */
+  /* --- END: Styles for truncating long text --- */
 }
 
 .cart-item-details p {
@@ -62,6 +70,7 @@
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0; /* Prevents button from shrinking */
 }
 
 .remove-item-btn:hover {

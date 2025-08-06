@@ -18,7 +18,10 @@ const EditProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const TOTAL_IMAGE_LIMIT = 5; // Define the total limit
+  // Define character limits
+  const TITLE_MAX_LENGTH = 55;
+  const DESC_MAX_LENGTH = 500;
+  const TOTAL_IMAGE_LIMIT = 5;
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -92,7 +95,6 @@ const EditProductPage = () => {
     return <p>Error: {error}</p>;
   }
 
-  // Calculate how many new images can be added
   const remainingSlots = TOTAL_IMAGE_LIMIT - existingImages.length;
 
   return (
@@ -101,11 +103,29 @@ const EditProductPage = () => {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="title">Product Title</label>
-          <input type="text" id="title" name="title" value={formData.title} onChange={handleChange} required />
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            value={formData.title} 
+            onChange={handleChange} 
+            required 
+            maxLength={TITLE_MAX_LENGTH} 
+          />
+          <small className="char-counter">{formData.title.length} / {TITLE_MAX_LENGTH}</small>
         </div>
         <div className="form-group">
           <label htmlFor="description">Description</label>
-          <textarea id="description" name="description" value={formData.description} onChange={handleChange} required rows="5"></textarea>
+          <textarea 
+            id="description" 
+            name="description" 
+            value={formData.description} 
+            onChange={handleChange} 
+            required 
+            rows="5"
+            maxLength={DESC_MAX_LENGTH}
+          ></textarea>
+          <small className="char-counter">{formData.description.length} / {DESC_MAX_LENGTH}</small>
         </div>
         <div className="form-group">
           <label htmlFor="price">Price</label>
@@ -126,7 +146,6 @@ const EditProductPage = () => {
 
         <div className="form-group">
           <label>Upload New Images</label>
-          {/* Pass the calculated remaining slots to the dropzone */}
           <ImageDropzone 
             onFilesChange={(files) => setNewImageFiles(files)}
             maxFiles={remainingSlots}

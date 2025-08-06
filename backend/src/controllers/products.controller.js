@@ -1,9 +1,10 @@
 // backend/src/controllers/products.controller.js
 
 const prisma = require('../config/prisma');
+const fs = require('fs');
+const path = require('path');
 
 const createProduct = async (req, res) => {
-  // ... (no changes here)
   try {
     const { title, description, price } = req.body;
     const sellerId = req.user.id;
@@ -16,7 +17,7 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ message: 'Product title, description, and price are required' });
     }
 
-    const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    const images = req.processedFiles ? req.processedFiles.map(file => `/uploads/${file}`) : [];
 
     const newProduct = await prisma.product.create({
       data: {
@@ -37,29 +38,18 @@ const createProduct = async (req, res) => {
   }
 };
 
-// <== START: Rewritten getAllProducts function
 const getAllProducts = async (req, res) => {
   try {
-    const { search } = req.query; // Get search term from query parameters
+    const { search } = req.query;
 
     const whereClause = search
       ? {
           OR: [
-            {
-              title: {
-                contains: search,
-                mode: 'insensitive', // Case-insensitive search
-              },
-            },
-            {
-              description: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
+            { title: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
           ],
         }
-      : {}; // If no search term, whereClause is an empty object
+      : {};
 
     const products = await prisma.product.findMany({
       where: whereClause,
@@ -78,19 +68,11 @@ const getAllProducts = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-// <== END: Rewritten getAllProducts function
-
 
 const getSellerProducts = async (req, res) => {
-  // ... (no changes here)
   try {
     const sellerId = req.user.id;
-
-    const products = await prisma.product.findMany({
-      where: {
-        sellerId: sellerId,
-      },
-    });
+    const products = await prisma.product.findMany({ where: { sellerId: sellerId } });
     res.status(200).json(products);
   } catch (error) {
     console.error('Get seller products error:', error);
@@ -99,14 +81,12 @@ const getSellerProducts = async (req, res) => {
 };
 
 const getProductById = async (req, res) => {
-  // ... (no changes here)
   try {
     const { id } = req.params;
     const product = await prisma.product.findUnique({
       where: { id },
       include: { seller: { select: { id: true, email: true } } },
     });
-
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
@@ -117,7 +97,6 @@ const getProductById = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  // ... (no changes here)
   try {
     const { id } = req.params;
     const { title, description, price, existingImages } = req.body;
@@ -128,7 +107,6 @@ const updateProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-
     if (product.sellerId !== userId) {
       return res.status(403).json({ message: 'Forbidden: You can only update your own products' });
     }
@@ -138,8 +116,8 @@ const updateProduct = async (req, res) => {
         finalImages = Array.isArray(existingImages) ? existingImages : JSON.parse(existingImages);
     }
     
-    if (req.files && req.files.length > 0) {
-      const newImages = req.files.map(file => `/uploads/${file.filename}`);
+    if (req.processedFiles && req.processedFiles.length > 0) {
+      const newImages = req.processedFiles.map(file => `/uploads/${file}`);
       finalImages.push(...newImages);
     }
 
@@ -161,7 +139,6 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
-  // ... (no changes here)
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -171,15 +148,25 @@ const deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-
     if (product.sellerId !== userId) {
       return res.status(403).json({ message: 'Forbidden: You can only delete your own products' });
+    }
+    
+    // After deleting the DB record, delete the associated image files
+    if (product.images && product.images.length > 0) {
+      product.images.forEach(imagePath => {
+        const fullPath = path.join(__dirname, '../../', imagePath);
+        if (fs.existsSync(fullPath)) {
+          fs.unlinkSync(fullPath);
+        }
+      });
     }
 
     await prisma.product.delete({ where: { id } });
 
     res.status(204).send();
   } catch (error) {
+    console.error('Delete product error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };

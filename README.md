@@ -25,7 +25,7 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 ### Backend
 - **Runtime:** Node.js, Express.js
 - **File Uploads:** Multer
-- **Database:** PostgreSQL
+- **Image Processing:** Sharp - **Database:** PostgreSQL
 - **ORM:** Prisma
 - **Payments:** Stripe
 - **Authentication:** JSON Web Tokens (JWT)
@@ -140,7 +140,7 @@ You need **two separate terminals** to run both services concurrently.
 
 | Method | Path | Protected | Role | Description |
 |:---    |:---                         |:---       |:---      |:---         |
-| `POST` | `/api/orders`                   | Yes       | `BUYER`  | Create an order from the cart. |
-| `GET`  | `/api/orders`                   | Yes       | `BUYER`  | Get the user's order history. |
-| `POST` | `/api/payments/create-intent`   | Yes       | `BUYER`  | Create a Stripe Payment Intent. |
+| `POST` | `/api/orders`                   | Yes       | Logged In  | Create an order from the cart. |
+| `GET`  | `/api/orders`                   | Yes       | Logged In  | Get the user's order history. |
+| `POST` | `/api/payments/create-intent`   | Yes       | Logged In  | Create a Stripe Payment Intent. |
 | `POST` | `/api/payments/webhook`         | No        | -        | Stripe webhook for payment events. |

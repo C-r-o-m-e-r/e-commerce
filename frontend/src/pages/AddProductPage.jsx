@@ -18,6 +18,10 @@ const AddProductPage = () => {
   const navigate = useNavigate();
   const { token, user } = useAuth();
 
+  // Define character limits
+  const TITLE_MAX_LENGTH = 55;
+  const DESC_MAX_LENGTH = 500;
+
   if (user?.role !== 'SELLER') {
     return (
       <div className="form-container">
@@ -89,7 +93,9 @@ const AddProductPage = () => {
             value={formData.title}
             onChange={handleChange}
             required
+            maxLength={TITLE_MAX_LENGTH} // Add maxLength attribute
           />
+          <small className="char-counter">{formData.title.length} / {TITLE_MAX_LENGTH}</small>
         </div>
 
         <div className="form-group">
@@ -101,7 +107,9 @@ const AddProductPage = () => {
             onChange={handleChange}
             required
             rows="5"
+            maxLength={DESC_MAX_LENGTH} // Add maxLength attribute
           ></textarea>
+          <small className="char-counter">{formData.description.length} / {DESC_MAX_LENGTH}</small>
         </div>
 
         <div className="form-group">
@@ -118,7 +126,6 @@ const AddProductPage = () => {
         
         <div className="form-group">
           <label>Product Images</label>
-          {/* Use the maxFiles prop here as well */}
           <ImageDropzone 
             onFilesChange={(files) => setImageFiles(files)} 
             maxFiles={TOTAL_IMAGE_LIMIT}
