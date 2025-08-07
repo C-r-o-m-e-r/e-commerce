@@ -1,4 +1,5 @@
 # Full-Stack E-Commerce Marketplace
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy or Amazon. It includes a **React (Vite)** frontend and a **Node.js (Express)** backend API. The entire backend environment is containerized with Docker for easy and consistent setup.
 
@@ -12,6 +13,7 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 - **Shopping Cart:** Persistent, server-side cart with functionality to add, remove, and update item quantities.
 - **Order Management:** Functionality to convert a cart into a persistent order and view order history.
 - **Payment Integration:** Secure payment processing using Stripe Payment Intents and Webhooks.
+- **Wishlist Management:** Users can create multiple wishlists, rename them, delete them, and add or remove products. The product page UI dynamically reflects whether an item is in a wishlist.
 
 ## Tech Stack
 
@@ -21,11 +23,13 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 - **Routing:** React Router DOM
 - **State Management:** React Context
 - **File Uploads:** React Dropzone
+- **Notifications:** React Toastify
 
 ### Backend
 - **Runtime:** Node.js, Express.js
 - **File Uploads:** Multer
-- **Image Processing:** Sharp - **Database:** PostgreSQL
+- **Image Processing:** Sharp
+- **Database:** PostgreSQL
 - **ORM:** Prisma
 - **Payments:** Stripe
 - **Authentication:** JSON Web Tokens (JWT)
@@ -135,6 +139,17 @@ You need **two separate terminals** to run both services concurrently.
 | `PUT`  | `/api/cart/items/:itemId`     | Yes       | Update the quantity of an item in the cart. |
 | `DELETE`| `/api/cart/items/:itemId`    | Yes       | Remove an item from the cart. |
 
+### Wishlists
+| Method | Path | Protected | Description |
+|:---    |:---                                     |:---       |:---         |
+| `GET`  | `/api/wishlists`                        | Yes       | Get all wishlists for the current user. |
+| `POST` | `/api/wishlists`                        | Yes       | Create a new wishlist. |
+| `GET`  | `/api/wishlists/:id`                    | Yes       | Get a single wishlist by ID. |
+| `PATCH`| `/api/wishlists/:id`                    | Yes       | Update (rename) a wishlist. |
+| `DELETE`| `/api/wishlists/:id`                   | Yes       | Delete a wishlist. |
+| `POST` | `/api/wishlists/:wishlistId/items`      | Yes       | Add a product to a wishlist. |
+| `DELETE`| `/api/wishlists/items/by-product/:productId`| Yes   | Remove a product from the user's wishlists. |
+
 ### Orders & Payments
 *(Functionality exists on the backend but is not yet fully integrated into the frontend workflow)*
 
@@ -144,3 +159,9 @@ You need **two separate terminals** to run both services concurrently.
 | `GET`  | `/api/orders`                   | Yes       | Logged In  | Get the user's order history. |
 | `POST` | `/api/payments/create-intent`   | Yes       | Logged In  | Create a Stripe Payment Intent. |
 | `POST` | `/api/payments/webhook`         | No        | -        | Stripe webhook for payment events. |
+
+## License
+
+This project is licensed under the MIT License.  
+See the [LICENSE](LICENSE) file for full details.  
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
