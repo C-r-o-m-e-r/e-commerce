@@ -1,3 +1,5 @@
+// backend/src/controllers/wishlist.controller.js
+
 const prisma = require('../config/prisma');
 
 // Get all wishlists for the logged-in user
@@ -6,6 +8,16 @@ const getWishlists = async (req, res) => {
         const wishlists = await prisma.wishlist.findMany({
             where: { userId: req.user.id },
             include: {
+                // FIX: Include the actual items to check against on the product page
+                items: {
+                    select: {
+                        productId: true,
+                        // Include nested product if your robust check uses `item.product.id`
+                        product: {
+                            select: { id: true }
+                        }
+                    }
+                },
                 _count: {
                     select: { items: true },
                 },
@@ -61,6 +73,46 @@ const createWishlist = async (req, res) => {
     }
 };
 
+// --- START: New function to update a wishlist's name ---
+const updateWishlist = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body;
+        const userId = req.user.id;
+
+        if (!name || name.trim() === '') {
+            return res.status(400).json({ message: 'Wishlist name cannot be empty.' });
+        }
+
+        // First, find the wishlist to ensure it belongs to the user
+        const wishlistToUpdate = await prisma.wishlist.findUnique({
+            where: { id },
+        });
+
+        if (!wishlistToUpdate) {
+            return res.status(404).json({ message: 'Wishlist not found.' });
+        }
+
+        if (wishlistToUpdate.userId !== userId) {
+            // This is a security check to prevent users from editing others' wishlists
+            return res.status(403).json({ message: 'You do not have permission to edit this wishlist.' });
+        }
+
+        // If all checks pass, update the wishlist
+        const updatedWishlist = await prisma.wishlist.update({
+            where: { id: id },
+            data: { name: name },
+        });
+
+        res.status(200).json(updatedWishlist);
+    } catch (error) {
+        console.error("Error updating wishlist:", error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+// --- END: New function ---
+
+
 // Delete a wishlist
 const deleteWishlist = async (req, res) => {
     try {
@@ -94,17 +146,17 @@ const addItemToWishlist = async (req, res) => {
             return res.status(404).json({ message: 'Wishlist not found.' });
         }
 
-        await prisma.wishlistItem.create({
+        const newItem = await prisma.wishlistItem.create({
             data: {
                 wishlistId,
                 productId,
             },
         });
 
-        res.status(201).json({ message: 'Item added to wishlist.' });
+        res.status(201).json(newItem);
     } catch (error) {
         if (error.code === 'P2002') {
-            return res.status(409).json({ message: 'This item is already in your wishlist.' });
+            return res.status(409).json({ message: 'This item is already in this wishlist.' });
         }
         res.status(500).json({ message: 'Internal server error' });
     }
@@ -133,14 +185,12 @@ const removeItemFromWishlist = async (req, res) => {
     }
 };
 
-// --- START: New function added ---
 // Remove an item from any of the user's wishlists using the Product ID
 const removeItemFromWishlistByProduct = async (req, res) => {
     try {
         const { productId } = req.params;
         const userId = req.user.id;
 
-        // Find the specific wishlist item that connects this user and product
         const wishlistItem = await prisma.wishlistItem.findFirst({
             where: {
                 productId: productId,
@@ -148,12 +198,10 @@ const removeItemFromWishlistByProduct = async (req, res) => {
             },
         });
 
-        // If it doesn't exist, it's not an error, the action is complete.
         if (!wishlistItem) {
             return res.status(204).send();
         }
 
-        // If it exists, delete it
         await prisma.wishlistItem.delete({
             where: { id: wishlistItem.id },
         });
@@ -164,14 +212,14 @@ const removeItemFromWishlistByProduct = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
-// --- END: New function added ---
 
 module.exports = {
     getWishlists,
     createWishlist,
     deleteWishlist,
     getWishlistById,
+    updateWishlist, // --- Added to exports ---
     addItemToWishlist,
     removeItemFromWishlist,
-    removeItemFromWishlistByProduct, // --- Added to exports ---
+    removeItemFromWishlistByProduct,
 };
