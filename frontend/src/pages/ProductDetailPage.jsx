@@ -5,12 +5,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { addToCart } from '../api/cart.js';
 import { getWishlists, createWishlist, addItemToWishlist, removeItemByProductId } from '../api/wishlist.js';
-import { toast } from 'react-toastify'; // Import toast
+import { toast } from 'react-toastify';
 import './ProductDetailPage.css';
 
-// --- SVG Icons (unchanged) ---
-const HeartIconOutline = () => (<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z" /></svg>);
-const HeartIconFilled = () => (<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>);
+// --- SVG Icons for the wishlist button ---
+const HeartIconOutline = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z" /></svg>
+);
+
+const HeartIconFilled = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
+);
 
 
 const ProductDetailPage = () => {
@@ -22,13 +27,47 @@ const ProductDetailPage = () => {
     const [error, setError] = useState(null);
     const [quantity, setQuantity] = useState(1);
 
+    // --- State for Image Gallery & Lightbox ---
+    const [selectedImage, setSelectedImage] = useState(0);
+    const [isLightboxOpen, setLightboxOpen] = useState(false);
+
+    // --- Wishlist State ---
     const [isInWishlist, setIsInWishlist] = useState(false);
     const [userWishlists, setUserWishlists] = useState([]);
     const [isWishlistModalOpen, setWishlistModalOpen] = useState(false);
 
+    // --- State for the 'Create Wishlist' modal ---
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
     const [newWishlistName, setNewWishlistName] = useState('');
 
+    // --- Logic for Image Gallery & Lightbox ---
+    const goToNextImage = (e) => {
+        e.stopPropagation();
+        if (product && product.images.length > 0) {
+            setSelectedImage(prevIndex => (prevIndex + 1) % product.images.length);
+        }
+    };
+    const goToPreviousImage = (e) => {
+        e.stopPropagation();
+        if (product && product.images.length > 0) {
+            setSelectedImage(prevIndex => (prevIndex - 1 + product.images.length) % product.images.length);
+        }
+    };
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (!isLightboxOpen) return;
+            if (e.key === 'ArrowRight') goToNextImage(e);
+            else if (e.key === 'ArrowLeft') goToPreviousImage(e);
+            else if (e.key === 'Escape') setLightboxOpen(false);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isLightboxOpen, selectedImage, product]);
+
+
+    // --- DATA FETCHING ---
     const fetchUserWishlists = async (currentProductId) => {
         try {
             const wishlistsData = await getWishlists(token);
@@ -45,7 +84,6 @@ const ProductDetailPage = () => {
             }
         } catch (err) {
             console.error("Failed to fetch wishlists:", err);
-            // We don't show a toast for this, as it's a background process
         }
     };
 
@@ -70,10 +108,11 @@ const ProductDetailPage = () => {
         fetchProductAndWishlists();
     }, [productId, user, token]);
 
+
+    // --- EVENT HANDLERS ---
     const handleAddToCart = async () => {
         if (!user) return navigate('/login');
         if (!quantity || quantity < 1) return toast.warn('Please enter a valid quantity.');
-
         try {
             await addToCart(product.id, quantity, token);
             toast.success('Product added to cart!');
@@ -95,7 +134,7 @@ const ProductDetailPage = () => {
     const handleOpenWishlistSelection = () => {
         if (userWishlists.length === 0) {
             toast.info('You need to create a wishlist first.');
-            setWishlistModalOpen(true); // Open the modal to allow creation
+            setWishlistModalOpen(true);
             return;
         }
         if (userWishlists.length === 1) {
@@ -154,7 +193,23 @@ const ProductDetailPage = () => {
         <>
             <div className="product-detail-container">
                 <div className="product-image-section">
-                    <img src={getImageUrl(product.images[0])} alt={product.title} className="main-product-image" />
+                    <img
+                        src={product.images && product.images.length > 0 ? getImageUrl(product.images[selectedImage]) : 'https://via.placeholder.com/400'}
+                        alt={product.title}
+                        className="main-product-image"
+                        onClick={() => product.images.length > 0 && setLightboxOpen(true)}
+                    />
+                    <div className="product-thumbnails-container">
+                        {product.images && product.images.map((image, index) => (
+                            <img
+                                key={index}
+                                src={getImageUrl(image)}
+                                alt={`${product.title} thumbnail ${index + 1}`}
+                                className={`thumbnail-image ${selectedImage === index ? 'active' : ''}`}
+                                onClick={() => setSelectedImage(index)}
+                            />
+                        ))}
+                    </div>
                 </div>
                 <div className="product-info-section">
                     <h2>{product.title}</h2>
@@ -169,9 +224,33 @@ const ProductDetailPage = () => {
                             </button>
                         )}
                     </div>
-                    {/* The old notification <p> tag is no longer needed */}
                 </div>
             </div>
+
+            {isLightboxOpen && (
+                <div className="lightbox-overlay" onClick={() => setLightboxOpen(false)}>
+                    {/* --- FIX: Replaced the text '×' with an SVG icon --- */}
+                    <button className="lightbox-close-btn" onClick={() => setLightboxOpen(false)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="36" viewBox="0 -960 960 960" width="36"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" /></svg>
+                    </button>
+                    {product.images.length > 1 && (
+                        <>
+                            <button className="lightbox-nav-btn prev" onClick={goToPreviousImage}>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M400-80 0-480l400-400 56 57-343 343 343 343-56 57Z" /></svg>
+                            </button>
+                            <button className="lightbox-nav-btn next" onClick={goToNextImage}>
+                                <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="m304-82-56-57 343-343-343-343 56-57 400 400L304-82Z" /></svg>
+                            </button>
+                        </>
+                    )}
+                    <img
+                        src={getImageUrl(product.images[selectedImage])}
+                        alt={product.title}
+                        className="lightbox-content"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            )}
 
             {isWishlistModalOpen && (
                 <div className="modal-overlay" onClick={() => { setWishlistModalOpen(false); setCreateModalOpen(false); }}>

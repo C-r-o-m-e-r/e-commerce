@@ -299,3 +299,29 @@
 .wishlist-btn.active:hover svg path:last-child {
     fill: #7b24cc; /* Darker purple on hover */
 }
+
+.lightbox-close-btn svg {
+    fill: white;
+    transition: transform 0.2s;
+}
+
+.lightbox-close-btn:hover svg {
+    transform: scale(1.1);
+}
+
+.product-info-section h2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --- FIX for Long Description ---
+  This allows long, unbroken words in the description 
+  to wrap to the next line.
+*/
+.product-info-section .product-description {
+    overflow-wrap: break-word;
+    word-break: break-word; /* For better compatibility */
+}

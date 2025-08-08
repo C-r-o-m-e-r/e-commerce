@@ -68,12 +68,24 @@ Make sure you have the following software installed:
     npm install
     ```
 4.  **Run the Database Migration:**
-    **This is a critical step.** The application will fail without it.
+    **This is a critical step.** The application will fail without it. The migration must be run from your local machine, but it will connect to the database running inside the Docker container.
     
-    a. **Temporarily change the `DATABASE_URL` in `backend/.env`** to point to `localhost`.
-    b. **Start only the database** container: `docker-compose up -d db`.
-    c. **Run the migration from your local terminal**: `npx prisma migrate dev`.
-    d. **IMPORTANT: Change the `DATABASE_URL` back** to use the service name `db`.
+    a. **Temporarily change the `DATABASE_URL` in `backend/.env`** to point to `localhost`. For example:
+       `DATABASE_URL="postgresql://user:password@localhost:5432/mydb?schema=public"`
+
+    b. **In a new terminal, start only the database** container:
+       ```bash
+       cd backend
+       docker-compose up -d db
+       ```
+
+    c. **Run the migration from your first terminal**. This command will apply any existing migrations and prompt you to create a new one if you've changed the schema. Leave the name blank, and Prisma will generate one for you.
+       ```bash
+       npx prisma migrate dev
+       ```
+
+    d. **IMPORTANT: Change the `DATABASE_URL` back** to use the Docker service name `db`. For example:
+       `DATABASE_URL="postgresql://user:password@db:5432/mydb?schema=public"`
 
 ### Frontend Setup
 
@@ -164,4 +176,5 @@ You need **two separate terminals** to run both services concurrently.
 
 This project is licensed under the MIT License.  
 See the [LICENSE](LICENSE) file for full details.  
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
