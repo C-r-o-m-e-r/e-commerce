@@ -7,13 +7,15 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 
 - **Monorepo Structure:** Backend and frontend code are managed in a single repository.
 - **Authentication:** JWT-based user registration and login.
-- **User Account Management:** Users can update their profile, change their password, and delete their account.
+- **User Account Management:** A unified account page with nested routing where users can update their profile, change their password, and delete their account.
 - **Authorization:** Protected routes and role-based access control (`BUYER`, `SELLER`).
 - **Product Management:** Full CRUD for products, including multi-image uploads. Sellers can manage their own listings.
+- **Product Categories:** A hierarchical category system with infinite nesting for subcategories, allowing for advanced filtering.
 - **Shopping Cart:** Persistent, server-side cart with functionality to add, remove, and update item quantities.
-- **Order Management:** Functionality to convert a cart into a persistent order and view order history.
+- **Wishlist Management:** Users can create multiple wishlists, rename them, delete them, and add or remove products.
+- **Order History:** Users can view a list of all their past orders and see a detailed breakdown of each one.
+- **Product Reviews & Ratings:** Users who have purchased a product can leave a star rating (1-5) and a written review.
 - **Payment Integration:** Secure payment processing using Stripe Payment Intents and Webhooks.
-- **Wishlist Management:** Users can create multiple wishlists, rename them, delete them, and add or remove products. The product page UI dynamically reflects whether an item is in a wishlist.
 
 ## Tech Stack
 
@@ -79,7 +81,7 @@ Make sure you have the following software installed:
        docker-compose up -d db
        ```
 
-    c. **Run the migration from your first terminal**. This command will apply any existing migrations and prompt you to create a new one if you've changed the schema. Leave the name blank, and Prisma will generate one for you.
+    c. **Run the migration from your first terminal**. This command will apply any existing migrations and prompt you to create a new one if you've changed the schema.
        ```bash
        npx prisma migrate dev
        ```
@@ -136,12 +138,17 @@ You need **two separate terminals** to run both services concurrently.
 ### Products
 | Method | Path | Protected | Role | Description |
 |:---    |:---                               |:---       |:---      |:---         |
-| `GET`  | `/api/products`                   | No        | -        | Get a list of all products (accepts `?search=` query). |
+| `GET`  | `/api/products`                   | No        | -        | Get a list of all products (accepts `?search=` & `?category=` query). |
 | `GET`  | `/api/products/:id`               | No        | -        | Get a single product by ID. |
 | `GET`  | `/api/products/seller/my-products`| Yes       | `SELLER` | Get all products for the current seller. |
-| `POST` | `/api/products`                   | Yes       | `SELLER` | Create a new product (handles file uploads). |
-| `PUT`  | `/api/products/:id`               | Yes       | `SELLER` | Update your own product (handles file uploads). |
+| `POST` | `/api/products`                   | Yes       | `SELLER` | Create a new product. |
+| `PUT`  | `/api/products/:id`               | Yes       | `SELLER` | Update your own product. |
 | `DELETE`| `/api/products/:id`              | Yes       | `SELLER` | Delete your own product. |
+
+### Categories
+| Method | Path | Protected | Description |
+|:---    |:---                |:---       |:---         |
+| `GET`  | `/api/categories`  | No        | Get a nested tree of all categories. |
 
 ### Cart
 | Method | Path | Protected | Description |
@@ -162,13 +169,22 @@ You need **two separate terminals** to run both services concurrently.
 | `POST` | `/api/wishlists/:wishlistId/items`      | Yes       | Add a product to a wishlist. |
 | `DELETE`| `/api/wishlists/items/by-product/:productId`| Yes   | Remove a product from the user's wishlists. |
 
-### Orders & Payments
-*(Functionality exists on the backend but is not yet fully integrated into the frontend workflow)*
+### Reviews
+| Method | Path | Protected | Description |
+|:---    |:---                         |:---       |:---         |
+| `GET`  | `/api/reviews/:productId`     | No        | Get all reviews for a product. |
+| `POST` | `/api/reviews/:productId`     | Yes       | Create or update a review for a product (user must have purchased it). |
 
+### Orders
+| Method | Path | Protected | Description |
+|:---    |:---                         |:---       |:---         |
+| `POST` | `/api/orders`                   | Yes       | Create an order from the cart. |
+| `GET`  | `/api/orders`                   | Yes       | Get the user's order history. |
+| `GET`  | `/api/orders/:id`               | Yes       | Get a single order by ID. |
+
+### Payments
 | Method | Path | Protected | Role | Description |
 |:---    |:---                         |:---       |:---      |:---         |
-| `POST` | `/api/orders`                   | Yes       | Logged In  | Create an order from the cart. |
-| `GET`  | `/api/orders`                   | Yes       | Logged In  | Get the user's order history. |
 | `POST` | `/api/payments/create-intent`   | Yes       | Logged In  | Create a Stripe Payment Intent. |
 | `POST` | `/api/payments/webhook`         | No        | -        | Stripe webhook for payment events. |
 

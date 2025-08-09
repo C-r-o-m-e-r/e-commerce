@@ -75,7 +75,7 @@ const MyProductsPage = () => {
   }
 
   return (
-    <div className="my-products-container">
+      <div className="page-container">
       <h2>My Products</h2>
       <div className="products-list">
         {products.length > 0 ? (

@@ -1,7 +1,6 @@
 // frontend/src/components/Dropdown.jsx
 
 import React, { useState, useRef, useEffect } from 'react'; // <== This line is now corrected
-import './Dropdown.css';
 
 const Dropdown = ({ trigger, children }) => {
   const [isOpen, setIsOpen] = useState(false);

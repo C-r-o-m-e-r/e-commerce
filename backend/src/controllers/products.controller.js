@@ -8,23 +8,23 @@ const MAX_PRICE = 20000;
 
 const createProduct = async (req, res) => {
     try {
-        const { title, description, price } = req.body;
+        // Add categoryId to the destructured body
+        const { title, description, price, categoryId } = req.body;
         const sellerId = req.user.id;
 
         if (req.user.role !== 'SELLER') {
             return res.status(403).json({ message: 'Forbidden: Only sellers can create products' });
         }
 
-        if (!title || !description || !price) {
-            return res.status(400).json({ message: 'Product title, description, and price are required' });
+        // Add categoryId to the validation
+        if (!title || !description || !price || !categoryId) {
+            return res.status(400).json({ message: 'Title, description, price, and category are required' });
         }
 
-        // --- START: Price Validation ---
         const priceValue = parseFloat(price);
         if (isNaN(priceValue) || priceValue <= 0 || priceValue > MAX_PRICE) {
             return res.status(400).json({ message: `Price must be a number between 0.01 and ${MAX_PRICE}.` });
         }
-        // --- END: Price Validation ---
 
         const images = req.processedFiles ? req.processedFiles.map(file => `/uploads/${file}`) : [];
 
@@ -32,11 +32,10 @@ const createProduct = async (req, res) => {
             data: {
                 title,
                 description,
-                price: priceValue, // Use the validated numeric price
+                price: priceValue,
                 images,
-                seller: {
-                    connect: { id: sellerId },
-                },
+                seller: { connect: { id: sellerId } },
+                category: { connect: { id: categoryId } }, // Connect to the category
             },
         });
 
@@ -50,7 +49,8 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, price, existingImages } = req.body;
+        // Add categoryId to the destructured body
+        const { title, description, price, existingImages, categoryId } = req.body;
         const userId = req.user.id;
 
         const product = await prisma.product.findUnique({ where: { id } });
@@ -64,7 +64,6 @@ const updateProduct = async (req, res) => {
 
         const dataToUpdate = { title, description };
 
-        // --- START: Price Validation ---
         if (price !== undefined) {
             const priceValue = parseFloat(price);
             if (isNaN(priceValue) || priceValue <= 0 || priceValue > MAX_PRICE) {
@@ -72,19 +71,19 @@ const updateProduct = async (req, res) => {
             }
             dataToUpdate.price = priceValue;
         }
-        // --- END: Price Validation ---
 
-        let finalImages = [];
-        if (existingImages) {
-            finalImages = Array.isArray(existingImages) ? existingImages : JSON.parse(existingImages);
+        // Add categoryId to the data to be updated
+        if (categoryId) {
+            dataToUpdate.category = { connect: { id: categoryId } };
         }
+
+        let finalImages = existingImages ? JSON.parse(existingImages) : [];
 
         if (req.processedFiles && req.processedFiles.length > 0) {
             const newImages = req.processedFiles.map(file => `/uploads/${file}`);
             finalImages.push(...newImages);
         }
         dataToUpdate.images = finalImages;
-
 
         const updatedProduct = await prisma.product.update({
             where: { id },
@@ -98,18 +97,26 @@ const updateProduct = async (req, res) => {
     }
 };
 
-
-// --- OTHER FUNCTIONS (UNCHANGED) ---
-
 const getAllProducts = async (req, res) => {
     try {
-        const { search } = req.query;
-        const whereClause = search
-            ? { OR: [{ title: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } },], }
-            : {};
+        const { search, category } = req.query; // Add category to query params
+        const whereClause = {};
+
+        if (search) {
+            whereClause.OR = [
+                { title: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } },
+            ];
+        }
+
+        // If a category is provided, filter by it
+        if (category) {
+            whereClause.categoryId = category;
+        }
+
         const products = await prisma.product.findMany({
             where: whereClause,
-            include: { seller: { select: { id: true, email: true, }, }, },
+            include: { seller: { select: { id: true, email: true } } },
         });
         res.status(200).json(products);
     } catch (error) {
@@ -118,6 +125,8 @@ const getAllProducts = async (req, res) => {
     }
 };
 
+
+// --- Other functions (getSellerProducts, getProductById, deleteProduct) remain unchanged ---
 const getSellerProducts = async (req, res) => {
     try {
         const sellerId = req.user.id;
@@ -173,6 +182,7 @@ const deleteProduct = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
 
 module.exports = {
     createProduct,

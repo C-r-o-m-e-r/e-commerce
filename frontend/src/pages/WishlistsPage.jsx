@@ -91,7 +91,7 @@ const WishlistsPage = () => {
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <div className="wishlists-container">
+        <div className="page-container">
             <div className="wishlists-header">
                 <h2>My Wishlists</h2>
                 <button onClick={() => setIsModalOpen(true)} className="btn-create-wishlist">

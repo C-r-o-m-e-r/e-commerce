@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { getCategories } from '../api/category.js'; // Import categories API
 import ImageDropzone from '../components/ImageDropzone.jsx';
 import './Form.css';
 import './EditProductPage.css';
@@ -12,7 +13,8 @@ const EditProductPage = () => {
     const navigate = useNavigate();
     const { token } = useAuth();
 
-    const [formData, setFormData] = useState({ title: '', description: '', price: '' });
+    const [formData, setFormData] = useState({ title: '', description: '', price: '', categoryId: '' });
+    const [categories, setCategories] = useState([]); // State to hold categories
     const [existingImages, setExistingImages] = useState([]);
     const [newImageFiles, setNewImageFiles] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -24,25 +26,43 @@ const EditProductPage = () => {
     const PRICE_MAX_VALUE = 20000;
 
     useEffect(() => {
-        const fetchProductData = async () => {
+        const fetchPageData = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:3000/api/products/${id}`);
-                if (!response.ok) throw new Error('Could not fetch product data.');
+                // Fetch both product and categories in parallel
+                const [productResponse, categoriesData] = await Promise.all([
+                    fetch(`http://127.0.0.1:3000/api/products/${id}`),
+                    getCategories()
+                ]);
 
-                const data = await response.json();
+                if (!productResponse.ok) throw new Error('Could not fetch product data.');
+
+                const productData = await productResponse.json();
                 setFormData({
-                    title: data.title,
-                    description: data.description,
-                    price: data.price,
+                    title: productData.title,
+                    description: productData.description,
+                    price: productData.price,
+                    categoryId: productData.categoryId, // Set initial category
                 });
-                setExistingImages(data.images || []);
+                setExistingImages(productData.images || []);
+
+                // Flatten categories for the dropdown
+                const flattened = [];
+                const flatten = (cat, prefix = '') => {
+                    flattened.push({ ...cat, name: prefix + cat.name });
+                    if (cat.subcategories) {
+                        cat.subcategories.forEach(sub => flatten(sub, prefix + '- '));
+                    }
+                };
+                categoriesData.forEach(cat => flatten(cat));
+                setCategories(flattened);
+
             } catch (err) {
                 setError(err.message);
             } finally {
                 setLoading(false);
             }
         };
-        fetchProductData();
+        fetchPageData();
     }, [id]);
 
     const handleChange = (e) => {
@@ -57,20 +77,22 @@ const EditProductPage = () => {
         e.preventDefault();
         setError(null);
 
-        // --- START: Frontend Price Validation ---
         const priceValue = parseFloat(formData.price);
         if (isNaN(priceValue) || priceValue <= 0 || priceValue > PRICE_MAX_VALUE) {
             setError(`Price must be a number between $0.01 and $${PRICE_MAX_VALUE}.`);
             return;
         }
-        // --- END: Frontend Price Validation ---
-
+        if (!formData.categoryId) {
+            setError('Please select a category.');
+            return;
+        }
         setLoading(true);
 
         const data = new FormData();
         data.append('title', formData.title);
         data.append('description', formData.description);
         data.append('price', formData.price);
+        data.append('categoryId', formData.categoryId);
         data.append('existingImages', JSON.stringify(existingImages));
 
         newImageFiles.forEach(file => {
@@ -96,13 +118,8 @@ const EditProductPage = () => {
         }
     };
 
-    if (loading && !formData.title) {
-        return <p>Loading product details...</p>;
-    }
-
-    if (error) {
-        return <p>Error: {error}</p>;
-    }
+    if (loading) return <p>Loading product details...</p>;
+    if (error) return <p>Error: {error}</p>;
 
     const remainingSlots = TOTAL_IMAGE_LIMIT - existingImages.length;
 
@@ -112,33 +129,30 @@ const EditProductPage = () => {
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="title">Product Title</label>
-                    <input
-                        type="text" id="title" name="title"
-                        value={formData.title} onChange={handleChange}
-                        required maxLength={TITLE_MAX_LENGTH}
-                    />
+                    <input type="text" id="title" name="title" value={formData.title} onChange={handleChange} required maxLength={TITLE_MAX_LENGTH} />
                     <small className="char-counter">{formData.title.length} / {TITLE_MAX_LENGTH}</small>
                 </div>
                 <div className="form-group">
                     <label htmlFor="description">Description</label>
-                    <textarea
-                        id="description" name="description"
-                        value={formData.description} onChange={handleChange}
-                        required rows="5" maxLength={DESC_MAX_LENGTH}
-                    ></textarea>
+                    <textarea id="description" name="description" value={formData.description} onChange={handleChange} required rows="5" maxLength={DESC_MAX_LENGTH}></textarea>
                     <small className="char-counter">{formData.description.length} / {DESC_MAX_LENGTH}</small>
                 </div>
                 <div className="form-group">
                     <label htmlFor="price">Price</label>
-                    <input
-                        type="number" id="price" name="price"
-                        value={formData.price} onChange={handleChange}
-                        required
-                        min="0.01"
-                        max={PRICE_MAX_VALUE}
-                        step="0.01"
-                    />
+                    <input type="number" id="price" name="price" value={formData.price} onChange={handleChange} required min="0.01" max={PRICE_MAX_VALUE} step="0.01" />
                 </div>
+
+                {/* --- START: Category Select Dropdown --- */}
+                <div className="form-group">
+                    <label htmlFor="categoryId">Category</label>
+                    <select id="categoryId" name="categoryId" value={formData.categoryId} onChange={handleChange} required>
+                        <option value="" disabled>Select a category</option>
+                        {categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                    </select>
+                </div>
+                {/* --- END: Category Select Dropdown --- */}
 
                 <div className="form-group">
                     <label>Existing Images ({existingImages.length} / {TOTAL_IMAGE_LIMIT})</label>
@@ -154,10 +168,7 @@ const EditProductPage = () => {
 
                 <div className="form-group">
                     <label>Upload New Images</label>
-                    <ImageDropzone
-                        onFilesChange={(files) => setNewImageFiles(files)}
-                        maxFiles={remainingSlots}
-                    />
+                    <ImageDropzone onFilesChange={(files) => setNewImageFiles(files)} maxFiles={remainingSlots} />
                 </div>
 
                 <button type="submit" disabled={loading}>

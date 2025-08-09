@@ -1,0 +1,79 @@
+﻿/* frontend/src/pages/OrderDetailPage.css */
+
+.order-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #444;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+    .order-detail-header h2 {
+        margin: 0;
+    }
+
+.order-summary {
+    margin-bottom: 2rem;
+}
+
+    .order-summary p {
+        margin: 0.5rem 0;
+        color: #a0a0a0;
+    }
+
+    .order-summary strong {
+        color: #e0e0e0;
+    }
+
+.order-items-list {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.order-item-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2a2a2a;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+.order-item-info h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.order-item-info a {
+    color: #8c9eff;
+    text-decoration: none;
+}
+
+    .order-item-info a:hover {
+        text-decoration: underline;
+    }
+
+.order-item-info p {
+    margin: 0.25rem 0;
+    color: #a0a0a0;
+    font-size: 0.9rem;
+}
+
+.order-item-total {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.back-to-orders-link {
+    display: inline-block;
+    margin-top: 2rem;
+    color: #8c9eff;
+    text-decoration: none;
+}
+
+    .back-to-orders-link:hover {
+        text-decoration: underline;
+    }
