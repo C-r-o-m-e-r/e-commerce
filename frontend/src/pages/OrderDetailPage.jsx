@@ -33,7 +33,7 @@ const OrderDetailPage = () => {
     if (!order) return <p>Order not found.</p>;
 
     return (
-        <div className="page-container">
+        <div className="order-detail-container">
             <div className="order-detail-header">
                 <h2>Order #{order.id.substring(0, 8)}</h2>
                 <span className={`order-status ${order.status.toLowerCase()}`}>{order.status}</span>
@@ -60,7 +60,8 @@ const OrderDetailPage = () => {
                     </div>
                 ))}
             </div>
-            <Link to="/orders" className="back-to-orders-link">← Back to My Orders</Link>
+            {/* --- FIX: Updated the link to point to the new account page --- */}
+            <Link to="/account/orders" className="back-to-orders-link">← Back to My Orders</Link>
         </div>
     );
 };

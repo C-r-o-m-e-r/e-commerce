@@ -17,12 +17,9 @@ import WishlistsPage from './pages/WishlistsPage.jsx';
 import WishlistDetailPage from './pages/WishlistDetailPage.jsx';
 import OrdersPage from './pages/OrdersPage.jsx';
 import OrderDetailPage from './pages/OrderDetailPage.jsx';
-
-// --- START: New imports for Account Layout ---
 import AccountLayout from './pages/AccountLayout.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
-// --- END: New imports ---
-
+import CheckoutPage from './pages/CheckoutPage.jsx'; // 1. Import the new CheckoutPage
 
 import './App.css';
 
@@ -40,20 +37,20 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
 
-                    {/* --- START: New Nested Account Routes --- */}
+                    {/* Nested Account Routes */}
                     <Route path="/account" element={<AccountLayout />}>
-                        {/* Redirect /account to /account/profile by default */}
                         <Route index element={<Navigate to="profile" replace />} />
                         <Route path="profile" element={<ProfilePage />} />
                         <Route path="orders" element={<OrdersPage />} />
                         <Route path="wishlists" element={<WishlistsPage />} />
                     </Route>
-                    {/* --- END: New Nested Account Routes --- */}
 
                     {/* Standalone User Routes */}
                     <Route path="/cart" element={<CartPage />} />
                     <Route path="/wishlists/:id" element={<WishlistDetailPage />} />
                     <Route path="/orders/:id" element={<OrderDetailPage />} />
+                    <Route path="/checkout" element={<CheckoutPage />} /> {/* 2. Add the new route */}
+
 
                     {/* Seller Routes */}
                     <Route path="/products/add" element={<AddProductPage />} />

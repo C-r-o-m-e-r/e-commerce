@@ -6,7 +6,7 @@ const authMiddleware = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
-// All other payment routes are protected
+// All routes in this file are protected and require a user to be logged in.
 router.use(authMiddleware);
 
 router.post('/create-intent', createPaymentIntent);
