@@ -1,0 +1,157 @@
+/* frontend/src/pages/AccountLayout.css */
+
+.account-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr; /* Sidebar and main content */
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.account-sidebar {
+    background-color: #1a1a1a;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+}
+
+    .account-sidebar a {
+        display: block;
+        padding: 0.75rem 1rem;
+        color: #a0a0a0;
+        text-decoration: none;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+        .account-sidebar a:hover {
+            background-color: #2a2a2a;
+            color: #ffffff;
+        }
+
+        /* The .active class is automatically added by NavLink */
+        .account-sidebar a.active {
+            background-color: #646cff;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+.account-content {
+    /* Styles for the content cards are now here */
+    .account-grid
+
+{
+    display: grid;
+    grid-template-columns: 1fr; /* Stack cards vertically */
+    gap: 2rem;
+}
+
+.account-card {
+    background-color: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+    .account-card h3 {
+        margin-top: 0;
+        border-bottom: 1px solid #444;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* All other styles from the old AccountPage.css remain the same */
+    .account-card input[disabled] {
+        background-color: #333;
+        cursor: not-allowed;
+    }
+
+    .account-card button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 6px;
+        background-color: #646cff;
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 0.5rem;
+        transition: background-color 0.2s ease;
+    }
+
+        .account-card button:hover {
+            background-color: #535bf2;
+        }
+
+.danger-zone {
+    border-color: #ff4d4d;
+}
+
+    .danger-zone h3 {
+        color: #ff4d4d;
+    }
+
+    .danger-zone p {
+        color: #a0a0a0;
+        font-size: 0.9rem;
+    }
+
+.delete-btn {
+    background-color: #ff4d4d !important;
+}
+
+    .delete-btn:hover {
+        background-color: #e63939 !important;
+    }
+
+.message {
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 6px;
+    text-align: center;
+}
+
+    .message.success {
+        background-color: #27ae60;
+        color: white;
+    }
+
+    .message.error {
+        background-color: #c0392b;
+        color: white;
+    }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #1a1a1a;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    border: 1px solid #444;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+    .modal-actions .btn-secondary {
+        background-color: #3a3a3a;
+    }
+}

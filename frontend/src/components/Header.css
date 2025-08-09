@@ -1,0 +1,242 @@
+﻿/* frontend/src/components/Header.css */
+
+.header {
+    background-color: #1a1a1a;
+    border-bottom: 1px solid #444;
+    padding: 0.5rem 0;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    box-sizing: border-box;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+    margin-right: 2rem;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    max-width: 700px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    /* overflow: hidden;  <-- THIS WAS THE BUG, IT'S NOW REMOVED */
+}
+
+    .search-container:focus-within {
+        border-color: #646cff;
+    }
+
+.search-form {
+    display: flex;
+    flex-grow: 1;
+}
+
+.search-input {
+    flex-grow: 1;
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    font-size: 1rem;
+    height: 38px;
+    box-sizing: border-box;
+    border-radius: 0; /* Add this to ensure it's not rounded */
+}
+
+    .search-input:focus {
+        outline: none;
+    }
+
+.search-button {
+    padding: 0 12px;
+    height: 38px;
+    background-color: #3a3a3a;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .search-button svg {
+        fill: #e0e0e0;
+    }
+
+/* --- Category Dropdown Styles --- */
+.category-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.category-dropdown-toggle {
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+    padding: 0 16px;
+    font-size: 1rem;
+    border: none;
+    border-right: 1px solid #444;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    height: 38px;
+    border-radius: 8px 0 0 8px;
+}
+
+    .category-dropdown-toggle svg {
+        fill: #e0e0e0;
+        margin-left: 8px;
+    }
+
+.category-dropdown-menu {
+    position: absolute;
+    background-color: #2a2a2a;
+    min-width: 250px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 100;
+    border: 1px solid #444;
+    border-radius: 8px;
+    margin-top: 8px;
+    padding: 0.5rem 0;
+}
+
+    .category-dropdown-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .category-dropdown-menu li a {
+        color: #e0e0e0;
+        padding: 10px 20px;
+        text-decoration: none;
+        display: block;
+        white-space: nowrap;
+    }
+
+        .category-dropdown-menu li a:hover {
+            background-color: #3a3a3a;
+            color: #fff;
+        }
+
+    .category-dropdown-menu li {
+        position: relative;
+    }
+
+.dropdown-submenu {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: -8px;
+    background-color: #2a2a2a;
+    min-width: 250px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 0.5rem 0;
+}
+
+.category-dropdown-menu li:hover > .dropdown-submenu {
+    display: block;
+}
+
+/* --- Other Nav Link Styles --- */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-left: 2rem;
+}
+
+.nav-link {
+    color: #e0e0e0;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+    .nav-link:hover {
+        color: #646cff;
+    }
+
+.account-trigger {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.2;
+}
+
+.account-trigger-line2 {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+    .account-trigger-line2 svg {
+        fill: #e0e0e0;
+    }
+
+.cart-icon-link svg {
+    fill: #e0e0e0;
+    transition: fill 0.2s;
+}
+
+.cart-icon-link:hover svg {
+    fill: #646cff;
+}
+
+
+/* --- Styles for the Account Dropdown (from Dropdown.css) --- */
+.dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-trigger {
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    padding: 0.5rem 0;
+    z-index: 1000;
+    min-width: 220px;
+    list-style: none;
+}
+
+    .dropdown-menu .dropdown-item {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1.5rem;
+        box-sizing: border-box;
+        text-align: left;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #e0e0e0;
+        text-decoration: none;
+        font-size: 1rem;
+    }
+
+        .dropdown-menu .dropdown-item:hover {
+            background-color: #3a3a3a;
+        }

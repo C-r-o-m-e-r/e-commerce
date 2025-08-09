@@ -17,32 +17,45 @@ enum Role {
 }
 
 model User {
-  id          String     @id @default(cuid())
-  email       String     @unique
-  password    String
-  firstName   String?
-  lastName    String?
-  role        Role       @default(BUYER)
-  products    Product[]
-  cart        Cart?
-  orders      Order[]
-  wishlists   Wishlist[] // Relation to Wishlist model
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id        String     @id @default(cuid())
+  email     String     @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      Role       @default(BUYER)
+  products  Product[]
+  cart      Cart?
+  orders    Order[]
+  wishlists Wishlist[]
+  reviews   Review[] // Relation to user's reviews
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Category {
+  id            String     @id @default(cuid())
+  name          String     @unique
+  products      Product[]
+  parentId      String?
+  parent        Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  subcategories Category[] @relation("CategoryHierarchy")
 }
 
 model Product {
-  id             String        @id @default(cuid())
-  title          String
-  description    String
-  price          Float
-  images         String[]
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  sellerId       String
-  seller         User          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  cartItems      CartItem[]
-  wishlistItems  WishlistItem[] // Relation to WishlistItem model
+  id            String         @id @default(cuid())
+  title         String
+  description   String
+  price         Float
+  images        String[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  sellerId      String
+  seller        User           @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  cartItems     CartItem[]
+  wishlistItems WishlistItem[]
+  reviews       Review[] // Relation to product's reviews
+  categoryId    String
+  category      Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 }
 
 model Cart {
@@ -66,7 +79,6 @@ model CartItem {
   @@unique([cartId, productId])
 }
 
-// --- START: New Wishlist Models ---
 model Wishlist {
   id        String         @id @default(cuid())
   name      String
@@ -78,16 +90,15 @@ model Wishlist {
 }
 
 model WishlistItem {
-  id          String   @id @default(cuid())
-  wishlist    Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
-  wishlistId  String
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId   String
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  wishlistId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  String
+  createdAt  DateTime @default(now())
 
   @@unique([wishlistId, productId])
 }
-// --- END: New Wishlist Models ---
 
 enum OrderStatus {
   PENDING
@@ -118,3 +129,22 @@ model OrderItem {
   quantity  Int
   createdAt DateTime @default(now())
 }
+
+// --- START: New Review Model ---
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      // The star rating from 1 to 5
+  comment   String?  // The text content of the review
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+
+  // A user can only review a product once
+  @@unique([userId, productId])
+}
+// --- END: New Review Model ---

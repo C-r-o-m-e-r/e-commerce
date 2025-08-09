@@ -21,7 +21,9 @@ const cartRoutes = require('./routes/cart.routes');
 const ordersRoutes = require('./routes/orders.routes');
 const paymentsRoutes = require('./routes/payments.routes');
 const usersRoutes = require('./routes/users.routes');
-const wishlistRoutes = require('./routes/wishlist.routes'); // 1. Import the new wishlist routes
+const wishlistRoutes = require('./routes/wishlist.routes');
+const categoryRoutes = require('./routes/category.routes');
+const reviewRoutes = require('./routes/review.routes'); // 1. Import the new review routes
 
 // Register Routes
 app.use('/api/auth', authRoutes);
@@ -30,7 +32,9 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/users', usersRoutes);
-app.use('/api/wishlists', wishlistRoutes); // 2. Register the new wishlist routes
+app.use('/api/wishlists', wishlistRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/reviews', reviewRoutes); // 2. Register the new review routes
 
 // Root route placeholder
 app.get('/', (req, res) => {

@@ -1,10 +1,8 @@
 // src/App.jsx
 
-import { Routes, Route } from 'react-router-dom';
-// --- START: Added imports for react-toastify ---
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// --- END: Added imports ---
 
 import Header from './components/Header';
 import ProductsPage from './pages/ProductsPage';
@@ -15,9 +13,16 @@ import ProductDetailPage from './pages/ProductDetailPage.jsx';
 import MyProductsPage from './pages/MyProductsPage.jsx';
 import EditProductPage from './pages/EditProductPage.jsx';
 import CartPage from './pages/CartPage.jsx';
-import AccountPage from './pages/AccountPage.jsx';
 import WishlistsPage from './pages/WishlistsPage.jsx';
 import WishlistDetailPage from './pages/WishlistDetailPage.jsx';
+import OrdersPage from './pages/OrdersPage.jsx';
+import OrderDetailPage from './pages/OrderDetailPage.jsx';
+
+// --- START: New imports for Account Layout ---
+import AccountLayout from './pages/AccountLayout.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
+// --- END: New imports ---
+
 
 import './App.css';
 
@@ -25,21 +30,7 @@ function App() {
     return (
         <>
             <Header />
-            {/* --- START: Added ToastContainer component --- */}
-            {/* This component will render all our notifications */}
-            <ToastContainer
-                position="bottom-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="dark" // Set the theme to dark to match your site
-            />
-            {/* --- END: Added ToastContainer component --- */}
+            <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />
             <main className="container">
                 <Routes>
                     {/* Public Routes */}
@@ -49,11 +40,20 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
 
-                    {/* User Routes (Logged In) */}
+                    {/* --- START: New Nested Account Routes --- */}
+                    <Route path="/account" element={<AccountLayout />}>
+                        {/* Redirect /account to /account/profile by default */}
+                        <Route index element={<Navigate to="profile" replace />} />
+                        <Route path="profile" element={<ProfilePage />} />
+                        <Route path="orders" element={<OrdersPage />} />
+                        <Route path="wishlists" element={<WishlistsPage />} />
+                    </Route>
+                    {/* --- END: New Nested Account Routes --- */}
+
+                    {/* Standalone User Routes */}
                     <Route path="/cart" element={<CartPage />} />
-                    <Route path="/account" element={<AccountPage />} />
-                    <Route path="/wishlists" element={<WishlistsPage />} />
                     <Route path="/wishlists/:id" element={<WishlistDetailPage />} />
+                    <Route path="/orders/:id" element={<OrderDetailPage />} />
 
                     {/* Seller Routes */}
                     <Route path="/products/add" element={<AddProductPage />} />

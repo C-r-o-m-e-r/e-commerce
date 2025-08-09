@@ -81,7 +81,7 @@ const WishlistDetailPage = () => {
     }
 
     return (
-        <div className="wishlist-detail-container">
+        <div className="page-container">
             <h2>{wishlist.name}</h2>
             <div className="wishlist-items-list">
                 {wishlist.items.length > 0 ? (
