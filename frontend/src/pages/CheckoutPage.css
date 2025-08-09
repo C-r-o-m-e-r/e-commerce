@@ -1,0 +1,16 @@
+﻿/* frontend/src/pages/CheckoutPage.css */
+
+.checkout-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #1a1a1a;
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+}
+
+    .checkout-container h2 {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 2rem;
+    }

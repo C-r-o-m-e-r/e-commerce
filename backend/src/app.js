@@ -4,7 +4,24 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
+// Import controllers and routes
+const { handleStripeWebhook } = require('./controllers/payments.controller');
+const authRoutes = require('./routes/auth.routes');
+const productsRoutes = require('./routes/products.routes');
+const cartRoutes = require('./routes/cart.routes');
+const ordersRoutes = require('./routes/orders.routes');
+const paymentsRoutes = require('./routes/payments.routes');
+const usersRoutes = require('./routes/users.routes');
+const wishlistRoutes = require('./routes/wishlist.routes');
+const categoryRoutes = require('./routes/category.routes');
+const reviewRoutes = require('./routes/review.routes');
+
 const app = express();
+
+// --- START: Stripe Webhook Route ---
+// This route must be registered BEFORE express.json() to work with raw request bodies.
+app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
+// --- END: Stripe Webhook Route ---
 
 // Middleware
 app.use(express.json());
@@ -14,18 +31,7 @@ const uploadsPath = path.join(__dirname, '../uploads');
 console.log(`[SERVER] Serving static files from: ${uploadsPath}`);
 app.use('/uploads', express.static(uploadsPath));
 
-// Import Routes
-const authRoutes = require('./routes/auth.routes');
-const productsRoutes = require('./routes/products.routes');
-const cartRoutes = require('./routes/cart.routes');
-const ordersRoutes = require('./routes/orders.routes');
-const paymentsRoutes = require('./routes/payments.routes');
-const usersRoutes = require('./routes/users.routes');
-const wishlistRoutes = require('./routes/wishlist.routes');
-const categoryRoutes = require('./routes/category.routes');
-const reviewRoutes = require('./routes/review.routes'); // 1. Import the new review routes
-
-// Register Routes
+// Register all other API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/cart', cartRoutes);
@@ -34,7 +40,7 @@ app.use('/api/payments', paymentsRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/wishlists', wishlistRoutes);
 app.use('/api/categories', categoryRoutes);
-app.use('/api/reviews', reviewRoutes); // 2. Register the new review routes
+app.use('/api/reviews', reviewRoutes);
 
 // Root route placeholder
 app.get('/', (req, res) => {

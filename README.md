@@ -95,14 +95,18 @@ Make sure you have the following software installed:
     ```bash
     cd frontend
     ```
-2.  **Install frontend dependencies:**
+2.  **Create the environment file:**
+    Create a file named `frontend/.env` and add your Stripe Publishable Key:
+    `VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...`
+
+3.  **Install frontend dependencies:**
     ```bash
     npm install
     ```
 
 ### Running the Application
 
-You need **two separate terminals** to run both services concurrently.
+You need **two to three terminals** to run all services for local development.
 
 1.  **Terminal 1: Start the Backend**
     ```bash
@@ -119,7 +123,28 @@ You need **two separate terminals** to run both services concurrently.
     ```
     The React application will be available at `http://localhost:5173`.
 
+### Testing Payments with Stripe
+
+To test the payment flow, you need to forward Stripe's webhook events to your local backend server. This requires a **third terminal**.
+
+1.  **Log in to the Stripe CLI:**
+    ```bash
+    stripe login
+    ```
+2.  **Forward events to your local webhook endpoint:**
+    ```bash
+    stripe listen --forward-to http://localhost:3000/api/payments/webhook
+    ```
+3.  The command will output a **webhook signing secret** (it starts with `whsec_...`). **Copy this key.**
+4.  Open your `backend/.env` file and paste this key as the value for `STRIPE_WEBHOOK_SECRET`.
+5.  **Restart your backend server** to apply the new environment variable.
+6.  Keep the `stripe listen` command running in its terminal while you test payments.
+
 ## API Endpoints
+
+(API tables remain the same)
+
+---
 
 ### Auth
 | Method | Path | Protected | Description |
