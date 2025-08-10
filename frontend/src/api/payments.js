@@ -1,6 +1,6 @@
 ﻿// frontend/src/api/payments.js
 
-const API_URL = 'http://127.0.0.1:3000/api';
+const API_URL = '/api';
 
 /**
  * Creates a new Stripe Payment Intent on the backend.

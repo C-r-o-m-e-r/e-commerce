@@ -84,18 +84,19 @@ const Header = () => {
                                     </div>
                                 }
                             >
-                                {/* --- START: SIMPLIFIED DROPDOWN --- */}
                                 <Link to="/account" className="dropdown-item">Your Account</Link>
-                                {/* "My Orders" and "My Wishlists" are now accessed from within the Account page */}
 
                                 {user.role === 'SELLER' && (
                                     <>
+                                        {/* --- START: New Link for Seller Dashboard --- */}
+                                        <Link to="/seller/dashboard" className="dropdown-item">Dashboard</Link>
+                                        {/* --- END: New Link --- */}
+                                        <Link to="/seller/orders" className="dropdown-item">My Sales</Link>
                                         <Link to="/my-products" className="dropdown-item">My Products</Link>
                                         <Link to="/products/add" className="dropdown-item">Add Product</Link>
                                     </>
                                 )}
                                 <button onClick={handleLogout} className="dropdown-item">Logout</button>
-                                {/* --- END: SIMPLIFIED DROPDOWN --- */}
                             </Dropdown>
 
                             <Link to="/cart" className="nav-link cart-icon-link">

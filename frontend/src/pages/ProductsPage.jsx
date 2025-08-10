@@ -1,4 +1,4 @@
-// src/pages/ProductsPage.jsx
+﻿// src/pages/ProductsPage.jsx
 
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -15,7 +15,7 @@ const ProductsPage = () => {
             const searchTerm = searchParams.get('search');
             const selectedCategory = searchParams.get('category');
 
-            let url = new URL('http://127.0.0.1:3000/api/products');
+            let url = new URL('/api/products', window.location.origin);
             if (searchTerm) {
                 url.searchParams.append('search', searchTerm);
             }
@@ -57,7 +57,7 @@ const ProductsPage = () => {
                                     <img
                                         src={
                                             product.images && product.images.length > 0
-                                                ? `http://127.0.0.1:3000${product.images[0]}`
+                                                ? product.images[0]
                                                 : 'https://via.placeholder.com/300'
                                         }
                                         alt={product.title}

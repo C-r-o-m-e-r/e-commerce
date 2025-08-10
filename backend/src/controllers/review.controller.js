@@ -33,11 +33,12 @@ const createReview = async (req, res) => {
         const { rating, comment } = req.body;
         const userId = req.user.id;
 
-        // --- Security Check: Has the user purchased this product? ---
+        // --- START: FIX for Security Check ---
+        // Now checks if the order has been paid, shipped, or completed.
         const hasPurchased = await prisma.order.findFirst({
             where: {
                 buyerId: userId,
-                status: 'COMPLETED', // Or 'SHIPPED', depending on your logic
+                status: { in: ['PAID', 'SHIPPED', 'COMPLETED'] },
                 items: {
                     some: {
                         productId: productId,
@@ -45,20 +46,19 @@ const createReview = async (req, res) => {
                 },
             },
         });
+        // --- END: FIX ---
 
         if (!hasPurchased) {
             return res.status(403).json({ message: 'You can only review products you have purchased.' });
         }
 
-        // --- Validation ---
         if (!rating || rating < 1 || rating > 5) {
             return res.status(400).json({ message: 'Rating must be a number between 1 and 5.' });
         }
 
-        // Use `upsert` to create a new review or update an existing one
         const newReview = await prisma.review.upsert({
             where: {
-                userId_productId: { // Unique constraint we defined in the schema
+                userId_productId: {
                     userId: userId,
                     productId: productId,
                 },
@@ -78,7 +78,6 @@ const createReview = async (req, res) => {
         res.status(201).json(newReview);
     } catch (error) {
         console.error('Create review error:', error);
-        // Handle cases where the user might try to review the same product twice
         if (error.code === 'P2002') {
             return res.status(409).json({ message: 'You have already reviewed this product.' });
         }

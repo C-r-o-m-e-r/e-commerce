@@ -3,8 +3,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const prisma = require('../config/prisma');
 
-// This function now creates an order and clears the cart.
-// It will be called ONLY by the Stripe webhook after a successful payment.
+// This function is now responsible for decrementing stock
 const fulfillOrder = async (session) => {
     const userId = session.metadata.userId;
     const cart = await prisma.cart.findUnique({
@@ -15,12 +14,12 @@ const fulfillOrder = async (session) => {
     if (cart && cart.items.length > 0) {
         try {
             await prisma.$transaction(async (tx) => {
-                // 1. Create the Order from the cart details
+                // 1. Create the Order (same as before)
                 await tx.order.create({
                     data: {
                         buyerId: userId,
                         total: cart.items.reduce((acc, item) => acc + item.quantity * item.product.price, 0),
-                        status: 'PAID', // The order is immediately marked as PAID
+                        status: 'PAID',
                         items: {
                             create: cart.items.map((item) => ({
                                 productId: item.productId,
@@ -32,12 +31,24 @@ const fulfillOrder = async (session) => {
                     },
                 });
 
-                // 2. Clear the user's cart
+                // 2. Decrement stock for each item in the cart
+                for (const item of cart.items) {
+                    await tx.product.update({
+                        where: { id: item.productId },
+                        data: {
+                            stock: {
+                                decrement: item.quantity,
+                            },
+                        },
+                    });
+                }
+
+                // 3. Clear the user's cart
                 await tx.cartItem.deleteMany({
                     where: { cartId: cart.id },
                 });
             });
-            console.log(`SUCCESS: Order created for user ${userId} and cart cleared.`);
+            console.log(`SUCCESS: Order created for user ${userId}, stock updated, and cart cleared.`);
         } catch (error) {
             console.error(`DATABASE ERROR during order fulfillment for user ${userId}:`, error);
         }
@@ -58,14 +69,24 @@ const createPaymentIntent = async (req, res) => {
             return res.status(400).json({ message: 'Cannot create payment for an empty cart.' });
         }
 
+        // --- START: Stock Validation ---
+        // Check if every item in the cart is in stock BEFORE creating the payment
+        for (const item of cart.items) {
+            if (item.product.stock < item.quantity) {
+                return res.status(400).json({
+                    message: `Not enough stock for ${item.product.title}. Only ${item.product.stock} left.`
+                });
+            }
+        }
+        // --- END: Stock Validation ---
+
         const total = cart.items.reduce((acc, item) => acc + item.quantity * item.product.price, 0);
 
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(total * 100), // Amount in cents
+            amount: Math.round(total * 100),
             currency: 'usd',
             payment_method_types: ['card'],
             metadata: {
-                // We store the userId to create the order later in the webhook
                 userId: userId
             },
         });
@@ -90,12 +111,9 @@ const handleStripeWebhook = async (req, res) => {
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    // Handle the payment_intent.succeeded event
     if (event.type === 'payment_intent.succeeded') {
         const paymentIntent = event.data.object;
         console.log(`Webhook received: PaymentIntent ${paymentIntent.id} succeeded.`);
-
-        // Fulfill the order (create order in DB, clear cart)
         await fulfillOrder(paymentIntent);
     }
 

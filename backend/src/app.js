@@ -15,6 +15,7 @@ const usersRoutes = require('./routes/users.routes');
 const wishlistRoutes = require('./routes/wishlist.routes');
 const categoryRoutes = require('./routes/category.routes');
 const reviewRoutes = require('./routes/review.routes');
+const sellerRoutes = require('./routes/seller.routes'); // 1. Import the new seller routes
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/wishlists', wishlistRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/seller', sellerRoutes); // 2. Register the new seller routes
 
 // Root route placeholder
 app.get('/', (req, res) => {

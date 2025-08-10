@@ -47,6 +47,7 @@ model Product {
   description   String
   price         Float
   images        String[]
+  stock         Int            @default(0)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   sellerId      String
@@ -54,6 +55,7 @@ model Product {
   cartItems     CartItem[]
   wishlistItems WishlistItem[]
   reviews       Review[]
+  orderItems    OrderItem[]
   categoryId    String
   category      Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 }
@@ -110,12 +112,8 @@ enum OrderStatus {
 
 model Order {
   id        String      @id @default(cuid())
-  // --- START: FIX ---
-  // We make the relation to the buyer optional, so an order can exist
-  // even if the user who made it is deleted.
   buyer     User?       @relation(fields: [buyerId], references: [id], onDelete: SetNull)
-  buyerId   String?     // The '?' makes this field optional (nullable).
-  // --- END: FIX ---
+  buyerId   String?
   items     OrderItem[]
   total     Float
   status    OrderStatus @default(PENDING)
@@ -127,7 +125,13 @@ model OrderItem {
   id        String   @id @default(cuid())
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId   String
-  productId String
+  
+  // --- START: FIX ---
+  // We make the relation to the Product optional.
+  product   Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId String?   // The '?' makes this field optional (nullable).
+  // --- END: FIX ---
+
   title     String
   price     Float
   quantity  Int
