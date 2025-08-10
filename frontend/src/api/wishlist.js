@@ -1,6 +1,6 @@
 ﻿// frontend/src/api/wishlist.js
 
-const API_URL = 'http://127.0.0.1:3000/api';
+const API_URL = '/api';
 
 // Helper to handle API errors consistently
 const handleResponse = async (response) => {

@@ -89,7 +89,7 @@ const WishlistDetailPage = () => {
                         <div key={item.id} className="wishlist-item-card">
                             <Link to={`/products/${item.product.id}`}>
                                 <img
-                                    src={`http://127.0.0.1:3000${item.product.images[0]}`}
+                                    src={item.product.images[0]}
                                     alt={item.product.title}
                                     className="wishlist-item-image"
                                 />

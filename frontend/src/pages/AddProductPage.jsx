@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
-import { getCategories } from '../api/category.js'; // Import categories API
+import { getCategories } from '../api/category.js';
 import ImageDropzone from '../components/ImageDropzone.jsx';
 import './Form.css';
 
@@ -12,9 +12,10 @@ const AddProductPage = () => {
         title: '',
         description: '',
         price: '',
-        categoryId: '', // Add categoryId to state
+        categoryId: '',
+        stock: '', // Add stock to state
     });
-    const [categories, setCategories] = useState([]); // State to hold categories
+    const [categories, setCategories] = useState([]);
     const [imageFiles, setImageFiles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -25,12 +26,10 @@ const AddProductPage = () => {
     const DESC_MAX_LENGTH = 500;
     const PRICE_MAX_VALUE = 20000;
 
-    // Fetch categories when the component mounts
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const data = await getCategories();
-                // Flatten the category tree for a simple dropdown
                 const flattened = [];
                 const flatten = (cat, prefix = '') => {
                     flattened.push({ ...cat, name: prefix + cat.name });
@@ -79,13 +78,14 @@ const AddProductPage = () => {
         data.append('title', formData.title);
         data.append('description', formData.description);
         data.append('price', formData.price);
-        data.append('categoryId', formData.categoryId); // Append categoryId
+        data.append('categoryId', formData.categoryId);
+        data.append('stock', formData.stock); // Add stock to form data
         imageFiles.forEach(file => {
             data.append('images', file);
         });
 
         try {
-            const response = await fetch('http://127.0.0.1:3000/api/products', {
+            const response = await fetch('/api/products', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: data,
@@ -121,12 +121,19 @@ const AddProductPage = () => {
                     <small className="char-counter">{formData.description.length} / {DESC_MAX_LENGTH}</small>
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="price">Price</label>
-                    <input type="number" id="price" name="price" value={formData.price} onChange={handleChange} required min="0.01" max={PRICE_MAX_VALUE} step="0.01" />
+                <div className="form-row">
+                    <div className="form-group">
+                        <label htmlFor="price">Price</label>
+                        <input type="number" id="price" name="price" value={formData.price} onChange={handleChange} required min="0.01" max={PRICE_MAX_VALUE} step="0.01" />
+                    </div>
+                    {/* --- START: New Stock Input --- */}
+                    <div className="form-group">
+                        <label htmlFor="stock">Quantity in Stock</label>
+                        <input type="number" id="stock" name="stock" value={formData.stock} onChange={handleChange} required min="0" />
+                    </div>
+                    {/* --- END: New Stock Input --- */}
                 </div>
 
-                {/* --- START: Category Select Dropdown --- */}
                 <div className="form-group">
                     <label htmlFor="categoryId">Category</label>
                     <select id="categoryId" name="categoryId" value={formData.categoryId} onChange={handleChange} required>
@@ -136,7 +143,6 @@ const AddProductPage = () => {
                         ))}
                     </select>
                 </div>
-                {/* --- END: Category Select Dropdown --- */}
 
                 <div className="form-group">
                     <label>Product Images</label>

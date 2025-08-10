@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { getCategories } from '../api/category.js'; // Import categories API
+import { getCategories } from '../api/category.js';
 import ImageDropzone from '../components/ImageDropzone.jsx';
 import './Form.css';
 import './EditProductPage.css';
@@ -13,8 +13,8 @@ const EditProductPage = () => {
     const navigate = useNavigate();
     const { token } = useAuth();
 
-    const [formData, setFormData] = useState({ title: '', description: '', price: '', categoryId: '' });
-    const [categories, setCategories] = useState([]); // State to hold categories
+    const [formData, setFormData] = useState({ title: '', description: '', price: '', categoryId: '', stock: '' });
+    const [categories, setCategories] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
     const [newImageFiles, setNewImageFiles] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -28,9 +28,8 @@ const EditProductPage = () => {
     useEffect(() => {
         const fetchPageData = async () => {
             try {
-                // Fetch both product and categories in parallel
                 const [productResponse, categoriesData] = await Promise.all([
-                    fetch(`http://127.0.0.1:3000/api/products/${id}`),
+                    fetch(`/api/products/${id}`),
                     getCategories()
                 ]);
 
@@ -41,11 +40,11 @@ const EditProductPage = () => {
                     title: productData.title,
                     description: productData.description,
                     price: productData.price,
-                    categoryId: productData.categoryId, // Set initial category
+                    categoryId: productData.categoryId,
+                    stock: productData.stock, // Set initial stock
                 });
                 setExistingImages(productData.images || []);
 
-                // Flatten categories for the dropdown
                 const flattened = [];
                 const flatten = (cat, prefix = '') => {
                     flattened.push({ ...cat, name: prefix + cat.name });
@@ -93,6 +92,7 @@ const EditProductPage = () => {
         data.append('description', formData.description);
         data.append('price', formData.price);
         data.append('categoryId', formData.categoryId);
+        data.append('stock', formData.stock); // Add stock to form data
         data.append('existingImages', JSON.stringify(existingImages));
 
         newImageFiles.forEach(file => {
@@ -100,7 +100,7 @@ const EditProductPage = () => {
         });
 
         try {
-            const response = await fetch(`http://127.0.0.1:3000/api/products/${id}`, {
+            const response = await fetch(`/api/products/${id}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: data,
@@ -137,12 +137,20 @@ const EditProductPage = () => {
                     <textarea id="description" name="description" value={formData.description} onChange={handleChange} required rows="5" maxLength={DESC_MAX_LENGTH}></textarea>
                     <small className="char-counter">{formData.description.length} / {DESC_MAX_LENGTH}</small>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="price">Price</label>
-                    <input type="number" id="price" name="price" value={formData.price} onChange={handleChange} required min="0.01" max={PRICE_MAX_VALUE} step="0.01" />
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label htmlFor="price">Price</label>
+                        <input type="number" id="price" name="price" value={formData.price} onChange={handleChange} required min="0.01" max={PRICE_MAX_VALUE} step="0.01" />
+                    </div>
+                    {/* --- START: New Stock Input --- */}
+                    <div className="form-group">
+                        <label htmlFor="stock">Quantity in Stock</label>
+                        <input type="number" id="stock" name="stock" value={formData.stock} onChange={handleChange} required min="0" />
+                    </div>
+                    {/* --- END: New Stock Input --- */}
                 </div>
 
-                {/* --- START: Category Select Dropdown --- */}
                 <div className="form-group">
                     <label htmlFor="categoryId">Category</label>
                     <select id="categoryId" name="categoryId" value={formData.categoryId} onChange={handleChange} required>
@@ -152,14 +160,13 @@ const EditProductPage = () => {
                         ))}
                     </select>
                 </div>
-                {/* --- END: Category Select Dropdown --- */}
 
                 <div className="form-group">
                     <label>Existing Images ({existingImages.length} / {TOTAL_IMAGE_LIMIT})</label>
                     <div className="existing-images-container">
                         {existingImages.length > 0 ? existingImages.map((imageUrl, index) => (
                             <div key={index} className="existing-image-preview">
-                                <img src={`http://127.0.0.1:3000${imageUrl}`} alt="Existing product" />
+                                <img src={imageUrl} alt="Existing product" />
                                 <button type="button" className="remove-image-btn" onClick={() => handleRemoveExistingImage(imageUrl)}>×</button>
                             </div>
                         )) : <p>No existing images.</p>}

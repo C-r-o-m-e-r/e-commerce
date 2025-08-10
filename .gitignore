@@ -1,1 +1,19 @@
-/.vs
+# Environment variables
+/backend/.env
+/frontend/.env
+
+# Dependencies
+/node_modules
+/backend/node_modules
+/frontend/node_modules
+
+# IDE & Editor folders
+/.vs/
+/.vscode/
+
+# Build output
+/frontend/dist
+
+# OS generated files
+.DS_Store
+Thumbs.db

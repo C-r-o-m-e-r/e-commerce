@@ -53,7 +53,7 @@ Make sure you have the following software installed:
 - [Node.js](https://nodejs.org/) (LTS version recommended)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Git](https://git-scm.com/)
-- [Stripe CLI](https://stripe.com/docs/stripe-cli) (for testing payments locally)
+- [Stripe CLI](https://github.com/stripe/stripe-cli/releases) (for testing payments locally)
 
 ### Backend Setup
 
@@ -141,8 +141,6 @@ To test the payment flow, you need to forward Stripe's webhook events to your lo
 6.  Keep the `stripe listen` command running in its terminal while you test payments.
 
 ## API Endpoints
-
-(API tables remain the same)
 
 ---
 

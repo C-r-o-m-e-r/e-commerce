@@ -1,8 +1,11 @@
-// src/App.jsx
+﻿// src/App.jsx
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+// 1. ІМПОРТУЄМО ПРОВАЙДЕР
+import { AuthProvider } from './context/AuthContext.jsx';
 
 import Header from './components/Header';
 import ProductsPage from './pages/ProductsPage';
@@ -19,13 +22,17 @@ import OrdersPage from './pages/OrdersPage.jsx';
 import OrderDetailPage from './pages/OrderDetailPage.jsx';
 import AccountLayout from './pages/AccountLayout.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
-import CheckoutPage from './pages/CheckoutPage.jsx'; // 1. Import the new CheckoutPage
+import CheckoutPage from './pages/CheckoutPage.jsx';
+import SellerOrdersPage from './pages/SellerOrdersPage.jsx';
+import DashboardPage from './pages/DashboardPage.jsx';
+import SellerOrderDetailPage from './pages/SellerOrderDetailPage.jsx';
 
 import './App.css';
 
 function App() {
     return (
-        <>
+        // 2. ОГОРТАЄМО УВЕСЬ ДОДАТОК В AUTHPROVIDER
+        <AuthProvider>
             <Header />
             <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />
             <main className="container">
@@ -49,16 +56,18 @@ function App() {
                     <Route path="/cart" element={<CartPage />} />
                     <Route path="/wishlists/:id" element={<WishlistDetailPage />} />
                     <Route path="/orders/:id" element={<OrderDetailPage />} />
-                    <Route path="/checkout" element={<CheckoutPage />} /> {/* 2. Add the new route */}
-
+                    <Route path="/checkout" element={<CheckoutPage />} />
 
                     {/* Seller Routes */}
+                    <Route path="/seller/dashboard" element={<DashboardPage />} />
+                    <Route path="/seller/orders" element={<SellerOrdersPage />} />
+                    <Route path="/seller/orders/:id" element={<SellerOrderDetailPage />} />
                     <Route path="/products/add" element={<AddProductPage />} />
                     <Route path="/my-products" element={<MyProductsPage />} />
                     <Route path="/products/edit/:id" element={<EditProductPage />} />
                 </Routes>
             </main>
-        </>
+        </AuthProvider>
     );
 }
 

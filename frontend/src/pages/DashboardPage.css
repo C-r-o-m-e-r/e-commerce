@@ -1,0 +1,88 @@
+﻿/* frontend/src/pages/DashboardPage.css */
+
+.dashboard-container h2 {
+    margin-bottom: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: #1a1a1a;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+}
+
+    .stat-card h4 {
+        margin: 0 0 0.5rem 0;
+        color: #a0a0a0;
+        font-size: 1rem;
+        font-weight: normal;
+    }
+
+    .stat-card p {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #fff;
+    }
+
+.dashboard-section {
+    margin-bottom: 2rem;
+}
+
+.chart-container {
+    background-color: #1a1a1a;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.dashboard-list {
+    background-color: #1a1a1a;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+    min-height: 200px;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #333;
+    text-decoration: none;
+    color: #e0e0e0;
+    transition: background-color 0.2s;
+}
+
+    .list-item:last-child {
+        border-bottom: none;
+    }
+
+    .list-item:hover {
+        background-color: #2a2a2a;
+    }
+
+.low-stock-count {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}body {
+}
