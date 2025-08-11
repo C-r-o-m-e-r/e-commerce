@@ -25,6 +25,7 @@ const ProductDetailPage = () => {
     const [reviews, setReviews] = useState([]);
     const [newRating, setNewRating] = useState(0);
     const [newComment, setNewComment] = useState('');
+    const [hasReviewed, setHasReviewed] = useState(false); // New state to track if user has reviewed
 
     const [selectedImage, setSelectedImage] = useState(0);
     const [isLightboxOpen, setLightboxOpen] = useState(false);
@@ -33,6 +34,8 @@ const ProductDetailPage = () => {
     const [isWishlistModalOpen, setWishlistModalOpen] = useState(false);
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
     const [newWishlistName, setNewWishlistName] = useState('');
+
+    const COMMENT_MAX_LENGTH = 500;
 
     const goToNextImage = (e) => {
         e.stopPropagation();
@@ -96,6 +99,10 @@ const ProductDetailPage = () => {
 
                 if (user && token) {
                     await fetchUserWishlists(productId);
+                    const userReview = reviewsResponse.find(review => review.userId === user.id);
+                    if (userReview) {
+                        setHasReviewed(true);
+                    }
                 }
             } catch (err) {
                 setError(err.message);
@@ -185,12 +192,19 @@ const ProductDetailPage = () => {
             return toast.warn('Please select a star rating.');
         }
         try {
-            const newReview = await createReview(productId, { rating: newRating, comment: newComment }, token);
-            // Add the new review to the top of the list instantly
-            const updatedReview = { ...newReview, user: { firstName: user.firstName } };
-            setReviews([updatedReview, ...reviews]);
-            setNewComment('');
-            setNewRating(0);
+            const newReviewData = await createReview(productId, { rating: newRating, comment: newComment }, token);
+            const newReview = { ...newReviewData, user: { firstName: user.firstName } };
+
+            const existingReviewIndex = reviews.findIndex(r => r.userId === user.id);
+            if (existingReviewIndex > -1) {
+                const updatedReviews = [...reviews];
+                updatedReviews[existingReviewIndex] = newReview;
+                setReviews(updatedReviews);
+            } else {
+                setReviews([newReview, ...reviews]);
+            }
+
+            setHasReviewed(true);
             toast.success('Thank you for your review!');
         } catch (err) {
             toast.error(err.message);
@@ -204,7 +218,6 @@ const ProductDetailPage = () => {
     if (!product) return <p>Product not found.</p>;
 
     const getImageUrl = (imagePath) => imagePath;
-
     const isOutOfStock = product.stock === 0;
 
     return (
@@ -269,15 +282,30 @@ const ProductDetailPage = () => {
                     </div>
 
                     {user && (
+                        hasReviewed ? (
+                            <div className="review-form-message">
+                                <p>Thank you for your feedback! You can edit your review by submitting a new one.</p>
+                            </div>
+                        ) : null
+                    )}
+
+                    {user && (
                         <form className="review-form" onSubmit={handleReviewSubmit}>
-                            <h4>Write Your Review</h4>
+                            <h4>{hasReviewed ? 'Update Your Review' : 'Write Your Review'}</h4>
                             <div className="form-group rating-input">
                                 <label>Your Rating</label>
                                 <StarRating rating={newRating} onRatingChange={setNewRating} isEditable={true} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="comment">Your Comment</label>
-                                <textarea id="comment" value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="Share your thoughts... (optional)"></textarea>
+                                <textarea
+                                    id="comment"
+                                    value={newComment}
+                                    onChange={(e) => setNewComment(e.target.value)}
+                                    placeholder="Share your thoughts... (optional)"
+                                    maxLength={COMMENT_MAX_LENGTH}
+                                ></textarea>
+                                <small className="char-counter">{newComment.length} / {COMMENT_MAX_LENGTH}</small>
                             </div>
                             <button type="submit">Submit Review</button>
                         </form>

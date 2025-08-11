@@ -6,6 +6,7 @@ const getDashboardStats = async (req, res) => {
     try {
         const sellerId = req.user.id;
 
+        // --- Start: Revenue and Sales Count Calculation ---
         const orders = await prisma.order.findMany({
             where: {
                 status: { in: ['PAID', 'SHIPPED', 'COMPLETED'] },
@@ -36,7 +37,10 @@ const getDashboardStats = async (req, res) => {
         });
 
         const salesCount = orders.length;
+        // --- End: Revenue and Sales Count Calculation ---
 
+
+        // --- Start: Low Stock Products ---
         const lowStockProducts = await prisma.product.findMany({
             where: {
                 sellerId: sellerId,
@@ -50,7 +54,10 @@ const getDashboardStats = async (req, res) => {
             },
             take: 5,
         });
+        // --- End: Low Stock Products ---
 
+
+        // --- Start: Recent Orders ---
         const recentOrders = await prisma.order.findMany({
             where: {
                 items: {
@@ -75,12 +82,25 @@ const getDashboardStats = async (req, res) => {
                 }
             }
         });
+        // --- End: Recent Orders ---
+
+
+        // --- NEW: Calculate total for each recent order ---
+        const recentOrdersWithTotal = recentOrders.map(order => {
+            const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            // Return a new object for the order, including the calculated total
+            return {
+                ...order,
+                total
+            };
+        });
+        // --- END NEW ---
 
         res.status(200).json({
             totalRevenue: totalRevenue.toFixed(2),
             salesCount,
             lowStockProducts,
-            recentOrders,
+            recentOrders: recentOrdersWithTotal, // MODIFIED: Send orders with the total
         });
 
     } catch (error) {
