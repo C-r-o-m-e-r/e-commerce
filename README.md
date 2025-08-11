@@ -8,9 +8,14 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 - **Monorepo Structure:** Backend and frontend code are managed in a single repository.
 - **Authentication:** JWT-based user registration and login.
 - **User Account Management:** A unified account page with nested routing where users can update their profile, change their password, and delete their account.
+- **Seller Dashboard:** A dedicated dashboard for sellers to view sales statistics, recent orders, and low-stock items.
 - **Authorization:** Protected routes and role-based access control (`BUYER`, `SELLER`).
 - **Product Management:** Full CRUD for products, including multi-image uploads. Sellers can manage their own listings.
-- **Product Categories:** A hierarchical category system with infinite nesting for subcategories, allowing for advanced filtering.
+- **Advanced Product Discovery:**
+    - **Filtering:** A hierarchical category system with infinite nesting for subcategories.
+    - **Sorting:** Sort products by newest, price ascending, and price descending.
+    - **Pagination:** Product lists are paginated for better performance and usability.
+    - **Search Autocomplete:** Rich search suggestions (with product image, title, and price) appear as the user types.
 - **Shopping Cart:** Persistent, server-side cart with functionality to add, remove, and update item quantities.
 - **Wishlist Management:** Users can create multiple wishlists, rename them, delete them, and add or remove products.
 - **Order History:** Users can view a list of all their past orders and see a detailed breakdown of each one.
@@ -142,74 +147,81 @@ To test the payment flow, you need to forward Stripe's webhook events to your lo
 
 ## API Endpoints
 
----
-
 ### Auth
 | Method | Path | Protected | Description |
-|:---    |:---                  |:---       |:---         |
+|:---    |:---                   |:---       |:---             |
 | `POST` | `/api/auth/register` | No        | Register a new user. |
 | `POST` | `/api/auth/login`    | No        | Login and receive a JWT. |
 | `GET`  | `/api/auth/me`       | Yes       | Get the current user's profile. |
 
 ### Users
 | Method | Path | Protected | Description |
-|:---    |:---                         |:---       |:---         |
-| `PUT`  | `/api/users/me`             | Yes       | Update the current user's name. |
+|:---    |:---                          |:---       |:---             |
+| `PUT`  | `/api/users/me`               | Yes       | Update the current user's name. |
 | `POST` | `/api/users/me/change-password`| Yes       | Change the current user's password. |
-| `DELETE`| `/api/users/me`            | Yes       | Delete the current user's account. |
+| `DELETE`| `/api/users/me`               | Yes       | Delete the current user's account. |
 
 ### Products
 | Method | Path | Protected | Role | Description |
-|:---    |:---                               |:---       |:---      |:---         |
-| `GET`  | `/api/products`                   | No        | -        | Get a list of all products (accepts `?search=` & `?category=` query). |
-| `GET`  | `/api/products/:id`               | No        | -        | Get a single product by ID. |
+|:---    |:---                                 |:---       |:---      |:---             |
+| `GET`  | `/api/products`                     | No        | -        | Get products. Accepts `search`, `category`, `sortBy`, `page`, `limit`. |
+| `GET`  | `/api/products/suggestions`         | No        | -        | Get search suggestions (for autocomplete). |
+| `GET`  | `/api/products/:id`                 | No        | -        | Get a single product by ID. |
 | `GET`  | `/api/products/seller/my-products`| Yes       | `SELLER` | Get all products for the current seller. |
-| `POST` | `/api/products`                   | Yes       | `SELLER` | Create a new product. |
-| `PUT`  | `/api/products/:id`               | Yes       | `SELLER` | Update your own product. |
-| `DELETE`| `/api/products/:id`              | Yes       | `SELLER` | Delete your own product. |
+| `POST` | `/api/products`                     | Yes       | `SELLER` | Create a new product. |
+| `PUT`  | `/api/products/:id`                 | Yes       | `SELLER` | Update your own product. |
+| `DELETE`| `/api/products/:id`                 | Yes       | `SELLER` | Delete your own product. |
+
+### Seller
+| Method | Path | Protected | Role | Description |
+|:---    |:---                                 |:---       |:---      |:---             |
+| `GET`  | `/api/seller/dashboard`             | Yes       | `SELLER` | Get statistics for the seller dashboard. |
+| `GET`  | `/api/seller/orders`                | Yes       | `SELLER` | Get a list of orders containing the seller's products. |
+| `GET`  | `/api/seller/orders/:id`            | Yes       | `SELLER` | Get a single order by ID. |
+| `PATCH`| `/api/seller/orders/:id/status`     | Yes       | `SELLER` | Update the status of an order. |
 
 ### Categories
 | Method | Path | Protected | Description |
-|:---    |:---                |:---       |:---         |
+|:---    |:---                |:---       |:---             |
 | `GET`  | `/api/categories`  | No        | Get a nested tree of all categories. |
 
 ### Cart
 | Method | Path | Protected | Description |
-|:---    |:---                         |:---       |:---         |
-| `GET`  | `/api/cart`                   | Yes       | Get the user's current cart. |
-| `POST` | `/api/cart/items`             | Yes       | Add an item to the cart. |
-| `PUT`  | `/api/cart/items/:itemId`     | Yes       | Update the quantity of an item in the cart. |
-| `DELETE`| `/api/cart/items/:itemId`    | Yes       | Remove an item from the cart. |
+|:---    |:---                        |:---       |:---             |
+| `GET`  | `/api/cart`                 | Yes       | Get the user's current cart. |
+| `POST` | `/api/cart/items`           | Yes       | Add an item to the cart. |
+| `PUT`  | `/api/cart/items/:itemId`   | Yes       | Update the quantity of an item in the cart. |
+| `DELETE`| `/api/cart/items/:itemId`   | Yes       | Remove an item from the cart. |
 
 ### Wishlists
 | Method | Path | Protected | Description |
-|:---    |:---                                     |:---       |:---         |
-| `GET`  | `/api/wishlists`                        | Yes       | Get all wishlists for the current user. |
-| `POST` | `/api/wishlists`                        | Yes       | Create a new wishlist. |
-| `GET`  | `/api/wishlists/:id`                    | Yes       | Get a single wishlist by ID. |
-| `PATCH`| `/api/wishlists/:id`                    | Yes       | Update (rename) a wishlist. |
-| `DELETE`| `/api/wishlists/:id`                   | Yes       | Delete a wishlist. |
-| `POST` | `/api/wishlists/:wishlistId/items`      | Yes       | Add a product to a wishlist. |
-| `DELETE`| `/api/wishlists/items/by-product/:productId`| Yes   | Remove a product from the user's wishlists. |
+|:---    |:---                                         |:---       |:---             |
+| `GET`  | `/api/wishlists`                            | Yes       | Get all wishlists for the current user. |
+| `POST` | `/api/wishlists`                            | Yes       | Create a new wishlist. |
+| `GET`  | `/api/wishlists/:id`                        | Yes       | Get a single wishlist by ID. |
+| `PATCH`| `/api/wishlists/:id`                        | Yes       | Update (rename) a wishlist. |
+| `DELETE`| `/api/wishlists/:id`                        | Yes       | Delete a wishlist. |
+| `POST` | `/api/wishlists/:wishlistId/items`          | Yes       | Add a product to a wishlist. |
+| `DELETE`| `/api/wishlists/items/by-product/:productId`| Yes       | Remove a product from the user's wishlists. |
 
 ### Reviews
 | Method | Path | Protected | Description |
-|:---    |:---                         |:---       |:---         |
-| `GET`  | `/api/reviews/:productId`     | No        | Get all reviews for a product. |
-| `POST` | `/api/reviews/:productId`     | Yes       | Create or update a review for a product (user must have purchased it). |
+|:---    |:---                      |:---       |:---             |
+| `GET`  | `/api/reviews/:productId`   | No        | Get all reviews for a product. |
+| `POST` | `/api/reviews/:productId`   | Yes       | Create or update a review for a product (user must have purchased it). |
 
 ### Orders
 | Method | Path | Protected | Description |
-|:---    |:---                         |:---       |:---         |
-| `POST` | `/api/orders`                   | Yes       | Create an order from the cart. |
-| `GET`  | `/api/orders`                   | Yes       | Get the user's order history. |
-| `GET`  | `/api/orders/:id`               | Yes       | Get a single order by ID. |
+|:---    |:---                |:---       |:---             |
+| `GET`  | `/api/orders`       | Yes       | Get the user's order history. |
+| `GET`  | `/api/orders/:id`   | Yes       | Get a single order by ID. |
+| `POST` | `/api/orders`       | Yes       | Create an order from the cart. |
 
 ### Payments
-| Method | Path | Protected | Role | Description |
-|:---    |:---                         |:---       |:---      |:---         |
-| `POST` | `/api/payments/create-intent`   | Yes       | Logged In  | Create a Stripe Payment Intent. |
-| `POST` | `/api/payments/webhook`         | No        | -        | Stripe webhook for payment events. |
+| Method | Path | Protected | Description |
+|:---    |:---                          |:---       |:---             |
+| `POST` | `/api/payments/create-intent` | Yes       | Create a Stripe Payment Intent. |
+| `POST` | `/api/payments/webhook`       | No        | Stripe webhook for payment events. |
 
 ## License
 

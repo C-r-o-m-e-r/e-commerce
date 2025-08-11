@@ -50,6 +50,11 @@
     margin-top: 0;
     margin-bottom: 1rem;
     word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .product-info-section .product-description {
@@ -57,13 +62,28 @@
     line-height: 1.7;
     color: #a0a0a0;
     margin-bottom: 2rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .product-info-section .product-price {
     font-size: 2rem;
     font-weight: bold;
     color: #8c9eff;
+    margin-bottom: 1rem; /* Reduced margin */
+}
+
+.stock-info {
     margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.stock-in {
+    color: #2ecc71;
+}
+
+.stock-out {
+    color: #e74c3c;
 }
 
 .add-to-cart-controls {
@@ -101,16 +121,6 @@
     background-color: #535bf2;
 }
 
-.cart-notification {
-    margin-top: 1rem;
-    padding: 0.75rem;
-    border-radius: 6px;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-    text-align: center;
-    font-weight: 500;
-}
-
 /* --- Lightbox Styles --- */
 .lightbox-overlay {
     position: fixed;
@@ -137,10 +147,19 @@
     right: 30px;
     background: none;
     border: none;
-    color: white;
-    font-size: 3rem;
     cursor: pointer;
+    font-size: 3rem; /* Fallback */
 }
+
+    .lightbox-close-btn svg {
+        fill: white;
+        transition: transform 0.2s;
+    }
+
+    .lightbox-close-btn:hover svg {
+        transform: scale(1.1);
+    }
+
 
 .lightbox-nav-btn {
     position: absolute;
@@ -175,7 +194,7 @@
         fill: white;
     }
 
-/* --- START: New Wishlist Styles --- */
+/* --- Wishlist Styles --- */
 .wishlist-btn {
     background: none;
     border: 1px solid #444;
@@ -203,29 +222,17 @@
             fill: #646cff;
         }
 
-.wishlist-selection-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.wishlist-selection-item {
-    width: 100%;
-    padding: 0.75rem;
-    text-align: left;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-    color: #e0e0e0;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-    .wishlist-selection-item:hover {
-        background-color: #3a3a3a;
+    .wishlist-btn.active svg path:last-child {
+        fill: #8a2be2;
     }
-/* --- END: New Wishlist Styles --- */
+
+    .wishlist-btn.active:hover svg path:last-child {
+        fill: #7b24cc;
+    }
+
+    .wishlist-btn.active {
+        border-color: #8a2be2;
+    }
 
 @media (max-width: 768px) {
     .product-detail-container {
@@ -233,102 +240,9 @@
     }
 }
 
-/* --- New styles for the Wishlist Creation Modal --- */
-.wishlist-selection-list-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.add-wishlist-btn {
-    background-color: #8a2be2; /* Purple */
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 40px; /* Center the plus sign vertically */
-    text-align: center;
-    cursor: pointer;
-    margin-top: 1rem;
-    align-self: center; /* Center it horizontally */
-    transition: background-color 0.2s;
-}
-
-    .add-wishlist-btn:hover {
-        background-color: #7b24cc;
-    }
-
-.create-wishlist-input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0.75rem;
-    margin: 1rem 0;
-    border-radius: 6px;
-    border: 1px solid #444;
-    background-color: #2a2a2a;
-    color: #ffffff;
-    font-size: 1rem;
-}
-
-.create-wishlist-button {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #fff;
-    background-color: #646cff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-    .create-wishlist-button:hover {
-        background-color: #535bf2;
-    }
-
-/* FIX: Make the active heart icon purple */
-.wishlist-btn.active svg path:last-child {
-    fill: #8a2be2; /* Purple color */
-}
-
-.wishlist-btn.active:hover svg path:last-child {
-    fill: #7b24cc; /* Darker purple on hover */
-}
-
-.lightbox-close-btn svg {
-    fill: white;
-    transition: transform 0.2s;
-}
-
-.lightbox-close-btn:hover svg {
-    transform: scale(1.1);
-}
-
-.product-info-section h2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* --- FIX for Long Description ---
-  This allows long, unbroken words in the description 
-  to wrap to the next line.
-*/
-.product-info-section .product-description {
-    overflow-wrap: break-word;
-    word-break: break-word; /* For better compatibility */
-}
-
 /* --- Review Section Styles --- */
 .reviews-section {
-    grid-column: 1 / -1; /* Make the section span both columns */
+    grid-column: 1 / -1;
     margin-top: 3rem;
     padding-top: 2rem;
     border-top: 1px solid #444;
@@ -342,7 +256,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-top: -1.5rem; /* Pull it up closer to the price */
+    margin-top: -1rem;
     margin-bottom: 2rem;
 }
 
@@ -382,13 +296,27 @@
 
 /* Review Form Styles */
 .review-form {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid #444;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #444;
 }
 
     .review-form .form-group {
         margin-bottom: 1rem;
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+
+        .review-form .form-group:last-child {
+            padding-bottom: 0;
+        }
+
+    .review-form .char-counter {
+        position: absolute;
+        bottom: 0;
+        right: 5px;
+        font-size: 0.8rem;
+        color: #a0a0a0;
     }
 
     .review-form textarea {
@@ -421,4 +349,10 @@
         border: none;
         border-radius: 8px;
         cursor: pointer;
+        margin-top: 1rem; /* Added margin */
     }
+
+/* --- FIX: Added margin-top to separate the review list from the form --- */
+.review-list {
+    margin-top: 2rem;
+}
