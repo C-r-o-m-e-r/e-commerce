@@ -9,10 +9,11 @@
 
     .wishlists-header h2 {
         margin: 0;
+        color: var(--text-primary);
     }
 
 .btn-create-wishlist {
-    background-color: #646cff;
+    background-color: var(--accent-primary);
     color: white;
     border: none;
     border-radius: 50%;
@@ -26,7 +27,7 @@
 }
 
     .btn-create-wishlist:hover {
-        background-color: #535bf2;
+        background-color: var(--accent-primary-hover);
     }
 
     .btn-create-wishlist svg {
@@ -44,13 +45,13 @@
 }
 
 .wishlist-card {
-    background-color: #1e1e1e;
-    border: 1px solid #444;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 1.5rem;
     text-decoration: none;
     color: inherit;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s ease, border-color 0.3s ease;
     display: block;
     height: 100%;
     box-sizing: border-box;
@@ -58,18 +59,19 @@
 
     .wishlist-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        border-color: var(--accent-primary);
     }
 
     .wishlist-card h3 {
         margin-top: 0;
         margin-bottom: 0.5rem;
-        color: #e0e0e0;
+        color: var(--text-primary);
     }
 
     .wishlist-card p {
         margin: 0;
-        color: #a0a0a0;
+        color: var(--text-secondary);
     }
 
 /* --- Styles for Action Buttons (Rename/Delete) --- */
@@ -109,7 +111,7 @@
 }
 
     .btn-wishlist-action.rename {
-        background-color: #3498db; /* Blue */
+        background-color: #3498db; /* Blue for 'rename' is fine for both themes */
         padding-bottom: 2px;
     }
 
@@ -119,7 +121,7 @@
 
     .btn-wishlist-action.delete {
         font-size: 20px;
-        background-color: #ff4d4d; /* Red */
+        background-color: #ff4d4d; /* Red for 'delete' is fine for both themes */
     }
 
         .btn-wishlist-action.delete:hover {
@@ -129,8 +131,8 @@
 /* Styles for the card during inline editing */
 .wishlist-edit-form {
     padding: 1.5rem;
-    background-color: #2a2a2a;
-    border: 1px solid #646cff;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--accent-primary);
     border-radius: 8px;
     height: 100%;
     box-sizing: border-box;
@@ -142,9 +144,9 @@
         padding: 0.5rem;
         font-size: 1.2rem;
         margin-bottom: 1rem;
-        background-color: #1a1a1a;
-        color: white;
-        border: 1px solid #444;
+        background-color: var(--input-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
         border-radius: 4px;
     }
 
@@ -153,7 +155,6 @@
     gap: 0.5rem;
     justify-content: flex-end;
 }
-
 
 /* --- MODAL STYLES --- */
 .modal-overlay {
@@ -170,16 +171,17 @@
 }
 
 .modal-content {
-    background: #1a1a1a;
+    background: var(--bg-secondary);
     padding: 2rem;
     border-radius: 8px;
     width: 90%;
     max-width: 400px;
-    border: 1px solid #444;
+    border: 1px solid var(--border-color);
 }
 
     .modal-content h3 {
         margin-top: 0;
+        color: var(--text-primary);
     }
 
 .modal-actions {
@@ -200,19 +202,19 @@
 }
 
 .btn-primary {
-    background-color: #646cff;
+    background-color: var(--accent-primary);
     color: white;
 }
 
     .btn-primary:hover {
-        background-color: #535bf2;
+        background-color: var(--accent-primary-hover);
     }
 
 .btn-secondary {
-    background-color: #3a3a3a;
-    color: white;
+    background-color: var(--bg-secondary-hover);
+    color: var(--text-primary);
 }
 
     .btn-secondary:hover {
-        background-color: #4a4a4a;
+        filter: brightness(0.9);
     }

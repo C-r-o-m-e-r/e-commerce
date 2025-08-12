@@ -6,8 +6,7 @@ const path = require('path');
 
 const MAX_PRICE = 20000;
 
-// ... (всі функції, крім getProductSuggestions, залишаються без змін)
-
+// ... (all other functions remain unchanged)
 const getDescendantCategoryIds = async (categoryId) => {
     const directSubcategories = await prisma.category.findMany({
         where: { parentId: categoryId },
@@ -102,7 +101,7 @@ const updateProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
     try {
-        const { search, category, sortBy, page = 1, limit = 8 } = req.query;
+        const { search, category, sortBy, page = 1, limit = 48 } = req.query;
         const whereClause = {};
 
         if (search) {
@@ -187,13 +186,30 @@ const deleteProduct = async (req, res) => {
         const product = await prisma.product.findUnique({ where: { id } });
         if (!product) { return res.status(404).json({ message: 'Product not found' }); }
         if (product.sellerId !== userId) { return res.status(403).json({ message: 'Forbidden: You can only delete your own products' }); }
+
+        console.log('--- STARTING DELETE PROCESS ---');
         if (product.images && product.images.length > 0) {
+            console.log('Found images to delete:', product.images);
             product.images.forEach(imagePath => {
                 const fullPath = path.join(__dirname, '../../', imagePath);
-                if (fs.existsSync(fullPath)) { fs.unlinkSync(fullPath); }
+
+                console.log(`Attempting to delete file at path: ${fullPath}`);
+
+                if (fs.existsSync(fullPath)) {
+                    console.log(`File EXISTS. Deleting...`);
+                    fs.unlinkSync(fullPath);
+                    console.log(`File DELETED successfully.`);
+                } else {
+                    console.log(`File does NOT exist at this path. Skipping.`);
+                }
             });
+        } else {
+            console.log('No images found for this product.');
         }
+
         await prisma.product.delete({ where: { id } });
+        console.log('Product deleted from database.');
+        console.log('--- FINISHED DELETE PROCESS ---');
         res.status(204).send();
     } catch (error) {
         console.error('Delete product error:', error);
@@ -221,8 +237,8 @@ const getProductSuggestions = async (req, res) => {
             select: {
                 id: true,
                 title: true,
-                price: true,  // ADDED: Include the price
-                images: true, // ADDED: Include the images array
+                price: true,
+                images: true,
             },
         });
 

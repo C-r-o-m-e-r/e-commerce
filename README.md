@@ -20,6 +20,9 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 - **Wishlist Management:** Users can create multiple wishlists, rename them, delete them, and add or remove products.
 - **Order History:** Users can view a list of all their past orders and see a detailed breakdown of each one.
 - **Product Reviews & Ratings:** Users who have purchased a product can leave a star rating (1-5) and a written review.
+- **UI/UX Enhancements:**
+    - **Automatic Day/Night Theme:** The UI automatically switches between a light and dark theme based on the user's local time (7 PM - 7 AM for dark mode).
+    - **Scroll to Top Button:** A convenient button appears on long pages to quickly return to the top.
 - **Payment Integration:** Secure payment processing using Stripe Payment Intents and Webhooks.
 
 ## Tech Stack

@@ -1,0 +1,28 @@
+﻿/* frontend/src/components/ScrollToTopButton.css */
+
+.scroll-to-top-button {
+    position: fixed; /* Stay in the same place on the screen */
+    bottom: 30px; /* 30px from the bottom */
+    right: 30px; /* 30px from the right */
+    z-index: 1000; /* Appear on top of other content */
+    /* Button Styling */
+    background-color: #8c9eff; /* Use your violet accent color */
+    color: #1a1a1a; /* Dark text for contrast */
+    border: none;
+    border-radius: 50%; /* Make it a circle */
+    width: 50px; /* Set width */
+    height: 50px; /* Set height */
+    font-size: 24px; /* Make the arrow bigger */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    opacity: 0.8;
+}
+
+    .scroll-to-top-button:hover {
+        opacity: 1;
+        transform: scale(1.1); /* Slightly enlarge on hover */
+    }
