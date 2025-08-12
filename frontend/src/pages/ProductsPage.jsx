@@ -45,7 +45,7 @@ const ProductsPage = () => {
     const [error, setError] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const PRODUCTS_PER_PAGE = 8;
+    const PRODUCTS_PER_PAGE = 48;
 
     // 2. Define sort options as an array of objects
     const sortOptions = [

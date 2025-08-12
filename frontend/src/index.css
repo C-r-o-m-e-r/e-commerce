@@ -1,30 +1,54 @@
 /* frontend/src/index.css */
 
+/* 1. Light theme variables (default) */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    color-scheme: light dark;
+    --bg-primary: #F9F9F9;
+    --bg-secondary: #FFFFFF;
+    --bg-secondary-hover: #E9ECEF; /* ADDED: For subtle hover on light elements */
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --accent-primary: #5A67D8;
+    --accent-primary-hover: #4C5ADF;
+    --border-color: #DEE2E6;
+    --input-bg: #FFFFFF;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
+/* 2. Dark theme variable overrides */
+body.dark-theme {
+    --bg-primary: #242424;
+    --bg-secondary: #1a1a1a;
+    --bg-secondary-hover: #3a3a3a; /* ADDED: Your original hover/button color */
+    --text-primary: rgba(255, 255, 255, 0.87);
+    --text-secondary: #a0a0a0;
+    --accent-primary: #8c9eff;
+    --accent-primary-hover: #a1a9ff;
+    --border-color: #444444;
+    --input-bg: #2a2a2a;
+}
+
+/* 3. Apply variables to global styles */
 body {
-  margin: 0;
-  min-width: 320px;
+    margin: 0;
+    min-width: 320px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
 }
 
 a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+    font-weight: 500;
+    color: var(--accent-primary);
+    text-decoration: inherit;
 }
-a:hover {
-  color: #535bf2;
-}
+
+    a:hover {
+        color: var(--accent-primary-hover);
+    }

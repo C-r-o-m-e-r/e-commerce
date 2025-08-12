@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 import { getCategories } from '../api/category.js';
 import Dropdown from './Dropdown.jsx';
 import CategoryDropdown from './CategoryDropdown.jsx';
@@ -11,6 +12,7 @@ import './Header.css';
 
 const Header = () => {
     const { user, logout } = useAuth();
+    const { theme } = useTheme();
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
 
@@ -32,13 +34,12 @@ const Header = () => {
     };
 
     return (
-        <header className="header">
+        <header className={`header ${theme}-theme`}>
             <nav className="header-nav">
                 <Link to="/" className="logo">
                     Marketplace
                 </Link>
 
-                {/* We return the original container and place both components inside */}
                 <div className="search-container">
                     <CategoryDropdown categories={categories} />
                     <SearchWithSuggestions />
@@ -76,7 +77,11 @@ const Header = () => {
                             </Dropdown>
 
                             <Link to="/cart" className="nav-link cart-icon-link">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24" width="24" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zM1 3h2.15l3.43 7.59-1.18 2.16c-.22.39-.35.83-.35 1.28 0 1.1.9 2 2 2h10v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0021 6H5.21l-.94-2H1V3z" /></svg>
+                                {/* CORRECTED SVG ICON */}
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+                                    <path d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM17 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-1.45-5c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.37-.67-.11-1.48-.88-1.48H5.21l-.94-2H1v2h2l3.6 7.59L3.62 17H19v-2H7l1.1-2h7.45z" />
+                                </svg>
                             </Link>
                         </>
                     )}

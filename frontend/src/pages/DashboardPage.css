@@ -2,6 +2,7 @@
 
 .dashboard-container h2 {
     margin-bottom: 2rem;
+    color: var(--text-primary);
 }
 
 .stats-grid {
@@ -12,15 +13,16 @@
 }
 
 .stat-card {
-    background-color: #1a1a1a;
+    background-color: var(--bg-secondary);
     padding: 1.5rem;
     border-radius: 8px;
-    border: 1px solid #444;
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
     .stat-card h4 {
         margin: 0 0 0.5rem 0;
-        color: #a0a0a0;
+        color: var(--text-secondary);
         font-size: 1rem;
         font-weight: normal;
     }
@@ -29,7 +31,7 @@
         margin: 0;
         font-size: 2.5rem;
         font-weight: bold;
-        color: #fff;
+        color: var(--text-primary);
     }
 
 .dashboard-section {
@@ -37,10 +39,11 @@
 }
 
 .chart-container {
-    background-color: #1a1a1a;
+    background-color: var(--bg-secondary);
     padding: 1.5rem;
     border-radius: 8px;
-    border: 1px solid #444;
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .dashboard-grid {
@@ -50,20 +53,21 @@
 }
 
 .dashboard-list {
-    background-color: #1a1a1a;
+    background-color: var(--bg-secondary);
     padding: 1.5rem;
     border-radius: 8px;
-    border: 1px solid #444;
+    border: 1px solid var(--border-color);
     min-height: 200px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .list-item {
     display: flex;
     justify-content: space-between;
     padding: 0.75rem 0;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--border-color);
     text-decoration: none;
-    color: #e0e0e0;
+    color: var(--text-secondary);
     transition: background-color 0.2s;
 }
 
@@ -72,11 +76,12 @@
     }
 
     .list-item:hover {
-        background-color: #2a2a2a;
+        background-color: var(--input-bg);
+        color: var(--text-primary);
     }
 
 .low-stock-count {
-    color: #e74c3c;
+    color: #e74c3c; /* Status color, should be the same in both themes */
     font-weight: bold;
 }
 
@@ -84,5 +89,4 @@
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
-}body {
 }

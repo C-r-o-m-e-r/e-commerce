@@ -1,126 +1,184 @@
 /* frontend/src/pages/Form.css */
 
 .form-container {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 30px;
-  background-color: #1a1a1a;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.form-container h2 {
-  text-align: center;
-  margin-bottom: 25px;
-  color: #ffffff;
-}
+    .form-container h2 {
+        text-align: center;
+        margin-bottom: 25px;
+    }
 
 .form-group {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #e0e0e0;
-}
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid #444;
-  background-color: #2a2a2a;
-  color: #ffffff;
-  font-size: 16px;
-  box-sizing: border-box;
-}
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--accent-primary-hover);
+        }
 
 .form-container button[type="submit"] {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 6px;
-  background-color: #646cff;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
-.form-container button[type="submit"]:hover {
-  background-color: #535bf2;
+/* --- Light Theme Styles --- */
+.light-theme .form-container {
+    background-color: #FFFFFF;
+    border: 1px solid #DEE2E6;
 }
 
-.form-container button[type="submit"]:disabled {
-  background-color: #4a4a4a;
-  cursor: not-allowed;
+    .light-theme .form-container h2 {
+        color: #212529;
+    }
+
+.light-theme .form-group label {
+    color: #6c757d;
 }
 
+.light-theme .form-group input,
+.light-theme .form-group select,
+.light-theme .form-group textarea {
+    border: 1px solid #DEE2E6;
+    background-color: #FFFFFF;
+    color: #212529;
+}
+
+.light-theme .form-container button[type="submit"] {
+    background-color: #5A67D8;
+    color: white;
+}
+
+    .light-theme .form-container button[type="submit"]:hover {
+        background-color: #4C5ADF;
+    }
+
+    .light-theme .form-container button[type="submit"]:disabled {
+        background-color: #DEE2E6;
+        color: #6c757d;
+    }
+
+.light-theme .password-toggle-btn svg {
+    fill: #6c757d;
+}
+
+.light-theme .password-toggle-btn:hover svg {
+    fill: #212529;
+}
+
+
+/* --- Dark Theme Styles --- */
+.dark-theme .form-container {
+    background-color: #1a1a1a;
+    border: 1px solid #444;
+}
+
+    .dark-theme .form-container h2 {
+        color: #ffffff;
+    }
+
+.dark-theme .form-group label {
+    color: #e0e0e0;
+}
+
+.dark-theme .form-group input,
+.dark-theme .form-group select,
+.dark-theme .form-group textarea {
+    border: 1px solid #444;
+    background-color: #2a2a2a;
+    color: #ffffff;
+}
+
+.dark-theme .form-container button[type="submit"] {
+    background-color: #8c9eff;
+    color: #1a1a1a;
+}
+
+    .dark-theme .form-container button[type="submit"]:hover {
+        background-color: #a1a9ff;
+    }
+
+    .dark-theme .form-container button[type="submit"]:disabled {
+        background-color: #4a4a4a;
+    }
+
+.dark-theme .password-toggle-btn svg {
+    fill: #a0a0a0;
+}
+
+.dark-theme .password-toggle-btn:hover svg {
+    fill: #ffffff;
+}
+
+
+/* Other styles that don't depend on theme */
 .error-message {
-  color: #ff6b6b;
-  margin-top: 15px;
-  text-align: center;
+    color: #ff6b6b;
+    margin-top: 15px;
+    text-align: center;
 }
 
 .success-message {
-  color: #2ecc71;
-  margin-top: 15px;
-  text-align: center;
+    color: #2ecc71;
+    margin-top: 15px;
+    text-align: center;
 }
 
-.form-group select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.7rem center;
-  background-size: 1em;
-}
-
-.form-group select option {
-  background-color: #2a2a2a;
-  color: #ffffff;
-}
-
-/* --- START: Styles for Password Toggle Button --- */
 .password-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
-/* Add padding to the input to prevent text from going under the button */
-.password-input-wrapper input {
-  padding-right: 50px; 
-}
+    .password-input-wrapper input {
+        padding-right: 50px;
+    }
 
 .password-toggle-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background: none;
-  border: none;
-  padding: 0 15px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: none;
+    border: none;
+    padding: 0 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
-.password-toggle-btn svg {
-  fill: #a0a0a0;
-  width: 24px;
-  height: 24px;
-  transition: fill 0.2s;
-}
-
-.password-toggle-btn:hover svg {
-  fill: #ffffff;
-}
-/* --- END: Styles for Password Toggle Button --- */
+    .password-toggle-btn svg {
+        width: 24px;
+        height: 24px;
+        transition: fill 0.2s;
+    }

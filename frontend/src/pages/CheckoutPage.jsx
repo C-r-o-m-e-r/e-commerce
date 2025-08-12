@@ -5,27 +5,25 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 
 import { useAuth } from '../context/AuthContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 import { createPaymentIntent } from '../api/payments.js';
 import CheckoutForm from '../components/CheckoutForm.jsx';
 import './CheckoutPage.css';
 
-// Make sure to call `loadStripe` outside of a component’s render to avoid
-// recreating the `Stripe` object on every render.
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const CheckoutPage = () => {
     const [clientSecret, setClientSecret] = useState("");
     const { token } = useAuth();
+    const { theme } = useTheme();
 
     useEffect(() => {
-        // Create PaymentIntent as soon as the page loads
         const fetchPaymentIntent = async () => {
             try {
                 const data = await createPaymentIntent(token);
                 setClientSecret(data.clientSecret);
             } catch (error) {
                 console.error("Error fetching payment intent:", error);
-                // Handle the error appropriately, maybe show a message to the user
             }
         };
 
@@ -34,17 +32,32 @@ const CheckoutPage = () => {
         }
     }, [token]);
 
-    const appearance = {
-        theme: 'stripe',
-        variables: {
-            colorPrimary: '#646cff',
-            colorBackground: '#1a1a1a',
-            colorText: '#ffffff',
-            colorDanger: '#df1b41',
-            fontFamily: 'Ideal Sans, system-ui, sans-serif',
-            spacingUnit: '4px',
-            borderRadius: '4px',
+    // Define theme-specific variables for the Stripe Element
+    const stripeThemeVariables = theme === 'dark'
+        ? {
+            // Dark Theme Variables
+                    colorPrimary: '#646cff',
+                    colorBackground: '#1a1a1a',
+                    colorText: '#ffffff',
+                    colorDanger: '#df1b41',
         }
+        : {
+            // Light Theme Variables
+            colorPrimary: '#5A67D8',
+            colorBackground: '#ffffff',
+            colorText: '#212529',
+            colorTextSecondary: '#6c757d',
+            colorTextPlaceholder: '#6c757d',
+            borderColor: '#DEE2E6',
+        };
+
+    const appearance = {
+        theme: 'stripe', // Use 'stripe' as a base and override it
+        variables: {
+            fontFamily: 'Inter, system-ui, sans-serif',
+            borderRadius: '8px',
+            ...stripeThemeVariables // Spread in our theme-specific colors
+        },
     };
 
     const options = {
