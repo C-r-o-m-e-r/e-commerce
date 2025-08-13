@@ -1,7 +1,7 @@
 ﻿// backend/src/routes/review.routes.js
 
 const express = require('express');
-const authMiddleware = require('../middleware/auth.middleware');
+const { authMiddleware } = require('../middleware/auth.middleware');
 const { getProductReviews, createReview } = require('../controllers/review.controller');
 
 const router = express.Router();

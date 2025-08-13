@@ -11,9 +11,10 @@ const {
     updateProduct,
     deleteProduct,
     getSellerProducts,
-    getProductSuggestions, // 1. Import the new controller function
+    getProductSuggestions,
 } = require('../controllers/products.controller');
-const authMiddleware = require('../middleware/auth.middleware');
+// FIX: Use destructuring { } to import the specific middleware function
+const { authMiddleware } = require('../middleware/auth.middleware');
 const checkRole = require('../middleware/role.middleware');
 const { processImages } = require('../middleware/image.middleware');
 
@@ -33,11 +34,7 @@ const upload = multer({ storage: storage });
 
 // --- Public routes ---
 router.get('/', getAllProducts);
-
-// 2. Add the new route for suggestions.
-// It's important to place it BEFORE the '/:id' route.
 router.get('/suggestions', getProductSuggestions);
-
 router.get('/:id', getProductById);
 
 

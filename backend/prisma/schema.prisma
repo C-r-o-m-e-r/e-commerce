@@ -62,8 +62,13 @@ model Product {
 
 model Cart {
   id        String     @id @default(cuid())
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String     @unique
+  
+  // --- START: CHANGES FOR GUEST CART ---
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?    @unique // User ID is now optional
+  guestId   String?    @unique // Add an optional, unique ID for guest users
+  // --- END: CHANGES FOR GUEST CART ---
+
   items     CartItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -126,12 +131,9 @@ model OrderItem {
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId   String
   
-  // --- START: FIX ---
-  // We make the relation to the Product optional.
-  product   Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
-  productId String?   // The '?' makes this field optional (nullable).
-  // --- END: FIX ---
-
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId String?
+  
   title     String
   price     Float
   quantity  Int

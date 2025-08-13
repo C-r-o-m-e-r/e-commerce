@@ -1,0 +1,53 @@
+﻿/* frontend/src/components/ProductCardSkeleton.css */
+
+.product-card-skeleton {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* The base style for all skeleton placeholder elements */
+.skeleton {
+    background-color: var(--bg-secondary-hover);
+    border-radius: 4px;
+    animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Keyframes for the pulse animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+}
+
+.skeleton-image {
+    width: 100%;
+    padding-top: 100%; /* Creates a square aspect ratio */
+    border-radius: 0;
+}
+
+.skeleton-content {
+    padding: 1.5rem;
+}
+
+.skeleton-title {
+    height: 24px;
+    margin-bottom: 0.75rem;
+    width: 70%; /* Title is not full width */
+}
+
+.skeleton-text {
+    height: 16px;
+    margin-bottom: 0.5rem;
+}
+
+    .skeleton-text.short {
+        width: 50%; /* A shorter line for the price */
+    }

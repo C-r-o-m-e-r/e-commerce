@@ -181,8 +181,10 @@
 
 /* --- Light Theme --- */
 .header.light-theme {
-    background-color: #FFFFFF;
-    border-bottom: 1px solid #DEE2E6;
+    background-color: #F8F9FA;
+    border: 1px solid #DEE2E6;
+    border-radius: 8px;
+    margin: 0.75rem auto 2rem auto;
 }
 
 .light-theme .logo {
@@ -243,8 +245,10 @@
 
 /* --- Dark Theme --- */
 .header.dark-theme {
-    background-color: #1a1a1a;
-    border-bottom: 1px solid #444444;
+    background-color: #1a1a1a; /* Темний фон */
+    border: 1px solid #444444;
+    border-radius: 8px; /* Заокруглення */
+    margin: 0.75rem auto 2rem auto; /* Відступи (зверху, з боків, знизу) */
 }
 
 .dark-theme .logo {

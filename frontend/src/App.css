@@ -1,4 +1,4 @@
-/* frontend/src/App.css */
+﻿/* frontend/src/App.css */
 
 /* --- GLOBAL LAYOUT --- */
 #root {
@@ -18,12 +18,9 @@
 
 /* --- HEADER STYLES --- */
 .header {
-  width: 100%;
-  max-width: 1280px;
-  margin-bottom: 2rem;
-  background-color: #1a1a1a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+    width: 100%;
+    max-width: 1280px;
+    border-radius: 8px; 
 }
 
 .header nav {

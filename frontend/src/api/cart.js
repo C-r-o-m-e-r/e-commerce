@@ -2,11 +2,22 @@
 
 const API_URL = '/api';
 
-export const getCart = async (token) => {
+// Helper function to create the correct headers
+const createAuthHeaders = (token, guestId) => {
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    } else if (guestId) {
+        headers['x-guest-id'] = guestId;
+    }
+    return headers;
+};
+
+export const getCart = async (token, guestId) => {
     const response = await fetch(`${API_URL}/cart`, {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
+        headers: createAuthHeaders(token, guestId),
     });
 
     if (!response.ok) {
@@ -15,13 +26,10 @@ export const getCart = async (token) => {
     return response.json();
 };
 
-export const addToCart = async (productId, quantity, token) => {
+export const addToCart = async (productId, quantity, { token, guestId }) => {
     const response = await fetch(`${API_URL}/cart/items`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-        },
+        headers: createAuthHeaders(token, guestId),
         body: JSON.stringify({ productId, quantity }),
     });
 
@@ -32,30 +40,23 @@ export const addToCart = async (productId, quantity, token) => {
     return response.json();
 };
 
-export const removeFromCart = async (itemId, token) => {
+export const removeFromCart = async (itemId, { token, guestId }) => {
     const response = await fetch(`${API_URL}/cart/items/${itemId}`, {
         method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
+        headers: createAuthHeaders(token, guestId),
     });
 
     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to remove item from cart');
     }
-
-    return;
+    return; // No JSON body on 204 response
 };
 
-// <== START: New function added
-export const updateCartItemQuantity = async (itemId, quantity, token) => {
+export const updateCartItemQuantity = async (itemId, quantity, { token, guestId }) => {
     const response = await fetch(`${API_URL}/cart/items/${itemId}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-        },
+        headers: createAuthHeaders(token, guestId),
         body: JSON.stringify({ quantity }),
     });
 
@@ -65,4 +66,3 @@ export const updateCartItemQuantity = async (itemId, quantity, token) => {
     }
     return response.json();
 };
-// <== END: New function added

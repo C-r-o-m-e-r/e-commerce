@@ -1,7 +1,7 @@
 // backend/src/routes/wishlist.routes.js
 
 const express = require('express');
-const authMiddleware = require('../middleware/auth.middleware');
+const { authMiddleware } = require('../middleware/auth.middleware');
 const {
     getWishlists,
     createWishlist,

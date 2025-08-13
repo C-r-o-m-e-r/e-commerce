@@ -16,7 +16,8 @@ const HeartIconFilled = () => (<svg xmlns="http://www.w3.org/2000/svg" height="2
 const ProductDetailPage = () => {
     const { id: productId } = useParams();
     const navigate = useNavigate();
-    const { user, token } = useAuth();
+    // 1. Get guestId from the AuthContext
+    const { user, token, guestId } = useAuth();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -25,7 +26,7 @@ const ProductDetailPage = () => {
     const [reviews, setReviews] = useState([]);
     const [newRating, setNewRating] = useState(0);
     const [newComment, setNewComment] = useState('');
-    const [hasReviewed, setHasReviewed] = useState(false); // New state to track if user has reviewed
+    const [hasReviewed, setHasReviewed] = useState(false);
 
     const [selectedImage, setSelectedImage] = useState(0);
     const [isLightboxOpen, setLightboxOpen] = useState(false);
@@ -37,6 +38,7 @@ const ProductDetailPage = () => {
 
     const COMMENT_MAX_LENGTH = 500;
 
+    // ... (Image gallery and other functions remain the same) ...
     const goToNextImage = (e) => {
         e.stopPropagation();
         if (product && product.images.length > 0) {
@@ -67,7 +69,6 @@ const ProductDetailPage = () => {
         try {
             const wishlistsData = await getWishlists(token);
             setUserWishlists(wishlistsData);
-
             if (wishlistsData && wishlistsData.length > 0) {
                 const foundInWishlist = wishlistsData.some(list =>
                     list.items && list.items.some(item => {
@@ -113,11 +114,15 @@ const ProductDetailPage = () => {
         fetchPageData();
     }, [productId, user, token]);
 
+
+    // 2. Update handleAddToCart to work for guests
     const handleAddToCart = async () => {
-        if (!user) return navigate('/login');
-        if (!quantity || quantity < 1) return toast.warn('Please enter a valid quantity.');
+        if (!product || quantity < 1) {
+            return toast.warn('Please enter a valid quantity.');
+        }
+
         try {
-            await addToCart(product.id, quantity, token);
+            await addToCart(product.id, quantity, { token, guestId });
             toast.success('Product added to cart!');
         } catch (err) {
             toast.error(err.message);
@@ -125,6 +130,7 @@ const ProductDetailPage = () => {
         }
     };
 
+    // ... (Wishlist and review functions remain the same) ...
     const handleWishlistClick = () => {
         if (!user) return navigate('/login');
         if (isInWishlist) {
@@ -211,18 +217,19 @@ const ProductDetailPage = () => {
         }
     };
 
-    const averageRating = reviews.length > 0 ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length : 0;
 
     if (loading) return <p>Loading product...</p>;
     if (error) return <p>Error: {error}</p>;
     if (!product) return <p>Product not found.</p>;
 
+    const averageRating = reviews.length > 0 ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length : 0;
     const getImageUrl = (imagePath) => imagePath;
     const isOutOfStock = product.stock === 0;
 
     return (
         <>
             <div className="product-detail-container">
+                {/* ... (JSX remains the same, except for the Add to Cart button logic) ... */}
                 <div className="product-image-section">
                     <img
                         src={product.images && product.images.length > 0 ? getImageUrl(product.images[selectedImage]) : 'https://via.placeholder.com/400'}
@@ -244,17 +251,14 @@ const ProductDetailPage = () => {
                 </div>
                 <div className="product-info-section">
                     <h2>{product.title}</h2>
-
                     {reviews.length > 0 && (
                         <div className="average-rating">
                             <StarRating rating={averageRating} />
                             <p>({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})</p>
                         </div>
                     )}
-
                     <p className="product-description">{product.description}</p>
                     <p className="product-price">${product.price}</p>
-
                     <div className="stock-info">
                         {isOutOfStock ? (
                             <p className="stock-out">Out of Stock</p>
@@ -262,7 +266,6 @@ const ProductDetailPage = () => {
                             <p className="stock-in">In Stock ({product.stock} available)</p>
                         )}
                     </div>
-
                     <div className="add-to-cart-controls">
                         <input type="number" className="quantity-input" value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value, 10))} min="1" max={product.stock} disabled={isOutOfStock} />
                         <button onClick={handleAddToCart} className="add-to-cart-btn" disabled={isOutOfStock}>
@@ -275,12 +278,10 @@ const ProductDetailPage = () => {
                         )}
                     </div>
                 </div>
-
                 <div className="reviews-section">
                     <div className="reviews-header">
                         <h3>Customer Reviews</h3>
                     </div>
-
                     {user && (
                         hasReviewed ? (
                             <div className="review-form-message">
@@ -288,7 +289,6 @@ const ProductDetailPage = () => {
                             </div>
                         ) : null
                     )}
-
                     {user && (
                         <form className="review-form" onSubmit={handleReviewSubmit}>
                             <h4>{hasReviewed ? 'Update Your Review' : 'Write Your Review'}</h4>
@@ -310,7 +310,6 @@ const ProductDetailPage = () => {
                             <button type="submit">Submit Review</button>
                         </form>
                     )}
-
                     <div className="review-list">
                         {reviews.length > 0 ? (
                             reviews.map(review => (
@@ -328,7 +327,6 @@ const ProductDetailPage = () => {
                     </div>
                 </div>
             </div>
-
             {isLightboxOpen && (<div className="lightbox-overlay" onClick={() => setLightboxOpen(false)}> <button className="lightbox-close-btn" onClick={() => setLightboxOpen(false)}><svg xmlns="http://www.w3.org/2000/svg" height="36" viewBox="0 -960 960 960" width="36"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" /></svg></button> {product.images.length > 1 && (<> <button className="lightbox-nav-btn prev" onClick={goToPreviousImage}><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M400-80 0-480l400-400 56 57-343 343 343 343-56 57Z" /></svg></button> <button className="lightbox-nav-btn next" onClick={goToNextImage}><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="m304-82-56-57 343-343-343-343 56-57 400 400L304-82Z" /></svg></button> </>)} <img src={getImageUrl(product.images[selectedImage])} alt={product.title} className="lightbox-content" onClick={(e) => e.stopPropagation()} /> </div>)}
             {isWishlistModalOpen && (<div className="modal-overlay" onClick={() => { setWishlistModalOpen(false); setCreateModalOpen(false); }}> <div className="modal-content" onClick={(e) => e.stopPropagation()}> {!isCreateModalOpen ? (<> <h3>{userWishlists.length > 0 ? 'Choose a Wishlist' : 'Create a Wishlist'}</h3> <div className="wishlist-selection-list-container"> <div className="wishlist-selection-list"> {userWishlists.map(list => (<button key={list.id} onClick={() => handleConfirmAdd(list.id)} className="wishlist-selection-item"> {list.name} </button>))} </div> <button className="add-wishlist-btn" onClick={() => setCreateModalOpen(true)}>+</button> </div> </>) : (<> <h3>Create New Wishlist</h3> <input type="text" className="create-wishlist-input" placeholder="Wishlist Name" value={newWishlistName} onChange={(e) => setNewWishlistName(e.target.value)} autoFocus /> <button onClick={handleCreateWishlist} className="create-wishlist-button">Create</button> </>)} </div> </div>)}
         </>

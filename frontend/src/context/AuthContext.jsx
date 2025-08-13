@@ -1,61 +1,79 @@
 // frontend/src/context/AuthContext.jsx
 
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid'; // Import the uuid generator
 
 const AuthContext = createContext(null);
 
-// Helper function to safely get the initial user from localStorage
 const getInitialUser = () => {
-  try {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser && storedUser !== 'undefined') {
-      return JSON.parse(storedUser);
+    try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser && storedUser !== 'undefined') {
+            return JSON.parse(storedUser);
+        }
+    } catch (e) {
+        console.error("Failed to parse user from localStorage", e);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
     }
-  } catch (e) {
-    console.error("Failed to parse initial user from localStorage", e);
-    // If data is corrupt, clear it
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-  }
-  return null;
+    return null;
 };
 
 export const AuthProvider = ({ children }) => {
-  // Initialize state directly from localStorage using a function
-  const [user, setUser] = useState(getInitialUser);
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
-  const navigate = useNavigate();
-  
-  // The useEffect for initial loading is no longer needed
+    const [user, setUser] = useState(getInitialUser);
+    const [token, setToken] = useState(() => localStorage.getItem('token'));
+    const [guestId, setGuestId] = useState(() => localStorage.getItem('guestId')); // 1. Add guestId state
+    const navigate = useNavigate();
 
-  const login = (authData) => {
-    if (authData && authData.token && authData.user) {
-      localStorage.setItem('token', authData.token);
-      localStorage.setItem('user', JSON.stringify(authData.user));
-      setToken(authData.token);
-      setUser(authData.user);
-    }
-  };
+    // 2. Effect to manage the guestId
+    useEffect(() => {
+        if (!user && !localStorage.getItem('guestId')) {
+            // If the user is not logged in and has no guestId, create one.
+            const newGuestId = uuidv4();
+            localStorage.setItem('guestId', newGuestId);
+            setGuestId(newGuestId);
+        }
+    }, [user]); // This effect runs when the user logs in or out
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setToken(null);
-    setUser(null);
-    navigate('/login');
-  };
+    const login = (authData) => {
+        if (authData && authData.token && authData.user) {
+            localStorage.setItem('token', authData.token);
+            localStorage.setItem('user', JSON.stringify(authData.user));
+            setToken(authData.token);
+            setUser(authData.user);
 
-  const value = {
-    user,
-    token,
-    login,
-    logout,
-  };
+            // 3. Clear the guestId on successful login
+            localStorage.removeItem('guestId');
+            setGuestId(null);
+        }
+    };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    const logout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setToken(null);
+        setUser(null);
+
+        // 4. Create a new guestId on logout
+        const newGuestId = uuidv4();
+        localStorage.setItem('guestId', newGuestId);
+        setGuestId(newGuestId);
+
+        navigate('/login');
+    };
+
+    const value = {
+        user,
+        token,
+        guestId, // 5. Expose guestId to the rest of the app
+        login,
+        logout,
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+    return useContext(AuthContext);
 };
