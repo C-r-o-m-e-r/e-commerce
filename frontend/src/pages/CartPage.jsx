@@ -1,7 +1,7 @@
 // frontend/src/pages/CartPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // 1. Import useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getCart, removeFromCart, updateCartItemQuantity } from '../api/cart.js';
 import './CartPage.css';
@@ -10,28 +10,37 @@ const CartPage = () => {
     const [cart, setCart] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { token } = useAuth();
-    const navigate = useNavigate(); // 2. Initialize the navigate function
+    // 1. Get both token (for users) and guestId (for guests)
+    const { token, guestId } = useAuth();
+    const navigate = useNavigate();
 
+    // 2. useEffect now fetches the cart for both logged-in users and guests
     useEffect(() => {
-        if (token) {
-            const fetchCart = async () => {
-                try {
-                    const cartData = await getCart(token);
-                    setCart(cartData);
-                } catch (err) {
-                    setError(err.message);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchCart();
+        // We only proceed if we have an identifier (either a token for a user, or a guestId)
+        if (!token && !guestId) {
+            setLoading(false); // No identifier, nothing to load
+            return;
         }
-    }, [token]);
 
+        const fetchCart = async () => {
+            try {
+                setLoading(true);
+                const cartData = await getCart(token, guestId);
+                setCart(cartData);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCart();
+    }, [token, guestId]);
+
+    // 3. Action handlers now pass an object with both token and guestId
     const handleRemoveItem = async (itemId) => {
         try {
-            await removeFromCart(itemId, token);
+            await removeFromCart(itemId, { token, guestId });
             setCart(prevCart => ({
                 ...prevCart,
                 items: prevCart.items.filter(item => item.id !== itemId)
@@ -44,15 +53,29 @@ const CartPage = () => {
 
     const handleQuantityChange = async (itemId, newQuantity) => {
         const quantity = parseInt(newQuantity, 10);
-        if (isNaN(quantity) || quantity <= 0) {
+        if (isNaN(quantity) || quantity < 0) {
+            if (newQuantity === '' || quantity === 0) {
+                await handleRemoveItem(itemId);
+            }
             return;
         }
         try {
-            const updatedCart = await updateCartItemQuantity(itemId, quantity, token);
+            const updatedCart = await updateCartItemQuantity(itemId, quantity, { token, guestId });
             setCart(updatedCart);
         } catch (err) {
             console.error('Failed to update quantity:', err);
             setError('Failed to update quantity. Please try again.');
+        }
+    };
+
+    // 4. The checkout handler is now the gatekeeper
+    const handleProceedToCheckout = () => {
+        if (token) {
+            // If user is logged in, proceed to checkout
+            navigate('/checkout');
+        } else {
+            // If user is a guest, redirect to login
+            navigate('/login');
         }
     };
 
@@ -99,7 +122,7 @@ const CartPage = () => {
                                             id={`quantity-${item.id}`}
                                             value={item.quantity}
                                             onChange={(e) => handleQuantityChange(item.id, e.target.value)}
-                                            min="1"
+                                            min="0"
                                             className="quantity-input-cart"
                                         />
                                     </div>
@@ -112,8 +135,7 @@ const CartPage = () => {
                     <div className="cart-summary">
                         <h3>Cart Total</h3>
                         <p className="total-price">${calculateTotal()}</p>
-                        {/* 3. Add the onClick handler to navigate */}
-                        <button className="checkout-btn" onClick={() => navigate('/checkout')}>
+                        <button className="checkout-btn" onClick={handleProceedToCheckout}>
                             Proceed to Checkout
                         </button>
                     </div>

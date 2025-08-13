@@ -3,10 +3,12 @@
 const prisma = require('../config/prisma');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { mergeCarts } = require('./cart.controller');
 
 const register = async (req, res) => {
     try {
-        const { email, password, firstName, lastName, role } = req.body;
+        // 1. Get the guestId from the request body
+        const { email, password, firstName, lastName, role, guestId } = req.body;
 
         if (!email || !password || !firstName || !lastName) {
             return res.status(400).json({ message: 'Email, password, and name are required' });
@@ -27,17 +29,33 @@ const register = async (req, res) => {
             },
         });
 
-        // --- START: Create a default wishlist for the new user ---
         await prisma.wishlist.create({
             data: {
                 name: 'My Wishlist',
                 userId: newUser.id,
             },
         });
-        // --- END: Create a default wishlist ---
+
+        // --- START: MERGE GUEST CART ON REGISTRATION ---
+        if (guestId) {
+            try {
+                await mergeCarts(newUser.id, guestId);
+            } catch (mergeError) {
+                console.error('Failed to merge carts on registration:', mergeError);
+            }
+        }
+        // --- END: MERGE GUEST CART ON REGISTRATION ---
+
+        // --- START: AUTOMATIC LOGIN AFTER REGISTRATION ---
+        const token = jwt.sign(
+            { userId: newUser.id, email: newUser.email, role: newUser.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '8h' }
+        );
 
         res.status(201).json({
-            message: 'User created successfully',
+            message: 'User created and logged in successfully',
+            token: token,
             user: {
                 id: newUser.id,
                 email: newUser.email,
@@ -47,6 +65,8 @@ const register = async (req, res) => {
                 createdAt: newUser.createdAt
             },
         });
+        // --- END: AUTOMATIC LOGIN ---
+
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -55,7 +75,8 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, guestId } = req.body;
+
         if (!email || !password) {
             return res.status(400).json({ message: 'Email and password are required' });
         }
@@ -67,6 +88,15 @@ const login = async (req, res) => {
         if (!isPasswordCorrect) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
+
+        if (guestId) {
+            try {
+                await mergeCarts(user.id, guestId);
+            } catch (mergeError) {
+                console.error('Failed to merge carts on login:', mergeError);
+            }
+        }
+
         const token = jwt.sign(
             { userId: user.id, email: user.email, role: user.role },
             process.env.JWT_SECRET,

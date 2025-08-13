@@ -2,7 +2,7 @@
 
 const express = require('express');
 const { getDashboardStats, getSellerOrders, getSellerOrderById, updateOrderStatus } = require('../controllers/seller.controller');
-const authMiddleware = require('../middleware/auth.middleware');
+const { authMiddleware } = require('../middleware/auth.middleware');
 const roleMiddleware = require('../middleware/role.middleware');
 
 const router = express.Router();

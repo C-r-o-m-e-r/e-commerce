@@ -1,9 +1,9 @@
 // backend/src/routes/orders.routes.js
 
 const express = require('express');
-// We only import functions for BUYERS from the orders controller
 const { getUserOrders, getOrderById } = require('../controllers/orders.controller');
-const authMiddleware = require('../middleware/auth.middleware');
+// FIX: Use destructuring { } to import the specific middleware function
+const { authMiddleware } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
@@ -17,10 +17,5 @@ router.get('/', getUserOrders);
 
 // Route for a buyer to get a single one of their orders by ID
 router.get('/:id', getOrderById);
-
-/*
-NOTE: Seller-related routes (like GET /seller and PATCH /:id/status) 
-have been moved to `seller.routes.js` to keep the code organized.
-*/
 
 module.exports = router;

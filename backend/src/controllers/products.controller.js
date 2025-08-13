@@ -6,7 +6,6 @@ const path = require('path');
 
 const MAX_PRICE = 20000;
 
-// ... (all other functions remain unchanged)
 const getDescendantCategoryIds = async (categoryId) => {
     const directSubcategories = await prisma.category.findMany({
         where: { parentId: categoryId },
@@ -184,39 +183,31 @@ const deleteProduct = async (req, res) => {
         const { id } = req.params;
         const userId = req.user.id;
         const product = await prisma.product.findUnique({ where: { id } });
-        if (!product) { return res.status(404).json({ message: 'Product not found' }); }
-        if (product.sellerId !== userId) { return res.status(403).json({ message: 'Forbidden: You can only delete your own products' }); }
 
-        console.log('--- STARTING DELETE PROCESS ---');
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        if (product.sellerId !== userId) {
+            return res.status(403).json({ message: 'Forbidden: You can only delete your own products' });
+        }
+
         if (product.images && product.images.length > 0) {
-            console.log('Found images to delete:', product.images);
             product.images.forEach(imagePath => {
                 const fullPath = path.join(__dirname, '../../', imagePath);
-
-                console.log(`Attempting to delete file at path: ${fullPath}`);
-
                 if (fs.existsSync(fullPath)) {
-                    console.log(`File EXISTS. Deleting...`);
                     fs.unlinkSync(fullPath);
-                    console.log(`File DELETED successfully.`);
-                } else {
-                    console.log(`File does NOT exist at this path. Skipping.`);
                 }
             });
-        } else {
-            console.log('No images found for this product.');
         }
 
         await prisma.product.delete({ where: { id } });
-        console.log('Product deleted from database.');
-        console.log('--- FINISHED DELETE PROCESS ---');
+
         res.status(204).send();
     } catch (error) {
         console.error('Delete product error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
-
 
 const getProductSuggestions = async (req, res) => {
     try {
@@ -248,7 +239,6 @@ const getProductSuggestions = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
-
 
 module.exports = {
     createProduct,

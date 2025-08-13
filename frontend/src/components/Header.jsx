@@ -1,4 +1,4 @@
-// src/components/Header.jsx
+﻿// src/components/Header.jsx
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -52,39 +52,38 @@ const Header = () => {
                             <Link to="/register" className="nav-link">Register</Link>
                         </>
                     ) : (
-                        <>
-                            <Dropdown
-                                trigger={
-                                    <div className="account-trigger">
-                                        <span>Hello, {user.firstName}</span>
-                                        <span className="account-trigger-line2">
-                                            Account & Lists
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z" /></svg>
-                                        </span>
-                                    </div>
-                                }
-                            >
-                                <Link to="/account" className="dropdown-item">Your Account</Link>
-                                {user.role === 'SELLER' && (
-                                    <>
-                                        <Link to="/seller/dashboard" className="dropdown-item">Dashboard</Link>
-                                        <Link to="/seller/orders" className="dropdown-item">My Sales</Link>
-                                        <Link to="/my-products" className="dropdown-item">My Products</Link>
-                                        <Link to="/products/add" className="dropdown-item">Add Product</Link>
-                                    </>
-                                )}
-                                <button onClick={handleLogout} className="dropdown-item">Logout</button>
-                            </Dropdown>
-
-                            <Link to="/cart" className="nav-link cart-icon-link">
-                                {/* CORRECTED SVG ICON */}
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
-                                    <path d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM17 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-1.45-5c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.37-.67-.11-1.48-.88-1.48H5.21l-.94-2H1v2h2l3.6 7.59L3.62 17H19v-2H7l1.1-2h7.45z" />
-                                </svg>
-                            </Link>
-                        </>
+                        <Dropdown
+                            trigger={
+                                <div className="account-trigger">
+                                    <span>Hello, {user.firstName}</span>
+                                    <span className="account-trigger-line2">
+                                        Account & Lists
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z" /></svg>
+                                    </span>
+                                </div>
+                            }
+                        >
+                            <Link to="/account" className="dropdown-item">Your Account</Link>
+                            {user.role === 'SELLER' && (
+                                <>
+                                    <Link to="/seller/dashboard" className="dropdown-item">Dashboard</Link>
+                                    <Link to="/seller/orders" className="dropdown-item">My Sales</Link>
+                                    <Link to="/my-products" className="dropdown-item">My Products</Link>
+                                    <Link to="/products/add" className="dropdown-item">Add Product</Link>
+                                </>
+                            )}
+                            <button onClick={handleLogout} className="dropdown-item">Logout</button>
+                        </Dropdown>
                     )}
+
+                    {/* --- START: Cart Icon is now outside the conditional --- */}
+                    <Link to="/cart" className="nav-link cart-icon-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor">
+                            <path d="M0 0h24v24H0z" fill="none" />
+                            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM17 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-1.45-5c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.37-.67-.11-1.48-.88-1.48H5.21l-.94-2H1v2h2l3.6 7.59L3.62 17H19v-2H7l1.1-2h7.45z" />
+                        </svg>
+                    </Link>
+                    {/* --- END: Cart Icon is now outside the conditional --- */}
                 </div>
             </nav>
         </header>
