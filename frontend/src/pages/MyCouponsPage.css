@@ -1,0 +1,144 @@
+﻿/* frontend/src/pages/MyCouponsPage.css */
+
+.coupons-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+    .coupons-header h2 {
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+.btn-create-coupon {
+    background-color: var(--accent-primary);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .btn-create-coupon:hover {
+        background-color: var(--accent-primary-hover);
+    }
+
+.coupons-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.coupon-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-left: 5px solid var(--accent-primary);
+    border-radius: 8px;
+    padding: 2.2rem 1.5rem 1em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+
+    .coupon-card.disabled {
+        border-left-color: var(--text-secondary);
+        opacity: 0.7;
+    }
+
+.coupon-code {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    font-family: monospace;
+}
+
+.coupon-details {
+    text-align: center;
+}
+
+.coupon-discount {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.coupon-expiry {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.coupon-status {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: var(--accent-primary);
+}
+
+.coupon-card.disabled .coupon-status {
+    color: var(--text-secondary);
+}
+
+/* --- Modal and Form Styles --- */
+.coupon-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+}
+
+    .form-group-inline label {
+        margin-bottom: 0;
+    }
+
+.coupon-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    color: white;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+    .btn-action:hover {
+        transform: scale(1.1);
+    }
+
+    .btn-action.edit {
+        background-color: #3498db; /* Blue */
+    }
+
+    .btn-action.delete {
+        background-color: #e74c3c; /* Red */
+    }
+
+    .coupon-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; 
+}

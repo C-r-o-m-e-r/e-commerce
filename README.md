@@ -14,6 +14,7 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 -   **Authentication & Authorization:** JWT-based user registration, login, and role-based access control (`BUYER`, `SELLER`).
 -   **Product Management:** Full CRUD for products, including multi-image uploads. Sellers can manage their own listings.
 -   **Seller Dashboard:** A dedicated dashboard for sellers to view sales statistics, recent orders, and low-stock items.
+-   **Coupon System:** Sellers can create percentage-based or fixed-amount discount codes with optional expiration dates. Buyers can apply these codes in the cart to receive a discount.
 -   **Shopping Cart:** Persistent, server-side cart with functionality to add, remove, and update item quantities. **Supports both guest and authenticated users**, with seamless cart merging upon login.
 -   **Wishlist Management:** Users can create and manage multiple wishlists.
 -   **Order History:** Users can view a list of all their past orders and see a detailed breakdown of each one.
@@ -238,10 +239,20 @@ The test suite uses Jest and Supertest to run integration tests against the back
 
 | Method | Path | Protected | Description |
 |:---|:---|:---|:---|
-| `GET` | `/api/cart` | Yes | Get the user's current cart. |
-| `POST` | `/api/cart/items` | Yes | Add an item to the cart. |
-| `PUT` | `/api/cart/items/:itemId` | Yes | Update the quantity of an item in the cart. |
-| `DELETE`| `/api/cart/items/:itemId` | Yes | Remove an item from the cart. |
+| `GET` | `/api/cart` | Optional | Get the user's or guest's current cart. |
+| `POST` | `/api/cart/items` | Optional | Add an item to the cart. |
+| `PUT` | `/api/cart/items/:itemId` | Optional | Update the quantity of an item in the cart. |
+| `DELETE`| `/api/cart/items/:itemId` | Optional | Remove an item from the cart. |
+| `POST` | `/api/cart/apply-coupon` | Optional | Apply a coupon code to the current cart. |
+
+### Coupons (Seller Only)
+
+| Method | Path | Protected | Role | Description |
+|:---|:---|:---|:---|:---|
+| `POST` | `/api/coupons` | Yes | `SELLER` | Create a new coupon. |
+| `GET` | `/api/coupons` | Yes | `SELLER` | Get all coupons created by the seller. |
+| `PUT` | `/api/coupons/:id` | Yes | `SELLER` | Update an existing coupon. |
+| `DELETE`| `/api/coupons/:id` | Yes | `SELLER` | Delete a coupon. |
 
 ### Wishlists
 

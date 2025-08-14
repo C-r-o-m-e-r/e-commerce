@@ -1,53 +1,100 @@
 // backend/src/controllers/cart.controller.js
 
 const prisma = require('../config/prisma');
-const { v4: uuidv4 } = require('uuid'); // We'll need this for guest IDs
+const { v4: uuidv4 } = require('uuid');
 
-// Helper function to find or create a cart for a user or guest
+// Helper function to find or create a cart
 const getOrCreateCart = async (userId, guestId) => {
+    // ... (This helper function remains the same)
     let cart;
-
     if (userId) {
-        // Logged-in user logic
         cart = await prisma.cart.findUnique({
             where: { userId },
-            include: { items: { include: { product: true }, orderBy: { createdAt: 'asc' } } },
+            include: { items: { include: { product: true }, orderBy: { createdAt: 'asc' } }, appliedCoupon: true },
         });
         if (!cart) {
             cart = await prisma.cart.create({
                 data: { userId },
-                include: { items: { include: { product: true } } },
+                include: { items: { include: { product: true } }, appliedCoupon: true },
             });
         }
     } else if (guestId) {
-        // Guest user logic
         cart = await prisma.cart.findUnique({
             where: { guestId },
-            include: { items: { include: { product: true }, orderBy: { createdAt: 'asc' } } },
+            include: { items: { include: { product: true }, orderBy: { createdAt: 'asc' } }, appliedCoupon: true },
         });
         if (!cart) {
             cart = await prisma.cart.create({
                 data: { guestId },
-                include: { items: { include: { product: true } } },
+                include: { items: { include: { product: true } }, appliedCoupon: true },
             });
         }
     } else {
-        // No user and no guest ID - create a new guest cart
         const newGuestId = uuidv4();
         cart = await prisma.cart.create({
             data: { guestId: newGuestId },
-            include: { items: { include: { product: true } } },
+            include: { items: { include: { product: true } }, appliedCoupon: true },
         });
     }
-
     return cart;
 };
 
-// Get the current user's or guest's cart
+// --- START: NEW FUNCTION ---
+// @desc    Apply a coupon to the cart
+// @route   POST /api/cart/apply-coupon
+// @access  Public (Guest or User)
+const applyCoupon = async (req, res) => {
+    try {
+        const { couponCode } = req.body;
+        const userId = req.user?.id;
+        const guestId = req.headers['x-guest-id'];
+
+        if (!couponCode) {
+            return res.status(400).json({ message: 'Coupon code is required.' });
+        }
+
+        // Find the coupon
+        const coupon = await prisma.coupon.findUnique({
+            where: { code: couponCode.toUpperCase() },
+        });
+
+        // Validate the coupon
+        if (!coupon) {
+            return res.status(404).json({ message: 'Invalid coupon code.' });
+        }
+        if (!coupon.isActive) {
+            return res.status(400).json({ message: 'This coupon is no longer active.' });
+        }
+        if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) {
+            return res.status(400).json({ message: 'This coupon has expired.' });
+        }
+
+        // Get the user's or guest's cart
+        const cart = await getOrCreateCart(userId, guestId);
+
+        // Apply the coupon to the cart
+        const updatedCart = await prisma.cart.update({
+            where: { id: cart.id },
+            data: { appliedCouponId: coupon.id },
+            include: { items: { include: { product: true } }, appliedCoupon: true },
+        });
+
+        res.status(200).json(updatedCart);
+    } catch (error) {
+        console.error("Apply coupon error:", error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+// --- END: NEW FUNCTION ---
+
+
+// All other functions (getCart, addItemToCart, etc.) remain the same
+// ...
+
 const getCart = async (req, res) => {
     try {
         const userId = req.user?.id;
-        const guestId = req.headers['x-guest-id']; // Frontend will send this header
+        const guestId = req.headers['x-guest-id'];
         const cart = await getOrCreateCart(userId, guestId);
         res.status(200).json(cart);
     } catch (error) {
@@ -56,7 +103,6 @@ const getCart = async (req, res) => {
     }
 };
 
-// Add an item to the cart
 const addItemToCart = async (req, res) => {
     try {
         const { productId, quantity } = req.body;
@@ -69,7 +115,6 @@ const addItemToCart = async (req, res) => {
 
         const cart = await getOrCreateCart(userId, guestId);
 
-        // If a new guest cart was created, we need to send the new guestId back
         if (!userId && !guestId) {
             guestId = cart.guestId;
         }
@@ -97,7 +142,6 @@ const addItemToCart = async (req, res) => {
     }
 };
 
-// Remove an item from the cart
 const removeItemFromCart = async (req, res) => {
     try {
         const { itemId } = req.params;
@@ -125,7 +169,6 @@ const removeItemFromCart = async (req, res) => {
     }
 };
 
-// Update an item's quantity in the cart
 const updateCartItemQuantity = async (req, res) => {
     try {
         const { itemId } = req.params;
@@ -167,39 +210,29 @@ const updateCartItemQuantity = async (req, res) => {
     }
 };
 
-// --- NEW FUNCTION TO MERGE CARTS ON LOGIN ---
 const mergeCarts = async (userId, guestId) => {
+    // ... (This function remains the same)
     if (!userId || !guestId) return;
-
     const guestCart = await prisma.cart.findUnique({
         where: { guestId },
         include: { items: true },
     });
-
     if (!guestCart || guestCart.items.length === 0) return;
-
     const userCart = await getOrCreateCart(userId, null);
-
     for (const guestItem of guestCart.items) {
         const existingItem = userCart.items.find(item => item.productId === guestItem.productId);
-
         if (existingItem) {
-            // If item exists in user's cart, just add the quantity
             await prisma.cartItem.update({
                 where: { id: existingItem.id },
                 data: { quantity: existingItem.quantity + guestItem.quantity },
             });
         } else {
-            // If item does not exist, move it to the user's cart
             await prisma.cartItem.update({
                 where: { id: guestItem.id },
                 data: { cartId: userCart.id },
             });
         }
     }
-
-    // After merging, delete the now-empty guest cart
-    // We must first delete the items that were not moved (if any)
     await prisma.cartItem.deleteMany({ where: { cartId: guestCart.id } });
     await prisma.cart.delete({ where: { id: guestCart.id } });
 };
@@ -210,5 +243,6 @@ module.exports = {
     addItemToCart,
     removeItemFromCart,
     updateCartItemQuantity,
-    mergeCarts, // Export the new merge function
+    mergeCarts,
+    applyCoupon, // Export the new function
 };

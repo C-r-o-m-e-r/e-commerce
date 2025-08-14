@@ -18,7 +18,7 @@ export const ThemeProvider = ({ children }) => {
         if (currentHour >= 19 || currentHour < 7) {
             return 'dark';
         }
-        return 'dark';
+        return 'light'
     };
 
     // Initialize state with the theme based on the current time

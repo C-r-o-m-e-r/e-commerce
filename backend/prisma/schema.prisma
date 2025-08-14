@@ -28,6 +28,7 @@ model User {
   orders    Order[]
   wishlists Wishlist[]
   reviews   Review[]
+  coupons   Coupon[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
@@ -60,18 +61,18 @@ model Product {
   category      Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 }
 
+// --- MODIFIED: Added fields for applied coupon ---
 model Cart {
-  id        String     @id @default(cuid())
+  id              String      @id @default(cuid())
+  user            User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String?     @unique
+  guestId         String?     @unique
+  items           CartItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   
-  // --- START: CHANGES FOR GUEST CART ---
-  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String?    @unique // User ID is now optional
-  guestId   String?    @unique // Add an optional, unique ID for guest users
-  // --- END: CHANGES FOR GUEST CART ---
-
-  items     CartItem[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  appliedCouponId String?
+  appliedCoupon   Coupon?     @relation(fields: [appliedCouponId], references: [id], onDelete: SetNull)
 }
 
 model CartItem {
@@ -116,24 +117,26 @@ enum OrderStatus {
 }
 
 model Order {
-  id        String      @id @default(cuid())
-  buyer     User?       @relation(fields: [buyerId], references: [id], onDelete: SetNull)
-  buyerId   String?
-  items     OrderItem[]
-  total     Float
-  status    OrderStatus @default(PENDING)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id              String      @id @default(cuid())
+  buyer           User?       @relation(fields: [buyerId], references: [id], onDelete: SetNull)
+  buyerId         String?
+  items           OrderItem[]
+  total           Float
+  status          OrderStatus @default(PENDING)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  couponId        String?
+  coupon          Coupon?     @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  discountApplied Float       @default(0)
 }
 
 model OrderItem {
   id        String   @id @default(cuid())
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId   String
-  
   product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   productId String?
-  
   title     String
   price     Float
   quantity  Int
@@ -146,12 +149,31 @@ model Review {
   comment   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
 
   @@unique([userId, productId])
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+model Coupon {
+  id            String       @id @default(cuid())
+  code          String       @unique
+  discountType  DiscountType
+  discountValue Float
+  expiresAt     DateTime?
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  sellerId      String
+  seller        User         @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  
+  orders        Order[]
+  carts         Cart[] // A coupon can be applied to many carts
 }

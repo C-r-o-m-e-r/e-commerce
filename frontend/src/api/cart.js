@@ -19,7 +19,6 @@ export const getCart = async (token, guestId) => {
     const response = await fetch(`${API_URL}/cart`, {
         headers: createAuthHeaders(token, guestId),
     });
-
     if (!response.ok) {
         throw new Error('Failed to fetch cart');
     }
@@ -32,7 +31,6 @@ export const addToCart = async (productId, quantity, { token, guestId }) => {
         headers: createAuthHeaders(token, guestId),
         body: JSON.stringify({ productId, quantity }),
     });
-
     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to add item to cart');
@@ -45,12 +43,11 @@ export const removeFromCart = async (itemId, { token, guestId }) => {
         method: 'DELETE',
         headers: createAuthHeaders(token, guestId),
     });
-
     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to remove item from cart');
     }
-    return; // No JSON body on 204 response
+    return;
 };
 
 export const updateCartItemQuantity = async (itemId, quantity, { token, guestId }) => {
@@ -59,10 +56,22 @@ export const updateCartItemQuantity = async (itemId, quantity, { token, guestId 
         headers: createAuthHeaders(token, guestId),
         body: JSON.stringify({ quantity }),
     });
-
     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to update item quantity');
+    }
+    return response.json();
+};
+
+export const applyCoupon = async (couponCode, { token, guestId }) => {
+    const response = await fetch(`${API_URL}/cart/apply-coupon`, {
+        method: 'POST',
+        headers: createAuthHeaders(token, guestId),
+        body: JSON.stringify({ couponCode }),
+    });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to apply coupon');
     }
     return response.json();
 };

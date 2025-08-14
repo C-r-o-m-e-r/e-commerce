@@ -3,25 +3,23 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { getCart, removeFromCart, updateCartItemQuantity } from '../api/cart.js';
+import { getCart, removeFromCart, updateCartItemQuantity, applyCoupon } from '../api/cart.js';
+import { toast } from 'react-toastify';
 import './CartPage.css';
 
 const CartPage = () => {
     const [cart, setCart] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    // 1. Get both token (for users) and guestId (for guests)
+    const [couponCode, setCouponCode] = useState('');
     const { token, guestId } = useAuth();
     const navigate = useNavigate();
 
-    // 2. useEffect now fetches the cart for both logged-in users and guests
     useEffect(() => {
-        // We only proceed if we have an identifier (either a token for a user, or a guestId)
         if (!token && !guestId) {
-            setLoading(false); // No identifier, nothing to load
+            setLoading(false);
             return;
         }
-
         const fetchCart = async () => {
             try {
                 setLoading(true);
@@ -33,21 +31,19 @@ const CartPage = () => {
                 setLoading(false);
             }
         };
-
         fetchCart();
     }, [token, guestId]);
 
-    // 3. Action handlers now pass an object with both token and guestId
     const handleRemoveItem = async (itemId) => {
         try {
             await removeFromCart(itemId, { token, guestId });
-            setCart(prevCart => ({
-                ...prevCart,
-                items: prevCart.items.filter(item => item.id !== itemId)
-            }));
+            // Re-fetch the entire cart to ensure totals and discounts are accurate
+            const updatedCart = await getCart(token, guestId);
+            setCart(updatedCart);
+            toast.success("Item removed from cart.");
         } catch (err) {
             console.error('Failed to remove item:', err);
-            setError('Failed to remove item. Please try again.');
+            toast.error('Failed to remove item. Please try again.');
         }
     };
 
@@ -64,34 +60,47 @@ const CartPage = () => {
             setCart(updatedCart);
         } catch (err) {
             console.error('Failed to update quantity:', err);
-            setError('Failed to update quantity. Please try again.');
+            toast.error('Failed to update quantity. Please try again.');
         }
     };
 
-    // 4. The checkout handler is now the gatekeeper
+    const handleApplyCoupon = async (e) => {
+        e.preventDefault();
+        if (!couponCode.trim()) {
+            return toast.warn("Please enter a coupon code.");
+        }
+        try {
+            const updatedCart = await applyCoupon(couponCode, { token, guestId });
+            setCart(updatedCart);
+            toast.success("Coupon applied successfully!");
+        } catch (err) {
+            toast.error(err.message || "Failed to apply coupon.");
+        }
+    };
+
     const handleProceedToCheckout = () => {
         if (token) {
-            // If user is logged in, proceed to checkout
             navigate('/checkout');
         } else {
-            // If user is a guest, redirect to login
             navigate('/login');
         }
     };
 
+    if (loading) return <p>Loading your cart...</p>;
+    if (error) return <p>Error: {error}</p>;
 
-    if (loading) {
-        return <p>Loading your cart...</p>;
+    const subtotal = cart ? cart.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0) : 0;
+
+    let discount = 0;
+    if (cart && cart.appliedCoupon) {
+        if (cart.appliedCoupon.discountType === 'PERCENTAGE') {
+            discount = (subtotal * cart.appliedCoupon.discountValue) / 100;
+        } else { // FIXED
+            discount = cart.appliedCoupon.discountValue;
+        }
     }
 
-    if (error) {
-        return <p>Error: {error}</p>;
-    }
-
-    const calculateTotal = () => {
-        if (!cart || !cart.items) return 0;
-        return cart.items.reduce((total, item) => total + item.quantity * item.product.price, 0).toFixed(2);
-    };
+    const total = subtotal - discount;
 
     return (
         <div className="page-container">
@@ -104,17 +113,12 @@ const CartPage = () => {
                         {cart.items.map(item => (
                             <div key={item.id} className="cart-item">
                                 <Link to={`/products/${item.product.id}`}>
-                                    <img
-                                        src={item.product.images[0]}
-                                        alt={item.product.title}
-                                        className="cart-item-image"
-                                    />
+                                    <img src={item.product.images[0]} alt={item.product.title} className="cart-item-image" />
                                 </Link>
                                 <div className="cart-item-details">
                                     <Link to={`/products/${item.product.id}`} className="cart-item-title-link">
                                         <h3>{item.product.title}</h3>
                                     </Link>
-
                                     <div className="quantity-controls">
                                         <label htmlFor={`quantity-${item.id}`}>Quantity:</label>
                                         <input
@@ -133,8 +137,33 @@ const CartPage = () => {
                         ))}
                     </div>
                     <div className="cart-summary">
-                        <h3>Cart Total</h3>
-                        <p className="total-price">${calculateTotal()}</p>
+                        <h3>Cart Summary</h3>
+                        <div className="summary-row">
+                            <span>Subtotal</span>
+                            <span>${subtotal.toFixed(2)}</span>
+                        </div>
+                        {cart.appliedCoupon && (
+                            <div className="summary-row discount">
+                                <span>Discount ({cart.appliedCoupon.code})</span>
+                                <span>-${discount.toFixed(2)}</span>
+                            </div>
+                        )}
+                        <div className="summary-row total">
+                            <strong>Total</strong>
+                            <strong>${total > 0 ? total.toFixed(2) : '0.00'}</strong>
+                        </div>
+
+                        <form className="coupon-form" onSubmit={handleApplyCoupon}>
+                            <input
+                                type="text"
+                                value={couponCode}
+                                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                placeholder="Enter Coupon Code"
+                                className="coupon-input"
+                            />
+                            <button type="submit" className="coupon-btn">Apply</button>
+                        </form>
+
                         <button className="checkout-btn" onClick={handleProceedToCheckout}>
                             Proceed to Checkout
                         </button>
