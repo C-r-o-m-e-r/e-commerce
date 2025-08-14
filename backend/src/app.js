@@ -15,12 +15,12 @@ const usersRoutes = require('./routes/users.routes');
 const wishlistRoutes = require('./routes/wishlist.routes');
 const categoryRoutes = require('./routes/category.routes');
 const reviewRoutes = require('./routes/review.routes');
-const sellerRoutes = require('./routes/seller.routes'); // 1. Import the new seller routes
+const sellerRoutes = require('./routes/seller.routes');
+const couponRoutes = require('./routes/coupons.routes'); // 1. Import the new coupon routes
 
 const app = express();
 
 // --- START: Stripe Webhook Route ---
-// This route must be registered BEFORE express.json() to work with raw request bodies.
 app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
 // --- END: Stripe Webhook Route ---
 
@@ -42,7 +42,8 @@ app.use('/api/users', usersRoutes);
 app.use('/api/wishlists', wishlistRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/reviews', reviewRoutes);
-app.use('/api/seller', sellerRoutes); // 2. Register the new seller routes
+app.use('/api/seller', sellerRoutes);
+app.use('/api/coupons', couponRoutes); // 2. Register the new coupon routes
 
 // Root route placeholder
 app.get('/', (req, res) => {

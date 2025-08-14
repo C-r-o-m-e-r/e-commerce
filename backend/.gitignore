@@ -1,2 +1,29 @@
+# Environment variables
+# Ignore all .env files in any subdirectory
+**/*.env
+**/*.env.test
 
-/src/generated/prisma
+# Dependencies
+# Ignore all node_modules folders in the project
+node_modules/
+
+# IDE & Editor folders
+.vscode/
+.vs/
+
+# Build output
+/frontend/dist
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage folder
+coverage/
+
+# OS generated files
+.DS_Store
+._*
+Thumbs.db

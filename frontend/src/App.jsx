@@ -5,7 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { AuthProvider } from './context/AuthContext.jsx';
-import { ThemeProvider } from './context/ThemeContext.jsx'; // 1. Ensure ThemeProvider is imported
+import { ThemeProvider } from './context/ThemeContext.jsx';
 
 import Header from './components/Header';
 import ScrollToTopButton from './components/ScrollToTopButton.jsx';
@@ -27,40 +27,47 @@ import CheckoutPage from './pages/CheckoutPage.jsx';
 import SellerOrdersPage from './pages/SellerOrdersPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import SellerOrderDetailPage from './pages/SellerOrderDetailPage.jsx';
+import MyCouponsPage from './pages/MyCouponsPage.jsx'; // 1. Import the new page
 
 import './App.css';
 
 function App() {
     return (
         <AuthProvider>
-            {/* 2. Wrap the app in ThemeProvider so all children (like Header) can use the theme */}
             <ThemeProvider>
                 <Header />
                 <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />
                 <main className="container">
                     <Routes>
-                        {/* All your routes go here... */}
+                        {/* Public Routes */}
                         <Route path="/" element={<ProductsPage />} />
                         <Route path="/products" element={<ProductsPage />} />
                         <Route path="/products/:id" element={<ProductDetailPage />} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/register" element={<RegisterPage />} />
+
+                        {/* Nested Account Routes */}
                         <Route path="/account" element={<AccountLayout />}>
                             <Route index element={<Navigate to="profile" replace />} />
                             <Route path="profile" element={<ProfilePage />} />
                             <Route path="orders" element={<OrdersPage />} />
                             <Route path="wishlists" element={<WishlistsPage />} />
                         </Route>
+
+                        {/* Standalone User Routes */}
                         <Route path="/cart" element={<CartPage />} />
                         <Route path="/wishlists/:id" element={<WishlistDetailPage />} />
                         <Route path="/orders/:id" element={<OrderDetailPage />} />
                         <Route path="/checkout" element={<CheckoutPage />} />
+
+                        {/* Seller Routes */}
                         <Route path="/seller/dashboard" element={<DashboardPage />} />
                         <Route path="/seller/orders" element={<SellerOrdersPage />} />
                         <Route path="/seller/orders/:id" element={<SellerOrderDetailPage />} />
                         <Route path="/products/add" element={<AddProductPage />} />
                         <Route path="/my-products" element={<MyProductsPage />} />
                         <Route path="/products/edit/:id" element={<EditProductPage />} />
+                        <Route path="/my-coupons" element={<MyCouponsPage />} /> {/* 2. Add the new route */}
                     </Routes>
                 </main>
                 <ScrollToTopButton />

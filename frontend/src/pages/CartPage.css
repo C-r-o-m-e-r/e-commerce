@@ -161,3 +161,52 @@
         margin-bottom: 2rem;
         color: var(--text-primary);
     }
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+    .summary-row.total {
+        font-size: 1.5rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .summary-row.discount {
+        color: #2ecc71; /* Green color for discount */
+    }
+
+.coupon-form {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+}
+
+.coupon-input {
+    flex-grow: 1;
+    padding: 0.6rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    border-radius: 6px;
+}
+
+.coupon-btn {
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--accent-primary);
+    background-color: transparent;
+    color: var(--accent-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+    .coupon-btn:hover {
+        background-color: var(--accent-primary);
+        color: white;
+    }
