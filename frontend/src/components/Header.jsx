@@ -17,6 +17,7 @@ const Header = () => {
     const [categories, setCategories] = useState([]);
 
     useEffect(() => {
+        // Fetch categories for the dropdown menu
         const fetchCategories = async () => {
             try {
                 const data = await getCategories();
@@ -63,16 +64,32 @@ const Header = () => {
                                 </div>
                             }
                         >
+                            {/* --- START: Admin Panel Section --- */}
+                            {user.role === 'ADMIN' && (
+                                <>
+                                    <div className="dropdown-section-header">Admin Panel</div>
+                                    <Link to="/admin/dashboard" className="dropdown-item">Dashboard</Link> {/* <-- ДОДАНО */}
+                                    <Link to="/admin/users" className="dropdown-item">Manage Users</Link>
+                                    <hr className="dropdown-divider" />
+                                </>
+                            )}
+                            {/* --- END: Admin Panel Section --- */}
+
                             <Link to="/account" className="dropdown-item">Your Account</Link>
+                            
+                            {/* --- START: Seller Section --- */}
                             {user.role === 'SELLER' && (
                                 <>
+                                    <div className="dropdown-section-header">Seller Tools</div>
                                     <Link to="/seller/dashboard" className="dropdown-item">Dashboard</Link>
                                     <Link to="/seller/orders" className="dropdown-item">My Sales</Link>
                                     <Link to="/my-products" className="dropdown-item">My Products</Link>
                                     <Link to="/products/add" className="dropdown-item">Add Product</Link>
-                                    <Link to="/my-coupons" className="dropdown-item">My Coupons</Link> {/* 1. Add new link */}
+                                    <Link to="/my-coupons" className="dropdown-item">My Coupons</Link>
                                 </>
                             )}
+                            {/* --- END: Seller Section --- */}
+
                             <button onClick={handleLogout} className="dropdown-item">Logout</button>
                         </Dropdown>
                     )}

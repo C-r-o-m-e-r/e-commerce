@@ -179,6 +179,24 @@
         font-size: 1rem;
     }
 
+/* --- START: New Styles for Dropdown Sections --- */
+.dropdown-section-header {
+    padding: 0.5rem 1.5rem 0.25rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.dropdown-divider {
+    border: none;
+    border-top: 1px solid;
+    opacity: 0.1;
+    margin: 0.5rem 0;
+}
+/* --- END: New Styles for Dropdown Sections --- */
+
+
 /* --- Light Theme --- */
 .header.light-theme {
     background-color: #F8F9FA;
@@ -243,12 +261,22 @@
     fill: #212529;
 }
 
+/* --- Light Theme for new elements --- */
+.light-theme .dropdown-section-header {
+    color: #6c757d;
+}
+
+.light-theme .dropdown-divider {
+    border-color: #DEE2E6;
+}
+
+
 /* --- Dark Theme --- */
 .header.dark-theme {
-    background-color: #1a1a1a; /* Темний фон */
+    background-color: #1a1a1a;
     border: 1px solid #444444;
-    border-radius: 8px; /* Заокруглення */
-    margin: 0.75rem auto 2rem auto; /* Відступи (зверху, з боків, знизу) */
+    border-radius: 8px;
+    margin: 0.75rem auto 2rem auto;
 }
 
 .dark-theme .logo {
@@ -307,33 +335,11 @@
     fill: rgba(255, 255, 255, 0.87);
 }
 
-
-
-/* This block ensures all text and icons in the header have the correct color on the light theme */
-.header.light-theme .logo,
-.header.light-theme .account-trigger,
-.header.light-theme .dropdown-menu .dropdown-item {
-    color: #212529; /* Dark text */
+/* --- Dark Theme for new elements --- */
+.dark-theme .dropdown-section-header {
+    color: #a0a0a0;
 }
 
-.header.light-theme .nav-link,
-.header.light-theme .account-trigger-line2 {
-    color: #6c757d; /* Dark gray text */
-}
-
-    .header.light-theme .search-button svg,
-    .header.light-theme .category-dropdown-toggle svg,
-    .header.light-theme .account-trigger-line2 svg,
-    .header.light-theme .cart-icon-link svg {
-        fill: #212529; /* Dark icons */
-    }
-
-    .header.light-theme .nav-link:hover,
-    .header.light-theme .cart-icon-link:hover svg {
-        color: #5A67D8; /* Accent color */
-        fill: #5A67D8; /* Accent color for icon hover */
-    }
-
-.header.light-theme .search-button svg {
-    fill: #212529 !important; /* Force dark color for search icon */
+.dark-theme .dropdown-divider {
+    border-color: #444444;
 }

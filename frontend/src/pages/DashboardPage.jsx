@@ -1,10 +1,10 @@
-﻿// frontend/src/pages/DashboardPage.jsx
+﻿// /frontend/src/pages/DashboardPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom'; // Link поки не використовується в таблиці
 import { useAuth } from '../context/AuthContext.jsx';
-import { getDashboardStats } from '../api/seller.js';
-import SalesChart from '../components/SalesChart.jsx';
+import { getDashboardStats } from '../api/admin.js'; // ЗМІНА: Імпорт з admin.js
+// import SalesChart from '../components/SalesChart.jsx'; // ЗМІНА: Видалено, оскільки дані не готові для чарту
 import './DashboardPage.css';
 
 const DashboardPage = () => {
@@ -16,7 +16,8 @@ const DashboardPage = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const data = await getDashboardStats(token);
+                // ЗМІНА: Викликаємо функцію без токена, оскільки api/admin.js обробляє це сам
+                const data = await getDashboardStats(); 
                 setStats(data);
             } catch (err) {
                 setError(err.message);
@@ -35,53 +36,58 @@ const DashboardPage = () => {
 
     return (
         <div className="page-container dashboard-container">
-            <h2>Seller Dashboard</h2>
+            <h2>Admin Dashboard</h2> {/* ЗМІНА: Заголовок */}
 
             <div className="stats-grid">
+                {/* ЗМІНА: Картки зі статистикою для адміна */}
                 <div className="stat-card">
-                    <h4>Total Revenue</h4>
-                    <p>${stats.totalRevenue}</p>
+                    <h4>Total Users</h4>
+                    <p>{stats.totalUsers}</p>
+                </div>
+                <div className="stat-card">
+                    <h4>Total Products</h4>
+                    <p>{stats.totalProducts}</p>
                 </div>
                 <div className="stat-card">
                     <h4>Total Sales</h4>
-                    <p>{stats.salesCount}</p>
+                    <p>${stats.totalSales.toFixed(2)}</p>
                 </div>
             </div>
+
+            {/* ЗМІНА: Секцію з "Low Stock Items" та чартом видалено, оскільки API не надає цих даних */}
 
             <div className="dashboard-section">
-                <h3>Sales Overview</h3>
-                <div className="chart-container">
-                    <SalesChart orders={stats.recentOrders} />
-                </div>
-            </div>
-
-            <div className="dashboard-grid">
-                <div className="dashboard-section">
-                    <h3>Low Stock Items</h3>
-                    <div className="dashboard-list">
-                        {stats.lowStockProducts.length > 0 ? (
-                            stats.lowStockProducts.map(product => (
-                                <Link to={`/products/edit/${product.id}`} key={product.id} className="list-item">
-                                    <span>{product.title}</span>
-                                    <span className="low-stock-count">{product.stock} left</span>
-                                </Link>
-                            ))
-                        ) : <p>No products are low on stock.</p>}
-                    </div>
-                </div>
-
-                <div className="dashboard-section">
-                    <h3>Recent Orders</h3>
-                    <div className="dashboard-list">
-                        {stats.recentOrders.length > 0 ? (
-                            stats.recentOrders.map(order => (
-                                <Link to={`/seller/orders/${order.id}`} key={order.id} className="list-item">
-                                    <span>Order #{order.id.substring(0, 8)}</span>
-                                    <span>${order.total.toFixed(2)}</span>
-                                </Link>
-                            ))
-                        ) : <p>No recent orders.</p>}
-                    </div>
+                <h3>Recent Orders</h3>
+                {/* ЗМІНА: Замінено список на більш інформативну таблицю */}
+                <div className="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>User</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {stats.recentOrders.length > 0 ? (
+                                stats.recentOrders.map(order => (
+                                    <tr key={order.id}>
+                                        <td>{order.id.substring(0, 8)}...</td>
+                                        <td>{order.user ? `${order.user.firstName} ${order.user.lastName}` : 'N/A'}</td>
+                                        <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                                        <td><span className={`status-badge status-${order.status}`}>{order.status}</span></td>
+                                        <td>${order.totalPrice.toFixed(2)}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5">No recent orders.</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

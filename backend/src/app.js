@@ -17,6 +17,8 @@ const categoryRoutes = require('./routes/category.routes');
 const reviewRoutes = require('./routes/review.routes');
 const sellerRoutes = require('./routes/seller.routes');
 const couponRoutes = require('./routes/coupons.routes'); // 1. Import the new coupon routes
+const adminRoutes = require('./routes/admin.routes');
+
 
 const app = express();
 
@@ -26,7 +28,12 @@ app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), han
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 const uploadsPath = path.join(__dirname, '../uploads');
 console.log(`[SERVER] Serving static files from: ${uploadsPath}`);
@@ -44,6 +51,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/seller', sellerRoutes);
 app.use('/api/coupons', couponRoutes); // 2. Register the new coupon routes
+app.use('/api/admin', adminRoutes);
 
 // Root route placeholder
 app.get('/', (req, res) => {

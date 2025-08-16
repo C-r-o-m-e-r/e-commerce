@@ -4,7 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { AuthProvider } from './context/AuthContext.jsx';
+import { useAuth, AuthProvider } from './context/AuthContext.jsx'; // 1. Import useAuth
 import { ThemeProvider } from './context/ThemeContext.jsx';
 
 import Header from './components/Header';
@@ -27,9 +27,31 @@ import CheckoutPage from './pages/CheckoutPage.jsx';
 import SellerOrdersPage from './pages/SellerOrdersPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import SellerOrderDetailPage from './pages/SellerOrderDetailPage.jsx';
-import MyCouponsPage from './pages/MyCouponsPage.jsx'; // 1. Import the new page
+import MyCouponsPage from './pages/MyCouponsPage.jsx';
+import AdminUsersPage from './pages/AdminUsersPage';
 
 import './App.css';
+
+// --- Admin Route Protection ---
+// This component checks if a user is an admin.
+// If so, it shows the page. If not, it redirects them to the homepage.
+const AdminRoute = ({ children }) => {
+    const { user, isLoading } = useAuth();
+
+    // While authentication is loading, show nothing to prevent a flash redirect
+    if (isLoading) {
+        return null; 
+    }
+
+    // If there's no user or the user is not an ADMIN, redirect
+    if (!user || user.role !== 'ADMIN') {
+        return <Navigate to="/" replace />;
+    }
+
+    // If the user is an admin, show the requested page
+    return children;
+};
+
 
 function App() {
     return (
@@ -66,8 +88,20 @@ function App() {
                         <Route path="/seller/orders/:id" element={<SellerOrderDetailPage />} />
                         <Route path="/products/add" element={<AddProductPage />} />
                         <Route path="/my-products" element={<MyProductsPage />} />
-                        <Route path="/products/edit/:id" element={<EditProductPage />} />
-                        <Route path="/my-coupons" element={<MyCouponsPage />} /> {/* 2. Add the new route */}
+                        <Route path="/products/edit/:id"element={<EditProductPage />} />
+                        <Route path="/my-coupons" element={<MyCouponsPage />} />
+                        
+                        {/* --- Admin Routes (Protected) --- */}
+                        <Route path="/admin/dashboard" element={
+                            <AdminRoute>
+                                <DashboardPage />
+                            </AdminRoute>
+                        } />
+                        <Route path="/admin/users" element={
+                            <AdminRoute>
+                                <AdminUsersPage />
+                            </AdminRoute>
+                        } />
                     </Routes>
                 </main>
                 <ScrollToTopButton />
