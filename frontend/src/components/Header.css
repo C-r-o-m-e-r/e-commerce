@@ -238,8 +238,8 @@
     border-right: 1px solid #DEE2E6;
 }
 
-.light-theme .category-dropdown-menu, .light-theme .dropdown-submenu, .light-theme .dropdown-menu {
-    background-color: #FFFFFF;
+.light-theme .category-dropdown-menu, .light-theme .dropdown-submenu {
+    background-color: #fffffff0;
     border: 1px solid #DEE2E6;
 }
 

@@ -1,5 +1,4 @@
-/* /frontend/src/pages/AdminUsersPage.css */
-
+/* --- Base Styles (Shared) --- */
 .admin-users-page {
   padding: 2rem;
   max-width: 1200px;
@@ -8,9 +7,38 @@
 
 .admin-users-page h2 {
   margin-bottom: 1.5rem;
-  border-bottom: 2px solid #ccc;
   padding-bottom: 0.5rem;
 }
+
+/* ADDED: Styles for Search and Filter container */
+.filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-input, .role-filter {
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 1rem;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.search-input {
+  flex-grow: 1;
+  max-width: 400px;
+}
+
+.user-details-link {
+  text-decoration: none;
+  font-weight: 500;
+}
+.user-details-link:hover {
+  text-decoration: underline;
+}
+
 
 .table-container {
   overflow-x: auto;
@@ -22,38 +50,126 @@ table {
   text-align: left;
 }
 
-thead {
-  background-color: transparent; 
+tr {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
 }
 
 th, td {
   padding: 12px 15px;
-  border-bottom: 1px solid #444;
-}
-
-tr:hover {
-  background-color: #2c2c2c;
+  border-bottom: none;
 }
 
 select {
   padding: 6px 10px;
   border-radius: 4px;
-  border: 1px solid #ccc;
 }
 
-.delete-btn {
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 10px;
+}
+
+.actions-cell button {
   padding: 6px 12px;
   border: none;
-  background-color: #e74c3c;
-  color: white;
   border-radius: 4px;
   cursor: pointer;
+  color: white;
+  font-weight: bold;
 }
 
-.delete-btn:hover {
-  background-color: #c0392b;
+.delete-btn { background-color: #e74c3c; }
+.delete-btn:hover { background-color: #c0392b; }
+.block-btn { background-color: #f39c12; }
+.block-btn:hover { background-color: #d35400; }
+.unblock-btn { background-color: #2ecc71; }
+.unblock-btn:hover { background-color: #27ae60; }
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
 }
 
-.error-message {
-    color: #e74c3c;
+.status-badge.status-ACTIVE { background-color: #27ae60; }
+.status-badge.status-BLOCKED { background-color: #c0392b; }
+
+.error-message { color: #e74c3c; }
+
+/* --- Light Theme --- */
+.light-theme .admin-users-page {
+  color: #212529;
+}
+.light-theme .admin-users-page h2 {
+  border-bottom-color: #ccc;
+}
+.light-theme tr {
+  border-bottom-color: #ddd;
+}
+.light-theme tbody tr:hover {
+  background-color: #f5f5f5;
+}
+.light-theme select {
+  border-color: #ccc;
+  background-color: #fff;
+  color: #212529;
+}
+.light-theme .blocked-user {
+  background-color: #fee2e2;
+  color: #7f1d1d;
+}
+.light-theme .blocked-user:hover {
+  background-color: #fecaca;
+}
+.light-theme .search-input, .light-theme .role-filter {
+  border-color: #ccc;
+  background-color: #fff;
+  color: #212529;
+}
+.light-theme .user-details-link {
+  color: #007bff;
+}
+
+
+/* --- Dark Theme --- */
+.dark-theme .admin-users-page {
+  color: #e0e0e0;
+}
+.dark-theme .admin-users-page h2 {
+  border-bottom-color: #444;
+}
+.dark-theme tr {
+  border-bottom-color: #444;
+}
+.dark-theme tbody tr:hover {
+  background-color: #2c2c2c;
+}
+.dark-theme select {
+  border-color: #555;
+  background-color: #333;
+  color: #fff;
+}
+.dark-theme .blocked-user {
+  background-color: #3d2f2f;
+  color: #a0a0a0;
+}
+.dark-theme .blocked-user:hover {
+  background-color: #4a3a3a;
+}
+.dark-theme .search-input, .dark-theme .role-filter {
+  border-color: #555;
+  background-color: #333;
+  color: #fff;
+}
+.dark-theme .user-details-link {
+  color: #8c9eff;
 }

@@ -13,7 +13,6 @@ const {
     getSellerProducts,
     getProductSuggestions,
 } = require('../controllers/products.controller');
-// FIX: Use destructuring { } to import the specific middleware function
 const { authMiddleware } = require('../middleware/auth.middleware');
 const checkRole = require('../middleware/role.middleware');
 const { processImages } = require('../middleware/image.middleware');
@@ -38,10 +37,12 @@ router.get('/suggestions', getProductSuggestions);
 router.get('/:id', getProductById);
 
 
-// --- Protected routes for Sellers ---
+// --- Protected routes ---
 router.post('/', authMiddleware, checkRole('SELLER'), upload.array('images', 5), processImages, createProduct);
-router.put('/:id', authMiddleware, checkRole('SELLER'), upload.array('images', 5), processImages, updateProduct);
-router.delete('/:id', authMiddleware, checkRole('SELLER'), deleteProduct);
 router.get('/seller/my-products', authMiddleware, checkRole('SELLER'), getSellerProducts);
+
+// --- FIX: Removed checkRole('SELLER') to allow Admins access. The controller now handles the logic. ---
+router.put('/:id', authMiddleware, upload.array('images', 5), processImages, updateProduct);
+router.delete('/:id', authMiddleware, deleteProduct);
 
 module.exports = router;

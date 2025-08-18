@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import { getCategories } from '../api/category.js';
 import ImageDropzone from '../components/ImageDropzone.jsx';
+import { toast } from 'react-toastify'; // <-- FIX: Import toast for notifications
 import './Form.css';
 
 const AddProductPage = () => {
@@ -13,7 +14,7 @@ const AddProductPage = () => {
         description: '',
         price: '',
         categoryId: '',
-        stock: '', // Add stock to state
+        stock: '',
     });
     const [categories, setCategories] = useState([]);
     const [imageFiles, setImageFiles] = useState([]);
@@ -79,7 +80,7 @@ const AddProductPage = () => {
         data.append('description', formData.description);
         data.append('price', formData.price);
         data.append('categoryId', formData.categoryId);
-        data.append('stock', formData.stock); // Add stock to form data
+        data.append('stock', formData.stock);
         imageFiles.forEach(file => {
             data.append('images', file);
         });
@@ -95,9 +96,13 @@ const AddProductPage = () => {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Error adding product');
             }
-            navigate('/');
+            
+            // --- FIX: Show success message and redirect to "My Products" ---
+            toast.success("Product submitted for admin approval!");
+            navigate('/my-products');
         } catch (err) {
             setError(err.message);
+            toast.error(err.message); // Also show error in toast
         } finally {
             setLoading(false);
         }
@@ -126,12 +131,10 @@ const AddProductPage = () => {
                         <label htmlFor="price">Price</label>
                         <input type="number" id="price" name="price" value={formData.price} onChange={handleChange} required min="0.01" max={PRICE_MAX_VALUE} step="0.01" />
                     </div>
-                    {/* --- START: New Stock Input --- */}
                     <div className="form-group">
                         <label htmlFor="stock">Quantity in Stock</label>
                         <input type="number" id="stock" name="stock" value={formData.stock} onChange={handleChange} required min="0" />
                     </div>
-                    {/* --- END: New Stock Input --- */}
                 </div>
 
                 <div className="form-group">

@@ -1,0 +1,100 @@
+/* --- Base Styles (Shared) --- */
+.user-details-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 2rem;
+  text-decoration: none;
+  font-weight: bold;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.details-card {
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.details-card h3 {
+  margin-top: 0;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+
+.details-card p {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+}
+.status-badge.status-ACTIVE { background-color: #27ae60; }
+.status-badge.status-BLOCKED { background-color: #c0392b; }
+.status-badge.status-COMPLETED { background-color: #27ae60; }
+.status-badge.status-PENDING { background-color: #f39c12; }
+.status-badge.status-SHIPPED { background-color: #3498db; }
+
+
+/* --- Light Theme --- */
+.light-theme .user-details-page {
+  color: #212529; /* Black text */
+}
+.light-theme .back-link {
+  color: #007bff; /* Blue link */
+}
+.light-theme .details-card {
+  background-color: #ffffff; /* White card */
+  border-color: #dee2e6;
+}
+.light-theme .details-card h3 {
+  border-bottom-color: #dee2e6;
+}
+.light-theme .table-container table tr {
+  border-bottom-color: #dee2e6;
+}
+.light-theme .table-container table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+
+/* --- Dark Theme --- */
+.dark-theme .user-details-page {
+  color: #e0e0e0; /* Light text */
+}
+.dark-theme .back-link {
+  color: #8c9eff; /* Light blue link */
+}
+.dark-theme .details-card {
+  background-color: #1e1e1e; /* Dark card */
+  border-color: #444;
+}
+.dark-theme .details-card h3 {
+  border-bottom-color: #444;
+}
+.dark-theme .table-container table tr {
+  border-bottom-color: #444;
+}
+.dark-theme .table-container table tbody tr:hover {
+  background-color: #2c2c2c;
+}

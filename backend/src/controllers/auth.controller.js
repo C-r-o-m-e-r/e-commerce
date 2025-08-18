@@ -1,5 +1,3 @@
-// backend/src/controllers/auth.controller.js
-
 const prisma = require('../config/prisma');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -7,7 +5,6 @@ const { mergeCarts } = require('./cart.controller');
 
 const register = async (req, res) => {
     try {
-        // 1. Get the guestId from the request body
         const { email, password, firstName, lastName, role, guestId } = req.body;
 
         if (!email || !password || !firstName || !lastName) {
@@ -26,6 +23,7 @@ const register = async (req, res) => {
                 firstName,
                 lastName,
                 role: role || 'BUYER',
+                // The 'status' field will default to 'ACTIVE' from your schema
             },
         });
 
@@ -35,8 +33,7 @@ const register = async (req, res) => {
                 userId: newUser.id,
             },
         });
-
-        // --- START: MERGE GUEST CART ON REGISTRATION ---
+        
         if (guestId) {
             try {
                 await mergeCarts(newUser.id, guestId);
@@ -44,9 +41,7 @@ const register = async (req, res) => {
                 console.error('Failed to merge carts on registration:', mergeError);
             }
         }
-        // --- END: MERGE GUEST CART ON REGISTRATION ---
-
-        // --- START: AUTOMATIC LOGIN AFTER REGISTRATION ---
+        
         const token = jwt.sign(
             { userId: newUser.id, email: newUser.email, role: newUser.role },
             process.env.JWT_SECRET,
@@ -62,10 +57,10 @@ const register = async (req, res) => {
                 firstName: newUser.firstName,
                 lastName: newUser.lastName,
                 role: newUser.role,
+                status: newUser.status, // Also return status on registration
                 createdAt: newUser.createdAt
             },
         });
-        // --- END: AUTOMATIC LOGIN ---
 
     } catch (error) {
         console.error('Registration error:', error);
@@ -88,6 +83,12 @@ const login = async (req, res) => {
         if (!isPasswordCorrect) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
+
+        // --- FIX: Check if the user account is blocked ---
+        if (user.status === 'BLOCKED') {
+            return res.status(403).json({ message: 'Your account has been suspended. Please contact support.' });
+        }
+        // --- END FIX ---
 
         if (guestId) {
             try {
@@ -112,6 +113,7 @@ const login = async (req, res) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 role: user.role,
+                status: user.status,
                 createdAt: user.createdAt
             },
         });

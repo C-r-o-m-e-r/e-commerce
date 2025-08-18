@@ -1,10 +1,8 @@
-﻿// src/App.jsx
-
-import { Routes, Route, Navigate } from 'react-router-dom';
+﻿import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { useAuth, AuthProvider } from './context/AuthContext.jsx'; // 1. Import useAuth
+import { useAuth, AuthProvider } from './context/AuthContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 
 import Header from './components/Header';
@@ -29,26 +27,25 @@ import DashboardPage from './pages/DashboardPage.jsx';
 import SellerOrderDetailPage from './pages/SellerOrderDetailPage.jsx';
 import MyCouponsPage from './pages/MyCouponsPage.jsx';
 import AdminUsersPage from './pages/AdminUsersPage';
+import AdminUserDetailsPage from './pages/AdminUserDetailsPage';
+import AdminProductsPage from './pages/AdminProductsPage';
 
 import './App.css';
 
-// --- Admin Route Protection ---
-// This component checks if a user is an admin.
-// If so, it shows the page. If not, it redirects them to the homepage.
-const AdminRoute = ({ children }) => {
+// --- FIX: Created a more flexible ProtectedRoute ---
+// This component can check for one or more allowed roles.
+const ProtectedRoute = ({ children, roles }) => {
     const { user, isLoading } = useAuth();
 
-    // While authentication is loading, show nothing to prevent a flash redirect
     if (isLoading) {
-        return null; 
+        return null; // Or a loading spinner
     }
 
-    // If there's no user or the user is not an ADMIN, redirect
-    if (!user || user.role !== 'ADMIN') {
+    // Redirect if user is not logged in or their role is not in the allowed list
+    if (!user || !roles.includes(user.role)) {
         return <Navigate to="/" replace />;
     }
 
-    // If the user is an admin, show the requested page
     return children;
 };
 
@@ -83,24 +80,40 @@ function App() {
                         <Route path="/checkout" element={<CheckoutPage />} />
 
                         {/* Seller Routes */}
-                        <Route path="/seller/dashboard" element={<DashboardPage />} />
-                        <Route path="/seller/orders" element={<SellerOrdersPage />} />
-                        <Route path="/seller/orders/:id" element={<SellerOrderDetailPage />} />
-                        <Route path="/products/add" element={<AddProductPage />} />
-                        <Route path="/my-products" element={<MyProductsPage />} />
-                        <Route path="/products/edit/:id"element={<EditProductPage />} />
-                        <Route path="/my-coupons" element={<MyCouponsPage />} />
+                        <Route path="/seller/dashboard" element={<ProtectedRoute roles={['SELLER']}><DashboardPage /></ProtectedRoute>} />
+                        <Route path="/seller/orders" element={<ProtectedRoute roles={['SELLER']}><SellerOrdersPage /></ProtectedRoute>} />
+                        <Route path="/seller/orders/:id" element={<ProtectedRoute roles={['SELLER']}><SellerOrderDetailPage /></ProtectedRoute>} />
+                        <Route path="/products/add" element={<ProtectedRoute roles={['SELLER']}><AddProductPage /></ProtectedRoute>} />
+                        <Route path="/my-products" element={<ProtectedRoute roles={['SELLER']}><MyProductsPage /></ProtectedRoute>} />
+                        <Route path="/my-coupons" element={<ProtectedRoute roles={['SELLER']}><MyCouponsPage /></ProtectedRoute>} />
+                        
+                        {/* FIX: This route is now protected for both SELLER and ADMIN */}
+                        <Route path="/products/edit/:id" element={
+                            <ProtectedRoute roles={['SELLER', 'ADMIN']}>
+                                <EditProductPage />
+                            </ProtectedRoute>
+                        } />
                         
                         {/* --- Admin Routes (Protected) --- */}
                         <Route path="/admin/dashboard" element={
-                            <AdminRoute>
+                            <ProtectedRoute roles={['ADMIN']}>
                                 <DashboardPage />
-                            </AdminRoute>
+                            </ProtectedRoute>
                         } />
                         <Route path="/admin/users" element={
-                            <AdminRoute>
+                            <ProtectedRoute roles={['ADMIN']}>
                                 <AdminUsersPage />
-                            </AdminRoute>
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/admin/users/:userId" element={
+                            <ProtectedRoute roles={['ADMIN']}>
+                                <AdminUserDetailsPage />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/admin/products" element={
+                            <ProtectedRoute roles={['ADMIN']}>
+                                <AdminProductsPage />
+                            </ProtectedRoute>
                         } />
                     </Routes>
                 </main>

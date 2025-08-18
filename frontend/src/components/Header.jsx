@@ -1,6 +1,4 @@
-﻿// src/components/Header.jsx
-
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
@@ -63,13 +61,15 @@ const Header = () => {
                                     </span>
                                 </div>
                             }
+                            theme={theme}
                         >
                             {/* --- START: Admin Panel Section --- */}
                             {user.role === 'ADMIN' && (
                                 <>
                                     <div className="dropdown-section-header">Admin Panel</div>
-                                    <Link to="/admin/dashboard" className="dropdown-item">Dashboard</Link> {/* <-- ДОДАНО */}
+                                    <Link to="/admin/dashboard" className="dropdown-item">Dashboard</Link>
                                     <Link to="/admin/users" className="dropdown-item">Manage Users</Link>
+                                    <Link to="/admin/products" className="dropdown-item">Manage Products</Link> {/* <-- ADDED THIS LINK */}
                                     <hr className="dropdown-divider" />
                                 </>
                             )}

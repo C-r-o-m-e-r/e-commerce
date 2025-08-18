@@ -16,6 +16,10 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 -   **Seller Dashboard:** A dedicated dashboard for sellers to view sales statistics, recent orders, and low-stock items.
 -   **Coupon System:** Sellers can create percentage-based or fixed-amount discount codes with optional expiration dates. Buyers can apply these codes in the cart to receive a discount.
 -   **Shopping Cart:** Persistent, server-side cart with functionality to add, remove, and update item quantities. **Supports both guest and authenticated users**, with seamless cart merging upon login.
+-   **Comprehensive Admin Panel:**
+    -   A central **dashboard** with site-wide statistics (total users, products, sales).
+    -   Full **user management** (view all, edit roles, block/unblock, delete, search & filter).
+    -   Full **product management**, including the ability to approve/reject new products from sellers, edit any product's details, and delete products from the marketplace.
 -   **Wishlist Management:** Users can create and manage multiple wishlists.
 -   **Order History:** Users can view a list of all their past orders and see a detailed breakdown of each one.
 -   **Product Reviews & Ratings:** Users who have purchased a product can leave a star rating (1-5) and a written review.
@@ -212,13 +216,13 @@ The test suite uses Jest and Supertest to run integration tests against the back
 
 | Method | Path | Protected | Role | Description |
 |:---|:---|:---|:---|:---|
-| `GET` | `/api/products` | No | - | Get products. Accepts `search`, `category`, `sortBy`, `page`, `limit`. |
+| `GET` | `/api/products` | No | - | Get approved products. Accepts `search`, `category`, `sortBy`, `page`, `limit`. |
 | `GET` | `/api/products/suggestions` | No | - | Get search suggestions (for autocomplete). |
 | `GET` | `/api/products/:id` | No | - | Get a single product by ID. |
 | `GET` | `/api/products/seller/my-products`| Yes | `SELLER` | Get all products for the current seller. |
 | `POST` | `/api/products` | Yes | `SELLER` | Create a new product. |
-| `PUT` | `/api/products/:id` | Yes | `SELLER` | Update your own product. |
-| `DELETE`| `/api/products/:id` | Yes | `SELLER` | Delete your own product. |
+| `PUT` | `/api/products/:id` | Yes | **`SELLER`, `ADMIN`** | Update your own product (Seller) or any product (Admin). |
+| `DELETE`| `/api/products/:id` | Yes | **`SELLER`, `ADMIN`** | Delete your own product (Seller) or any product (Admin). |
 
 ### Seller
 
@@ -287,6 +291,21 @@ The test suite uses Jest and Supertest to run integration tests against the back
 |:---|:---|:---|:---|
 | `POST` | `/api/payments/create-intent` | Yes | Create a Stripe Payment Intent. |
 | `POST` | `/api/payments/webhook` | No | Stripe webhook for payment events. |
+
+### Admin
+
+| Method | Path | Protected | Role | Description |
+|:---|:---|:---|:---|:---|
+| `GET` | `/api/admin/dashboard-stats` | Yes | `ADMIN` | Get statistics for the admin dashboard. |
+| `GET` | `/api/admin/users` | Yes | `ADMIN` | Get all users. Accepts `search`, `role`. |
+| `GET` | `/api/admin/users/:id` | Yes | `ADMIN` | Get a single user's details. |
+| `PATCH`| `/api/admin/users/:id/role` | Yes | `ADMIN` | Update a user's role. |
+| `PATCH`| `/api/admin/users/:id/status` | Yes | `ADMIN` | Update a user's status (block/unblock). |
+| `DELETE`| `/api/admin/users/:id` | Yes | `ADMIN` | Delete a user. |
+| `GET` | `/api/admin/products` | Yes | `ADMIN` | Get all products. Accepts `search`, `status`, `categoryId`. |
+| `PUT` | `/api/admin/products/:id` | Yes | `ADMIN` | Update any product's details. |
+| `PATCH`| `/api/admin/products/:id/status` | Yes | `ADMIN` | Update a product's status (approve/reject). |
+| `DELETE`| `/api/admin/products/:id` | Yes | `ADMIN` | Delete any product. |
 
 -----
 

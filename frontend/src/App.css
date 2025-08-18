@@ -34,7 +34,6 @@
 .header .logo {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #fff;
   text-decoration: none;
 }
 
@@ -45,7 +44,6 @@
 }
 
 .header .nav-link {
-  color: #e0e0e0;
   text-decoration: none;
   font-size: 1rem;
   transition: color 0.2s;
@@ -64,16 +62,15 @@
   text-align: left;
 }
 
+/* FIX: Added missing closing brace */
 .account-trigger span:first-child {
   font-size: 0.8rem;
-  color: #a0a0a0;
 }
 
 .account-trigger .account-trigger-line2 {
   display: flex;
   align-items: center;
   font-weight: bold;
-  color: #e0e0e0;
 }
 
 .account-trigger .account-trigger-line2 svg {
