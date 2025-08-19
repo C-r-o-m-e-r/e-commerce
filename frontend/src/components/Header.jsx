@@ -1,4 +1,6 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿// /frontend/src/components/Header.jsx
+
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
@@ -69,7 +71,8 @@ const Header = () => {
                                     <div className="dropdown-section-header">Admin Panel</div>
                                     <Link to="/admin/dashboard" className="dropdown-item">Dashboard</Link>
                                     <Link to="/admin/users" className="dropdown-item">Manage Users</Link>
-                                    <Link to="/admin/products" className="dropdown-item">Manage Products</Link> {/* <-- ADDED THIS LINK */}
+                                    <Link to="/admin/products" className="dropdown-item">Manage Products</Link>
+                                    <Link to="/admin/orders" className="dropdown-item">Manage Orders</Link> {/* <-- ADDED THIS LINK */}
                                     <hr className="dropdown-divider" />
                                 </>
                             )}
@@ -84,7 +87,6 @@ const Header = () => {
                                     <Link to="/seller/dashboard" className="dropdown-item">Dashboard</Link>
                                     <Link to="/seller/orders" className="dropdown-item">My Sales</Link>
                                     <Link to="/my-products" className="dropdown-item">My Products</Link>
-                                    <Link to="/products/add" className="dropdown-item">Add Product</Link>
                                     <Link to="/my-coupons" className="dropdown-item">My Coupons</Link>
                                 </>
                             )}

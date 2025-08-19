@@ -1,0 +1,92 @@
+/* /frontend/src/pages/AdminOrdersPage.css
+
+/* --- Base Styles (Shared) --- */
+.admin-orders-page {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.admin-orders-page h2 {
+    margin-bottom: 1.5rem;
+}
+
+.order-details-link {
+    text-decoration: none;
+    font-weight: 500;
+}
+.order-details-link:hover {
+    text-decoration: underline;
+}
+
+.status-select {
+    padding: 6px 10px;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+}
+
+/* Color coding for status dropdowns */
+.status-PENDING { background-color: #f39c12; }
+.status-PAID { background-color: #2980b9; }
+.status-SHIPPED { background-color: #3498db; }
+.status-COMPLETED { background-color: #27ae60; }
+.status-CANCELLED { background-color: #c0392b; }
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+.pagination-controls button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border-width: 1px;
+    border-style: solid;
+    cursor: pointer;
+}
+.pagination-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --- Light Theme --- */
+.light-theme .admin-orders-page .filter-select {
+    border-color: #ccc;
+    background-color: #fff;
+    color: #212529;
+}
+.light-theme .admin-orders-page .order-details-link {
+    color: #007bff;
+}
+.light-theme .pagination-controls button {
+    border-color: #ccc;
+    background-color: #fff;
+    color: #212529;
+}
+.light-theme .pagination-controls button:hover:not(:disabled) {
+    background-color: #f5f5f5;
+}
+
+
+/* --- Dark Theme --- */
+.dark-theme .admin-orders-page .filter-select {
+    border-color: #555;
+    background-color: #333;
+    color: #fff;
+}
+.dark-theme .admin-orders-page .order-details-link {
+    color: #8c9eff;
+}
+.dark-theme .pagination-controls button {
+    border-color: #555;
+    background-color: #333;
+    color: #fff;
+}
+.dark-theme .pagination-controls button:hover:not(:disabled) {
+    background-color: #444;
+}

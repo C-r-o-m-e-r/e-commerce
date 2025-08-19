@@ -1,4 +1,6 @@
-﻿import { Routes, Route, Navigate } from 'react-router-dom';
+﻿// /src/App.jsx
+
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -29,11 +31,12 @@ import MyCouponsPage from './pages/MyCouponsPage.jsx';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminUserDetailsPage from './pages/AdminUserDetailsPage';
 import AdminProductsPage from './pages/AdminProductsPage';
+import AdminOrdersPage from './pages/AdminOrdersPage';
+import AdminOrderDetailPage from './pages/AdminOrderDetailPage'; // <-- ADDED: Import the new order detail page
 
 import './App.css';
 
-// --- FIX: Created a more flexible ProtectedRoute ---
-// This component can check for one or more allowed roles.
+// --- ProtectedRoute Component ---
 const ProtectedRoute = ({ children, roles }) => {
     const { user, isLoading } = useAuth();
 
@@ -41,7 +44,6 @@ const ProtectedRoute = ({ children, roles }) => {
         return null; // Or a loading spinner
     }
 
-    // Redirect if user is not logged in or their role is not in the allowed list
     if (!user || !roles.includes(user.role)) {
         return <Navigate to="/" replace />;
     }
@@ -87,7 +89,7 @@ function App() {
                         <Route path="/my-products" element={<ProtectedRoute roles={['SELLER']}><MyProductsPage /></ProtectedRoute>} />
                         <Route path="/my-coupons" element={<ProtectedRoute roles={['SELLER']}><MyCouponsPage /></ProtectedRoute>} />
                         
-                        {/* FIX: This route is now protected for both SELLER and ADMIN */}
+                        {/* Shared Edit Route */}
                         <Route path="/products/edit/:id" element={
                             <ProtectedRoute roles={['SELLER', 'ADMIN']}>
                                 <EditProductPage />
@@ -113,6 +115,17 @@ function App() {
                         <Route path="/admin/products" element={
                             <ProtectedRoute roles={['ADMIN']}>
                                 <AdminProductsPage />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/admin/orders" element={
+                            <ProtectedRoute roles={['ADMIN']}>
+                                <AdminOrdersPage />
+                            </ProtectedRoute>
+                        } />
+                        {/* <-- ADDED: New route for a single order's details page --> */}
+                        <Route path="/admin/orders/:orderId" element={
+                            <ProtectedRoute roles={['ADMIN']}>
+                                <AdminOrderDetailPage />
                             </ProtectedRoute>
                         } />
                     </Routes>

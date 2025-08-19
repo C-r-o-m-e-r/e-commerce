@@ -20,6 +20,7 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
     -   A central **dashboard** with site-wide statistics (total users, products, sales).
     -   Full **user management** (view all, edit roles, block/unblock, delete, search & filter).
     -   Full **product management**, including the ability to approve/reject new products from sellers, edit any product's details, and delete products from the marketplace.
+    -   Full **order management** with the ability to view all orders, filter by status, see order details, update status (e.g., Pending -> Shipped), and process full refunds via Stripe.
 -   **Wishlist Management:** Users can create and manage multiple wishlists.
 -   **Order History:** Users can view a list of all their past orders and see a detailed breakdown of each one.
 -   **Product Reviews & Ratings:** Users who have purchased a product can leave a star rating (1-5) and a written review.
@@ -306,6 +307,10 @@ The test suite uses Jest and Supertest to run integration tests against the back
 | `PUT` | `/api/admin/products/:id` | Yes | `ADMIN` | Update any product's details. |
 | `PATCH`| `/api/admin/products/:id/status` | Yes | `ADMIN` | Update a product's status (approve/reject). |
 | `DELETE`| `/api/admin/products/:id` | Yes | `ADMIN` | Delete any product. |
+| `GET` | `/api/admin/orders` | Yes | `ADMIN` | Get all orders. Accepts `status`, `page`, `limit`. |
+| `GET` | `/api/admin/orders/:id` | Yes | `ADMIN` | Get a single order's details. |
+| `PATCH`| `/api/admin/orders/:id/status` | Yes | `ADMIN` | Update an order's status. |
+| `POST` | `/api/admin/orders/:id/refund` | Yes | `ADMIN` | Process a full refund for an order. |
 
 -----
 

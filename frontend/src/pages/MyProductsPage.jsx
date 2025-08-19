@@ -1,8 +1,9 @@
-// frontend/src/pages/MyProductsPage.jsx
+// /frontend/src/pages/MyProductsPage.jsx
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './MyProductsPage.css';
 
 const MyProductsPage = () => {
@@ -22,7 +23,7 @@ const MyProductsPage = () => {
             try {
                 const response = await fetch('/api/products/seller/my-products', {
                     headers: {
-                        'Authorization': `Bearer ${token}`, // FIX: Added the authorization header
+                        'Authorization': `Bearer ${token}`,
                     },
                 });
 
@@ -38,7 +39,7 @@ const MyProductsPage = () => {
             }
         };
 
-        if (token) { // Only fetch if the token is available
+        if (token) {
             fetchMyProducts();
         }
     }, [token, user, navigate]);
@@ -61,8 +62,10 @@ const MyProductsPage = () => {
             }
 
             setProducts(products.filter(p => p.id !== productId));
+            toast.success("Product deleted successfully.");
         } catch (err) {
             setError(err.message);
+            toast.error(err.message);
         }
     };
 
@@ -75,24 +78,59 @@ const MyProductsPage = () => {
     }
 
     return (
-        <div className="page-container">
-            <h2>My Products</h2>
-            <div className="products-list">
+        <div className="my-products-page">
+            <div className="page-header">
+                <h2>My Products</h2>
+                <Link to="/products/add" className="btn-add-new">+ Add New Product</Link>
+            </div>
+            
+            {/* --- Replaced card list with a detailed table --- */}
+            <div className="table-container">
                 {products.length > 0 ? (
-                    products.map((product) => (
-                        <div key={product.id} className="product-card-manage">
-                            <div className="product-info">
-                                <h3>{product.title}</h3>
-                                <p className="product-price">${product.price}</p>
-                            </div>
-                            <div className="product-actions">
-                                <Link to={`/products/edit/${product.id}`} className="btn btn-edit">Edit</Link>
-                                <button onClick={() => handleDelete(product.id)} className="btn btn-delete">Delete</button>
-                            </div>
-                        </div>
-                    ))
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Date Added</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {products.map((product) => (
+                                <tr key={product.id}>
+                                    <td>
+                                        <img 
+                                            src={`http://localhost:3000${product.images[0]}`} 
+                                            alt={product.title} 
+                                            className="product-thumbnail" 
+                                        />
+                                    </td>
+                                    <td>{product.title}</td>
+                                    <td>${product.price.toFixed(2)}</td>
+                                    <td>{product.stock}</td>
+                                    <td>
+                                        <span className={`status-badge status-${product.status}`}>
+                                            {product.status}
+                                        </span>
+                                    </td>
+                                    <td>{new Date(product.createdAt).toLocaleDateString()}</td>
+                                    <td className="actions-cell">
+                                        <Link to={`/products/edit/${product.id}`} className="btn btn-edit">Edit</Link>
+                                        <button onClick={() => handleDelete(product.id)} className="btn btn-delete">Delete</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 ) : (
-                    <p>You haven't added any products yet.</p>
+                    <div className="no-products-message">
+                        <p>You haven't added any products yet.</p>
+                        <Link to="/products/add" className="btn-add-new">Add your first product</Link>
+                    </div>
                 )}
             </div>
         </div>

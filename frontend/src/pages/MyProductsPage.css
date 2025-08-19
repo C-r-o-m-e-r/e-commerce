@@ -1,78 +1,133 @@
 /* frontend/src/pages/MyProductsPage.css */
 
-.my-products-container h2 {
-    text-align: left;
-    margin-bottom: 2rem;
-    color: var(--text-primary); /* Use variable for title color */
+.my-products-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
 }
 
-.product-card-manage {
+.page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--bg-secondary); /* Use variable */
-    border: 1px solid var(--border-color); /* Use variable */
-    border-radius: 8px;
-    padding: 1rem 1.5rem;
-    margin-bottom: 1rem;
-    transition: background-color 0.3s ease, border-color 0.3s ease; /* Add smooth transition */
+    margin-bottom: 1.5rem;
 }
 
-.product-info {
-    flex-grow: 1;
-    min-width: 0;
-    margin-right: 1rem;
+.my-products-page h2 {
+    margin: 0;
+    color: var(--text-primary);
 }
 
-    .product-info h3 {
-        margin: 0;
-        font-size: 1.2rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        color: var(--text-primary); /* Use variable */
-    }
-
-    .product-info .product-price {
-        margin: 0.25rem 0 0;
-        color: var(--text-secondary); /* Use variable */
-    }
-
-.product-actions {
-    display: flex;
-    gap: 1rem;
-    flex-shrink: 0;
-}
-
-.btn {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
+.btn-add-new {
+    padding: 10px 20px;
+    background-color: var(--accent-primary);
+    color: white;
     text-decoration: none;
-    font-size: 0.9rem;
-    text-align: center;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: background-color 0.2s, color 0.2s;
+}
+.btn-add-new:hover {
+    background-color: var(--accent-primary-hover);
+    color: white; /* <-- FIX: Ensures text stays visible on hover */
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+tr {
+  border-bottom: 1px solid var(--border-color);
+}
+
+th, td {
+  padding: 16px 15px;
+  vertical-align: middle;
+  color: var(--text-primary);
+}
+
+th {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+tbody tr {
+    transition: background-color 0.2s;
+}
+tbody tr:hover {
+  background-color: var(--bg-secondary-hover);
+}
+
+.product-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 10px;
+}
+
+.btn, .btn-edit, .btn-delete {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.9rem;
+  text-align: center;
 }
 
 .btn-edit {
-    background-color: var(--input-bg); /* Use variable */
-    color: var(--text-secondary); /* Use variable */
-    border: 1px solid var(--border-color); /* Add border for light theme visibility */
+    background-color: var(--input-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
     transition: background-color 0.2s, border-color 0.2s;
 }
-
-    .btn-edit:hover {
-        border-color: var(--accent-primary);
-        background-color: var(--bg-secondary);
-    }
+.btn-edit:hover {
+    border-color: var(--accent-primary);
+    background-color: var(--bg-secondary);
+}
 
 .btn-delete {
-    background-color: #ff4d4d; /* Red is universal for delete, works on both themes */
+    background-color: #ff4d4d;
     color: #fff;
     transition: background-color 0.2s;
 }
+.btn-delete:hover {
+    background-color: #e63939;
+}
 
-    .btn-delete:hover {
-        background-color: #e63939;
-    }
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+.status-badge.status-PENDING { background-color: #f39c12; }
+.status-badge.status-APPROVED { background-color: #27ae60; }
+.status-badge.status-REJECTED { background-color: #c0392b; }
+
+.no-products-message {
+    text-align: center;
+    padding: 3rem;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+.no-products-message p {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}

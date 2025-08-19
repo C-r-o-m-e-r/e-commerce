@@ -1,3 +1,5 @@
+// /frontend/src/api/admin.js
+
 const API_URL = 'http://localhost:3000/api/admin'; // Base URL for admin routes
 
 // Helper to get the token
@@ -22,8 +24,6 @@ export const getDashboardStats = async () => {
 /**
  * @description Fetches all users, with optional search and role filtering.
  * @param {object} params - The search and filter parameters.
- * @param {string} params.search - The search term for email/name.
- * @param {string} params.role - The role to filter by.
  * @returns {Promise<Array>} A list of users.
  */
 export const adminGetAllUsers = async ({ search, role } = {}) => {
@@ -122,7 +122,7 @@ export const adminGetUserById = async (userId) => {
   return res.json();
 };
 
-// --- NEW: PRODUCT MANAGEMENT API FUNCTIONS ---
+// --- PRODUCT MANAGEMENT API FUNCTIONS ---
 
 /**
  * @description Fetches all products for the admin panel, with filtering.
@@ -187,4 +187,72 @@ export const adminUpdateProduct = async (productId, productData) => {
     });
     if (!res.ok) throw new Error('Failed to update product details');
     return res.json();
+};
+
+// --- ORDER MANAGEMENT API FUNCTIONS ---
+
+/**
+ * @description Fetches all orders for the admin panel, with filtering.
+ * @param {object} filters - The search and filter parameters.
+ * @returns {Promise<Object>} An object containing the list of orders and pagination data.
+ */
+export const adminGetAllOrders = async (filters = {}) => {
+  const params = new URLSearchParams(filters);
+  const queryString = params.toString();
+  const res = await fetch(`${API_URL}/orders?${queryString}`, {
+    headers: { 'Authorization': `Bearer ${getToken()}` }
+  });
+  if (!res.ok) throw new Error('Failed to fetch orders');
+  return res.json();
+};
+
+/**
+ * @description Fetches a single order by ID.
+ * @param {string} orderId - The ID of the order to fetch.
+ * @returns {Promise<Object>} The detailed order object.
+ */
+export const adminGetOrderById = async (orderId) => {
+  const res = await fetch(`${API_URL}/orders/${orderId}`, {
+    headers: { 'Authorization': `Bearer ${getToken()}` }
+  });
+  if (!res.ok) throw new Error('Failed to fetch order details');
+  return res.json();
+};
+
+/**
+ * @description Updates an order's status.
+ * @param {string} orderId - The ID of the order to update.
+ * @param {string} status - The new status.
+ * @returns {Promise<Object>} The updated order object.
+ */
+export const adminUpdateOrderStatus = async (orderId, status) => {
+  const res = await fetch(`${API_URL}/orders/${orderId}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${getToken()}`
+    },
+    body: JSON.stringify({ status })
+  });
+  if (!res.ok) throw new Error('Failed to update order status');
+  return res.json();
+};
+
+/**
+ * @description Creates a Stripe refund for a given order.
+ * @param {string} orderId - The ID of the order to refund.
+ * @returns {Promise<Object>} The server response, including the updated order.
+ */
+export const adminCreateRefund = async (orderId) => {
+  const res = await fetch(`${API_URL}/orders/${orderId}/refund`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${getToken()}`
+    },
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || 'Failed to process refund');
+  }
+  return res.json();
 };

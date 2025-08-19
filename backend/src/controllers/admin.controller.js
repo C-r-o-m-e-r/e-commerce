@@ -1,19 +1,17 @@
+// /backend/src/controllers/admin.controller.js
+
 const prisma = require('../config/prisma');
+// --- ADDED: Initialize Stripe with your secret key ---
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // --- USER MANAGEMENT FUNCTIONS (Unchanged) ---
-
-/**
- * @description MODIFIED: Get a list of all users, with search and filtering
- */
 const getAllUsers = async (req, res) => {
   try {
     const { search, role } = req.query;
     const where = {};
-
     if (role && ['BUYER', 'SELLER', 'ADMIN'].includes(role.toUpperCase())) {
       where.role = role.toUpperCase();
     }
-
     if (search) {
       where.OR = [
         { email: { contains: search, mode: 'insensitive' } },
@@ -21,7 +19,6 @@ const getAllUsers = async (req, res) => {
         { lastName: { contains: search, mode: 'insensitive' } },
       ];
     }
-
     const users = await prisma.user.findMany({
       where,
       select: {
@@ -33,9 +30,7 @@ const getAllUsers = async (req, res) => {
         status: true,
         createdAt: true,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
     });
     res.status(200).json(users);
   } catch (error) {
@@ -44,26 +39,18 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-/**
- * @description Update a user's role (Admin action)
- */
 const updateUserRole = async (req, res) => {
   try {
     const { id } = req.params;
     const { role } = req.body;
-
     if (!['BUYER', 'SELLER', 'ADMIN'].includes(role)) {
       return res.status(400).json({ message: 'Invalid role specified' });
     }
-
     const updatedUser = await prisma.user.update({
       where: { id },
       data: { role },
-      select: {
-        id: true, email: true, firstName: true, lastName: true, role: true, status: true,
-      },
+      select: { id: true, email: true, firstName: true, lastName: true, role: true, status: true },
     });
-
     res.status(200).json(updatedUser);
   } catch (error) {
     console.error('Admin update user role error:', error);
@@ -71,21 +58,13 @@ const updateUserRole = async (req, res) => {
   }
 };
 
-/**
- * @description Delete a user (Admin action)
- */
 const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-
     if (id === req.user.id) {
         return res.status(400).json({ message: "You cannot delete your own account from the admin panel." });
     }
-
-    await prisma.user.delete({
-      where: { id },
-    });
-
+    await prisma.user.delete({ where: { id } });
     res.status(204).send();
   } catch (error) {
     console.error('Admin delete user error:', error);
@@ -93,74 +72,55 @@ const deleteUser = async (req, res) => {
   }
 };
 
-
-/**
- * @description Get statistics for the admin dashboard
- */
 const getDashboardStats = async (req, res) => {
   try {
     const totalUsers = await prisma.user.count();
     const totalProducts = await prisma.product.count();
-    
     const salesData = await prisma.order.aggregate({
-      _sum: { total: true, },
-      where: { status: 'COMPLETED', },
+      _sum: { total: true },
+      where: { status: 'COMPLETED' },
     });
-    
     const totalSales = salesData._sum.total || 0;
-    
     const recentOrders = await prisma.order.findMany({
       take: 5,
-      orderBy: { createdAt: 'desc', },
+      orderBy: { createdAt: 'desc' },
       include: {
         buyer: { 
-          select: { firstName: true, lastName: true, },
+          select: { firstName: true, lastName: true },
         },
       },
     });
-
     const ordersWithUser = recentOrders.map(order => ({
         ...order,
         user: order.buyer,
     }));
-
     res.status(200).json({
       totalUsers,
       totalProducts,
       totalSales,
       recentOrders: ordersWithUser,
     });
-
   } catch (error) {
     console.error('Admin get dashboard stats error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
 
-/**
- * @description Update a user's status (Block/Unblock)
- */
 const updateUserStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-
     if (!['ACTIVE', 'BLOCKED'].includes(status)) {
       return res.status(400).json({ message: 'Invalid status specified' });
     }
-
     if (id === req.user.id) {
       return res.status(400).json({ message: "You cannot change your own status." });
     }
-
     const updatedUser = await prisma.user.update({
       where: { id },
       data: { status },
-      select: {
-        id: true, email: true, firstName: true, lastName: true, role: true, status: true,
-      },
+      select: { id: true, email: true, firstName: true, lastName: true, role: true, status: true, },
     });
-
     res.status(200).json(updatedUser);
   } catch (error) {
     console.error('Admin update user status error:', error);
@@ -168,9 +128,6 @@ const updateUserStatus = async (req, res) => {
   }
 };
 
-/**
- * @description Get a single user's details by ID
- */
 const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -196,16 +153,13 @@ const getUserById = async (req, res) => {
     }
 };
 
-// --- NEW: PRODUCT MANAGEMENT FUNCTIONS ---
 
-/**
- * @description Get all products with filtering for the admin panel.
- */
+// --- PRODUCT MANAGEMENT FUNCTIONS (Unchanged) ---
+
 const adminGetAllProducts = async (req, res) => {
     try {
         const { search, status, categoryId } = req.query;
         const where = {};
-
         if (status && ['PENDING', 'APPROVED', 'REJECTED'].includes(status.toUpperCase())) {
             where.status = status.toUpperCase();
         }
@@ -218,7 +172,6 @@ const adminGetAllProducts = async (req, res) => {
                 { description: { contains: search, mode: 'insensitive' } },
             ];
         }
-
         const products = await prisma.product.findMany({
             where,
             include: {
@@ -227,7 +180,6 @@ const adminGetAllProducts = async (req, res) => {
             },
             orderBy: { createdAt: 'desc' },
         });
-
         res.status(200).json(products);
     } catch (error) {
         console.error('Admin get all products error:', error);
@@ -235,9 +187,6 @@ const adminGetAllProducts = async (req, res) => {
     }
 };
 
-/**
- * @description Get a single product by ID for editing.
- */
 const adminGetProductById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -258,19 +207,14 @@ const adminGetProductById = async (req, res) => {
     }
 };
 
-/**
- * @description Update product details (e.g., title, price, etc.)
- */
 const adminUpdateProduct = async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description, price, stock, categoryId } = req.body;
-
         const updatedProduct = await prisma.product.update({
             where: { id },
             data: { title, description, price, stock, categoryId },
         });
-
         res.status(200).json(updatedProduct);
     } catch (error) {
         console.error('Admin update product error:', error);
@@ -278,23 +222,17 @@ const adminUpdateProduct = async (req, res) => {
     }
 };
 
-/**
- * @description Update a product's status (Approve/Reject)
- */
 const adminUpdateProductStatus = async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
-
         if (!['PENDING', 'APPROVED', 'REJECTED'].includes(status)) {
             return res.status(400).json({ message: 'Invalid status specified' });
         }
-
         const updatedProduct = await prisma.product.update({
             where: { id },
             data: { status },
         });
-
         res.status(200).json(updatedProduct);
     } catch (error) {
         console.error('Admin update product status error:', error);
@@ -302,9 +240,6 @@ const adminUpdateProductStatus = async (req, res) => {
     }
 };
 
-/**
- * @description Delete a product from the marketplace.
- */
 const adminDeleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
@@ -312,6 +247,135 @@ const adminDeleteProduct = async (req, res) => {
         res.status(204).send();
     } catch (error) {
         console.error('Admin delete product error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// --- ORDER MANAGEMENT FUNCTIONS (Unchanged, with Refund function added) ---
+
+const adminGetAllOrders = async (req, res) => {
+    try {
+        const { status, page = 1, limit = 20 } = req.query;
+        const where = {};
+
+        if (status && ['PENDING', 'PAID', 'SHIPPED', 'COMPLETED', 'CANCELLED', 'REFUNDED'].includes(status.toUpperCase())) {
+            where.status = status.toUpperCase();
+        }
+        
+        const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+
+        const [totalOrders, orders] = await prisma.$transaction([
+            prisma.order.count({ where }),
+            prisma.order.findMany({
+                where,
+                skip,
+                take: parseInt(limit, 10),
+                include: {
+                    buyer: { select: { id: true, firstName: true, lastName: true } },
+                },
+                orderBy: { createdAt: 'desc' },
+            })
+        ]);
+
+        res.status(200).json({
+            orders,
+            totalOrders,
+            totalPages: Math.ceil(totalOrders / parseInt(limit, 10)),
+        });
+    } catch (error) {
+        console.error('Admin get all orders error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+const adminGetOrderById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await prisma.order.findUniqueOrThrow({
+            where: { id },
+            include: {
+                buyer: { select: { id: true, firstName: true, lastName: true, email: true } },
+                items: {
+                    include: {
+                        product: { select: { id: true, title: true, images: true } }
+                    }
+                }
+            }
+        });
+        res.status(200).json(order);
+    } catch (error) {
+        console.error('Admin get order by ID error:', error);
+        if (error.code === 'P2025') {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+const adminUpdateOrderStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!['PENDING', 'PAID', 'SHIPPED', 'COMPLETED', 'CANCELLED', 'REFUNDED'].includes(status)) {
+            return res.status(400).json({ message: 'Invalid status specified' });
+        }
+
+        const updatedOrder = await prisma.order.update({
+            where: { id },
+            data: { status },
+        });
+        
+        res.status(200).json(updatedOrder);
+    } catch (error) {
+        console.error('Admin update order status error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// --- NEW: STRIPE REFUND FUNCTION ---
+/**
+ * @description Create a refund for an order via Stripe.
+ */
+const adminCreateRefund = async (req, res) => {
+    try {
+        const { id } = req.params; // Order ID
+
+        // 1. Find the order in your database
+        const order = await prisma.order.findUnique({
+            where: { id },
+        });
+
+        // 2. Validate the order
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        if (!order.paymentIntentId) {
+            return res.status(400).json({ message: 'This order has no payment ID and cannot be refunded.' });
+        }
+        if (order.status === 'REFUNDED') {
+            return res.status(400).json({ message: 'This order has already been refunded.' });
+        }
+
+        // 3. Create the refund with Stripe
+        const refund = await stripe.refunds.create({
+            payment_intent: order.paymentIntentId,
+        });
+
+        // 4. If refund is successful, update the order status in your database
+        const updatedOrder = await prisma.order.update({
+            where: { id },
+            data: { status: 'REFUNDED' },
+        });
+
+        res.status(200).json({ message: 'Refund successful', order: updatedOrder, refundDetails: refund });
+
+    } catch (error) {
+        console.error('Admin create refund error:', error);
+        // Handle potential Stripe errors
+        if (error.type === 'StripeInvalidRequestError') {
+             return res.status(400).json({ message: `Stripe Error: ${error.message}` });
+        }
         res.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -325,10 +389,15 @@ module.exports = {
   getDashboardStats,
   updateUserStatus,
   getUserById,
-  // New Product functions
+  // Product functions
   adminGetAllProducts,
   adminGetProductById,
   adminUpdateProduct,
   adminUpdateProductStatus,
   adminDeleteProduct,
+  // Order functions
+  adminGetAllOrders,
+  adminGetOrderById,
+  adminUpdateOrderStatus,
+  adminCreateRefund, // <-- Added new function
 };
