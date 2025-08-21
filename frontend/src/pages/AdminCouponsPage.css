@@ -1,0 +1,26 @@
+/* /frontend/src/pages/AdminCouponsPage.css */
+
+.admin-coupons-page {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.admin-coupons-page h2 {
+    margin-bottom: 1.5rem;
+}
+
+.coupon-code {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    background-color: var(--bg-secondary-hover);
+    padding: 6px 10px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Re-using status badge from other pages */
+.status-badge.status-INACTIVE {
+    background-color: #7f8c8d; /* Gray for inactive status */
+    color: white;
+}

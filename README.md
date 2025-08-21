@@ -21,6 +21,7 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
     -   Full **user management** (view all, edit roles, block/unblock, delete, search & filter).
     -   Full **product management**, including the ability to approve/reject new products from sellers, edit any product's details, and delete products from the marketplace.
     -   Full **order management** with the ability to view all orders, filter by status, see order details, update status (e.g., Pending -> Shipped), and process full refunds via Stripe.
+    -   **Site-wide moderation** including full CRUD for **categories**, and the ability to view and delete all user **reviews** and seller-created **coupons**.
 -   **Wishlist Management:** Users can create and manage multiple wishlists.
 -   **Order History:** Users can view a list of all their past orders and see a detailed breakdown of each one.
 -   **Product Reviews & Ratings:** Users who have purchased a product can leave a star rating (1-5) and a written review.
@@ -236,9 +237,12 @@ The test suite uses Jest and Supertest to run integration tests against the back
 
 ### Categories
 
-| Method | Path | Protected | Description |
-|:---|:---|:---|:---|
-| `GET` | `/api/categories` | No | Get a nested tree of all categories. |
+| Method | Path | Protected | Role | Description |
+|:---|:---|:---|:---|:---|
+| `GET` | `/api/categories` | No | - | Get a nested tree of all categories. |
+| `POST` | `/api/categories` | Yes | `ADMIN` | Create a new category. |
+| `PUT` | `/api/categories/:id` | Yes | `ADMIN` | Update a category. |
+| `DELETE`| `/api/categories/:id` | Yes | `ADMIN` | Delete a category. |
 
 ### Cart
 
@@ -311,6 +315,10 @@ The test suite uses Jest and Supertest to run integration tests against the back
 | `GET` | `/api/admin/orders/:id` | Yes | `ADMIN` | Get a single order's details. |
 | `PATCH`| `/api/admin/orders/:id/status` | Yes | `ADMIN` | Update an order's status. |
 | `POST` | `/api/admin/orders/:id/refund` | Yes | `ADMIN` | Process a full refund for an order. |
+| `GET` | `/api/admin/reviews` | Yes | `ADMIN` | Get all reviews. |
+| `DELETE`| `/api/admin/reviews/:id` | Yes | `ADMIN` | Delete a review. |
+| `GET` | `/api/admin/coupons` | Yes | `ADMIN` | Get all coupons. |
+| `DELETE`| `/api/admin/coupons/:id` | Yes | `ADMIN` | Delete a coupon. |
 
 -----
 

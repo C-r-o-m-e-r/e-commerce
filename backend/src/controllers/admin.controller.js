@@ -1,10 +1,10 @@
 // /backend/src/controllers/admin.controller.js
 
 const prisma = require('../config/prisma');
-// --- ADDED: Initialize Stripe with your secret key ---
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-// --- USER MANAGEMENT FUNCTIONS (Unchanged) ---
+// --- USER MANAGEMENT FUNCTIONS ---
+
 const getAllUsers = async (req, res) => {
   try {
     const { search, role } = req.query;
@@ -21,18 +21,24 @@ const getAllUsers = async (req, res) => {
     }
     const users = await prisma.user.findMany({
       where,
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        status: true,
-        createdAt: true,
+      include: {
+        _count: {
+          select: { products: true },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
-    res.status(200).json(users);
+    const safeUsers = users.map(user => ({
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        status: user.status,
+        createdAt: user.createdAt,
+        _count: user._count,
+    }));
+    res.status(200).json(safeUsers);
   } catch (error) {
     console.error('Admin get all users error:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -154,7 +160,7 @@ const getUserById = async (req, res) => {
 };
 
 
-// --- PRODUCT MANAGEMENT FUNCTIONS (Unchanged) ---
+// --- PRODUCT MANAGEMENT FUNCTIONS ---
 
 const adminGetAllProducts = async (req, res) => {
     try {
@@ -251,7 +257,7 @@ const adminDeleteProduct = async (req, res) => {
     }
 };
 
-// --- ORDER MANAGEMENT FUNCTIONS (Unchanged, with Refund function added) ---
+// --- ORDER MANAGEMENT FUNCTIONS ---
 
 const adminGetAllOrders = async (req, res) => {
     try {
@@ -333,20 +339,14 @@ const adminUpdateOrderStatus = async (req, res) => {
     }
 };
 
-// --- NEW: STRIPE REFUND FUNCTION ---
-/**
- * @description Create a refund for an order via Stripe.
- */
 const adminCreateRefund = async (req, res) => {
     try {
-        const { id } = req.params; // Order ID
+        const { id } = req.params;
 
-        // 1. Find the order in your database
         const order = await prisma.order.findUnique({
             where: { id },
         });
 
-        // 2. Validate the order
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
@@ -357,12 +357,10 @@ const adminCreateRefund = async (req, res) => {
             return res.status(400).json({ message: 'This order has already been refunded.' });
         }
 
-        // 3. Create the refund with Stripe
         const refund = await stripe.refunds.create({
             payment_intent: order.paymentIntentId,
         });
 
-        // 4. If refund is successful, update the order status in your database
         const updatedOrder = await prisma.order.update({
             where: { id },
             data: { status: 'REFUNDED' },
@@ -372,9 +370,94 @@ const adminCreateRefund = async (req, res) => {
 
     } catch (error) {
         console.error('Admin create refund error:', error);
-        // Handle potential Stripe errors
         if (error.type === 'StripeInvalidRequestError') {
              return res.status(400).json({ message: `Stripe Error: ${error.message}` });
+        }
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// --- REVIEW MANAGEMENT FUNCTIONS ---
+
+const adminGetAllReviews = async (req, res) => {
+    try {
+        const { page = 1, limit = 20 } = req.query;
+        const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+
+        const [totalReviews, reviews] = await prisma.$transaction([
+            prisma.review.count(),
+            prisma.review.findMany({
+                skip,
+                take: parseInt(limit, 10),
+                include: {
+                    user: { select: { id: true, firstName: true, lastName: true } },
+                    product: { select: { id: true, title: true } }
+                },
+                orderBy: { createdAt: 'desc' },
+            })
+        ]);
+
+        res.status(200).json({
+            reviews,
+            totalReviews,
+            totalPages: Math.ceil(totalReviews / parseInt(limit, 10)),
+        });
+    } catch (error) {
+        console.error('Admin get all reviews error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+const adminDeleteReview = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma.review.delete({
+            where: { id },
+        });
+        res.status(204).send();
+    } catch (error) {
+        console.error('Admin delete review error:', error);
+        if (error.code === 'P2025') {
+            return res.status(404).json({ message: 'Review not found' });
+        }
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// --- NEW: COUPON MANAGEMENT FUNCTIONS ---
+
+/**
+ * @description Get all coupons from all sellers.
+ */
+const adminGetAllCoupons = async (req, res) => {
+    try {
+        const coupons = await prisma.coupon.findMany({
+            include: {
+                seller: { select: { id: true, firstName: true, lastName: true } },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        res.status(200).json(coupons);
+    } catch (error) {
+        console.error('Admin get all coupons error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+/**
+ * @description Delete a coupon by its ID.
+ */
+const adminDeleteCoupon = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma.coupon.delete({
+            where: { id },
+        });
+        res.status(204).send();
+    } catch (error) {
+        console.error('Admin delete coupon error:', error);
+        if (error.code === 'P2025') {
+            return res.status(404).json({ message: 'Coupon not found' });
         }
         res.status(500).json({ message: 'Internal server error' });
     }
@@ -399,5 +482,11 @@ module.exports = {
   adminGetAllOrders,
   adminGetOrderById,
   adminUpdateOrderStatus,
-  adminCreateRefund, // <-- Added new function
+  adminCreateRefund,
+  // Review functions
+  adminGetAllReviews,
+  adminDeleteReview,
+  // New Coupon functions
+  adminGetAllCoupons,
+  adminDeleteCoupon,
 };

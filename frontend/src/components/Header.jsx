@@ -72,7 +72,10 @@ const Header = () => {
                                     <Link to="/admin/dashboard" className="dropdown-item">Dashboard</Link>
                                     <Link to="/admin/users" className="dropdown-item">Manage Users</Link>
                                     <Link to="/admin/products" className="dropdown-item">Manage Products</Link>
-                                    <Link to="/admin/orders" className="dropdown-item">Manage Orders</Link> {/* <-- ADDED THIS LINK */}
+                                    <Link to="/admin/orders" className="dropdown-item">Manage Orders</Link>
+                                    <Link to="/admin/categories" className="dropdown-item">Manage Categories</Link>
+                                    <Link to="/admin/reviews" className="dropdown-item">Manage Reviews</Link>
+                                    <Link to="/admin/coupons" className="dropdown-item">Manage Coupons</Link> {/* <-- ADDED THIS LINK */}
                                     <hr className="dropdown-divider" />
                                 </>
                             )}
@@ -87,6 +90,7 @@ const Header = () => {
                                     <Link to="/seller/dashboard" className="dropdown-item">Dashboard</Link>
                                     <Link to="/seller/orders" className="dropdown-item">My Sales</Link>
                                     <Link to="/my-products" className="dropdown-item">My Products</Link>
+                                    <Link to="/products/add" className="dropdown-item">Add Product</Link>
                                     <Link to="/my-coupons" className="dropdown-item">My Coupons</Link>
                                 </>
                             )}

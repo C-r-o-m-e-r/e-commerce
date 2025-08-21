@@ -19,7 +19,13 @@ const {
   adminGetAllOrders,
   adminGetOrderById,
   adminUpdateOrderStatus,
-  adminCreateRefund // <-- 1. Import the new function
+  adminCreateRefund,
+  // Review Management
+  adminGetAllReviews,
+  adminDeleteReview,
+  // Coupon Management - Added new imports
+  adminGetAllCoupons,
+  adminDeleteCoupon
 } = require('../controllers/admin.controller');
 const { authMiddleware } = require('../middleware/auth.middleware');
 const roleMiddleware = require('../middleware/role.middleware');
@@ -50,6 +56,14 @@ router.delete('/products/:id', adminDeleteProduct);
 router.get('/orders', adminGetAllOrders);
 router.get('/orders/:id', adminGetOrderById);
 router.patch('/orders/:id/status', adminUpdateOrderStatus);
-router.post('/orders/:id/refund', adminCreateRefund); // <-- 2. Add the new route for refunds
+router.post('/orders/:id/refund', adminCreateRefund);
+
+// --- Review Management ---
+router.get('/reviews', adminGetAllReviews);
+router.delete('/reviews/:id', adminDeleteReview);
+
+// --- NEW: Coupon Management ---
+router.get('/coupons', adminGetAllCoupons);      // Get all coupons
+router.delete('/coupons/:id', adminDeleteCoupon);  // Delete a coupon
 
 module.exports = router;

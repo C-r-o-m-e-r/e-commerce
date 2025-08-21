@@ -1,0 +1,30 @@
+/* /frontend/src/pages/AdminReviewsPage.css */
+
+.admin-reviews-page {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.admin-reviews-page h2 {
+    margin-bottom: 1.5rem;
+}
+
+.comment-column {
+    max-width: 400px; /* Limit the width of the comment column */
+    white-space: pre-wrap; /* Allow text to wrap */
+}
+
+/* Star Rating Styles */
+.star-rating {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+.star-filled {
+    color: #f39c12; /* Yellow for filled stars */
+}
+.star-empty {
+    color: #444; /* Dark gray for empty stars */
+}
+.light-theme .star-empty {
+    color: #ccc; /* Light gray for empty stars in light theme */
+}

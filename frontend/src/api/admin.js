@@ -1,6 +1,8 @@
 // /frontend/src/api/admin.js
 
 const API_URL = 'http://localhost:3000/api/admin'; // Base URL for admin routes
+// Base URL for category routes, as they have a different prefix
+const CATEGORY_API_URL = 'http://localhost:3000/api/categories'; 
 
 // Helper to get the token
 const getToken = () => localStorage.getItem('token');
@@ -255,4 +257,122 @@ export const adminCreateRefund = async (orderId) => {
     throw new Error(errorData.message || 'Failed to process refund');
   }
   return res.json();
+};
+
+
+// --- CATEGORY MANAGEMENT API FUNCTIONS ---
+
+/**
+ * @description Creates a new category. Admin only.
+ * @param {object} categoryData - The data for the new category (e.g., { name, parentId }).
+ * @returns {Promise<Object>} The new category object.
+ */
+export const adminCreateCategory = async (categoryData) => {
+  const res = await fetch(CATEGORY_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${getToken()}`
+    },
+    body: JSON.stringify(categoryData),
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || 'Failed to create category');
+  }
+  return res.json();
+};
+
+/**
+ * @description Updates a category's name. Admin only.
+ * @param {string} categoryId - The ID of the category to update.
+ * @param {object} categoryData - The new data (e.g., { name }).
+ * @returns {Promise<Object>} The updated category object.
+ */
+export const adminUpdateCategory = async (categoryId, categoryData) => {
+  const res = await fetch(`${CATEGORY_API_URL}/${categoryId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${getToken()}`
+    },
+    body: JSON.stringify(categoryData),
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || 'Failed to update category');
+  }
+  return res.json();
+};
+
+/**
+ * @description Deletes a category. Admin only.
+ * @param {string} categoryId - The ID of the category to delete.
+ */
+export const adminDeleteCategory = async (categoryId) => {
+  const res = await fetch(`${CATEGORY_API_URL}/${categoryId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${getToken()}`
+    },
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || 'Failed to delete category');
+  }
+};
+
+// --- REVIEW MANAGEMENT API FUNCTIONS ---
+
+/**
+ * @description Fetches all reviews. Admin only.
+ * @param {object} filters - Pagination filters (page, limit).
+ * @returns {Promise<Object>} An object with reviews and pagination data.
+ */
+export const adminGetAllReviews = async (filters = {}) => {
+    const params = new URLSearchParams(filters);
+    const queryString = params.toString();
+    const res = await fetch(`${API_URL}/reviews?${queryString}`, {
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    if (!res.ok) throw new Error('Failed to fetch reviews');
+    return res.json();
+};
+
+/**
+ * @description Deletes a review. Admin only.
+ * @param {string} reviewId - The ID of the review to delete.
+ */
+export const adminDeleteReview = async (reviewId) => {
+    const res = await fetch(`${API_URL}/reviews/${reviewId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    if (res.status !== 204) throw new Error('Failed to delete review');
+};
+
+// --- NEW: COUPON MANAGEMENT API FUNCTIONS ---
+
+/**
+ * @description Fetches all coupons. Admin only.
+ * @returns {Promise<Array>} A list of all coupons.
+ */
+export const adminGetAllCoupons = async () => {
+    const res = await fetch(`${API_URL}/coupons`, {
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    if (!res.ok) throw new Error('Failed to fetch coupons');
+    return res.json();
+};
+
+/**
+ * @description Deletes a coupon. Admin only.
+ * @param {string} couponId - The ID of the coupon to delete.
+ */
+export const adminDeleteCoupon = async (couponId) => {
+    const res = await fetch(`${API_URL}/coupons/${couponId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    if (res.status !== 204) throw new Error('Failed to delete coupon');
 };

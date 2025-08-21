@@ -83,7 +83,6 @@ const AdminUsersPage = () => {
     <div className="admin-users-page">
       <h2>User Management</h2>
       
-      {/* --- ADDED: Filter and Search Controls --- */}
       <div className="filters-container">
         <input
           type="text"
@@ -116,6 +115,7 @@ const AdminUsersPage = () => {
                 <th>Email</th>
                 <th>Name</th>
                 <th>Role</th>
+                <th>Product Count</th> {/* <-- ADDED */}
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -124,7 +124,6 @@ const AdminUsersPage = () => {
               {users.length > 0 ? users.map(user => (
                 <tr key={user.id} className={user.status === 'BLOCKED' ? 'blocked-user' : ''}>
                   <td>
-                    {/* ADDED: Link to user details page */}
                     <Link to={`/admin/users/${user.id}`} className="user-details-link">
                       {user.email}
                     </Link>
@@ -140,6 +139,10 @@ const AdminUsersPage = () => {
                       <option value="SELLER">SELLER</option>
                       <option value="ADMIN">ADMIN</option>
                     </select>
+                  </td>
+                  {/* --- ADDED: Display product count for sellers --- */}
+                  <td>
+                    {user.role === 'SELLER' ? user._count.products : 'N/A'}
                   </td>
                   <td>
                     <span className={`status-badge status-${user.status}`}>{user.status}</span>
@@ -161,7 +164,7 @@ const AdminUsersPage = () => {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center' }}>No users found.</td>
+                  <td colSpan="6" style={{ textAlign: 'center' }}>No users found.</td> {/* <-- Updated colSpan to 6 */}
                 </tr>
               )}
             </tbody>

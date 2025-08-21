@@ -32,7 +32,10 @@ import AdminUsersPage from './pages/AdminUsersPage';
 import AdminUserDetailsPage from './pages/AdminUserDetailsPage';
 import AdminProductsPage from './pages/AdminProductsPage';
 import AdminOrdersPage from './pages/AdminOrdersPage';
-import AdminOrderDetailPage from './pages/AdminOrderDetailPage'; // <-- ADDED: Import the new order detail page
+import AdminOrderDetailPage from './pages/AdminOrderDetailPage';
+import AdminCategoriesPage from './pages/AdminCategoriesPage';
+import AdminReviewsPage from './pages/AdminReviewsPage';
+import AdminCouponsPage from './pages/AdminCouponsPage'; // <-- ADDED: Import the new coupons page
 
 import './App.css';
 
@@ -122,10 +125,25 @@ function App() {
                                 <AdminOrdersPage />
                             </ProtectedRoute>
                         } />
-                        {/* <-- ADDED: New route for a single order's details page --> */}
                         <Route path="/admin/orders/:orderId" element={
                             <ProtectedRoute roles={['ADMIN']}>
                                 <AdminOrderDetailPage />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/admin/categories" element={
+                            <ProtectedRoute roles={['ADMIN']}>
+                                <AdminCategoriesPage />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/admin/reviews" element={
+                            <ProtectedRoute roles={['ADMIN']}>
+                                <AdminReviewsPage />
+                            </ProtectedRoute>
+                        } />
+                        {/* <-- ADDED: New route for the coupon management page --> */}
+                        <Route path="/admin/coupons" element={
+                            <ProtectedRoute roles={['ADMIN']}>
+                                <AdminCouponsPage />
                             </ProtectedRoute>
                         } />
                     </Routes>
