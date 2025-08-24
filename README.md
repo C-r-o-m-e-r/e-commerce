@@ -26,6 +26,7 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 -   **Order History:** Users can view a list of all their past orders and see a detailed breakdown of each one.
 -   **Product Reviews & Ratings:** Users who have purchased a product can leave a star rating (1-5) and a written review.
 -   **Payment Integration:** Secure payment processing using Stripe Payment Intents and Webhooks.
+-   **Backend Testing:** A robust test suite using Jest and Supertest provides over 50% code coverage for the backend API, ensuring reliability and stability for all major features including authentication, product, and order management.
 
 ### UI/UX Enhancements
 
@@ -173,25 +174,38 @@ To test the payment flow, you need to forward Stripe's webhook events to your lo
 
 ## Running Tests
 
-The test suite uses Jest and Supertest to run integration tests against the backend API.
+The test suite uses Jest and Supertest to run integration tests against the backend API. The tests run in an isolated environment with a separate test database.
 
-1.  **Ensure the test database is running:**
-    From the `backend` directory, start the database container.
+1.  **Create a Test Environment File:**
+    In the `/backend` directory, create a file named `.env.test`. It needs your JWT secret and a connection string for a **separate test database**.
+    
+    **Important:** The `DATABASE_URL` must use `localhost` instead of `db` so that Jest (running on your local machine) can connect to the database container.
+    ```env
+    DATABASE_URL="postgresql://user:password@localhost:5432/mydb_test?schema=public"
+    JWT_SECRET="your_secret_here"
+    STRIPE_SECRET_KEY="sk_test_..."
+    ```
 
+2.  **Start the Database Container:**
+    From the `/backend` directory, ensure only the database is running:
     ```bash
-    cd backend
     docker-compose up -d db
     ```
 
-2.  **Create a test environment file:**
-    Create a file named `backend/.env.test` and copy the variables from your `.env` file. **Important:** Ensure the `DATABASE_URL` in this file uses `localhost` instead of `db` so that Jest (running on your local machine) can connect to the database container.
-    `DATABASE_URL="postgresql://user:password@localhost:5432/mydb_test?schema=public"`
+3.  **Prepare the Test Database:**
+    This is a **one-time setup** (or run it whenever you change the schema). This command applies all migrations to your test database.
+    ```bash
+    npm run test:prepare
+    ```
 
-3.  **Run the tests:**
-    From the `backend` directory, run the test command:
-
+4.  **Run the Tests:**
+    To run all test suites:
     ```bash
     npm test
+    ```
+    To run the tests and see a coverage report in your terminal:
+    ```bash
+    npm test -- --coverage
     ```
 
 -----

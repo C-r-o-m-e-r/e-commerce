@@ -1,7 +1,16 @@
-﻿// backend/tests/setup.js
+﻿// /backend/tests/setup.js
 
-const dotenv = require('dotenv');
-const path = require('path');
+const { server } = require('../src/index'); // Import the server we exported
+const prisma = require('../src/config/prisma');
 
-// Load environment variables from .env.test file
-dotenv.config({ path: path.resolve(__dirname, '../.env.test') });
+// This will run once before all test suites
+beforeAll((done) => {
+    // Optional: add a small delay to ensure the server is fully up
+    setTimeout(done, 1000); 
+});
+
+// This will run once after all test suites
+afterAll(async (done) => {
+    await prisma.$disconnect(); // Disconnect Prisma client
+    server.close(done); // Close the server connection
+});

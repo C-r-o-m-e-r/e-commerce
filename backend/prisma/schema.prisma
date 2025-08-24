@@ -1,4 +1,4 @@
-// This is your Prisma schema file
+// backend/prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
@@ -142,7 +142,7 @@ model Order {
   status          OrderStatus @default(PENDING)
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
-  
+  paymentIntentId String?     @unique
   couponId        String?
   coupon          Coupon?     @relation(fields: [couponId], references: [id], onDelete: SetNull)
   discountApplied Float       @default(0)

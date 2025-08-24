@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { adminGetOrderById, adminCreateRefund } from '../api/admin';
 import { toast } from 'react-toastify';
-import './AdminOrderDetailPage.css'; // We will create this file next
+import './AdminOrderDetailPage.css';
 
 const AdminOrderDetailPage = () => {
     const { orderId } = useParams();
