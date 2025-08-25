@@ -1,4 +1,4 @@
-// src/pages/LoginPage.jsx
+// /src/pages/LoginPage.jsx
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -14,7 +14,6 @@ const LoginPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    // 1. Get the guestId and login function from the context
     const { login, guestId } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -31,7 +30,6 @@ const LoginPage = () => {
         setLoading(true);
         setError(null);
         try {
-            // 2. Pass the guestId along with the form data to the login function
             const data = await loginUser({ ...formData, guestId });
             login(data);
             navigate('/');
@@ -45,7 +43,8 @@ const LoginPage = () => {
     return (
         <div className="form-container">
             <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
+            {/* --- FIX: Added the data-cy attribute for testing --- */}
+            <form onSubmit={handleSubmit} data-cy="login-form">
                 <div className="form-group">
                     <label htmlFor="email">Email</label>
                     <input

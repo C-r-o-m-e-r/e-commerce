@@ -1,0 +1,113 @@
+# /.github/workflows/ci.yml
+
+name: Node.js CI/CD Pipeline
+
+# Controls when the workflow will run
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # --- Backend Job (Unchanged) ---
+  backend-ci:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache node_modules
+        id: cache-npm-backend
+        uses: actions/cache@v4
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-npm-backend-${{ hashFiles('backend/package-lock.json') }}
+
+      - name: Install Dependencies
+        if: steps.cache-npm-backend.outputs.cache-hit != 'true'
+        run: npm install
+
+      - name: Run Linter
+        run: npm run lint
+
+      - name: Prepare Test Database
+        env:
+          DATABASE_URL: "postgresql://testuser:testpassword@localhost:5432/testdb?schema=public"
+        run: npm run test:prepare
+
+      - name: Run Tests
+        env:
+          DATABASE_URL: "postgresql://testuser:testpassword@localhost:5432/testdb?schema=public"
+          JWT_SECRET: "a-secret-for-ci"
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+        run: npm test
+
+  # --- Frontend Job (Updated) ---
+  frontend-ci:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache node_modules
+        id: cache-npm-frontend
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-npm-frontend-${{ hashFiles('frontend/package-lock.json') }}
+
+      - name: Install Dependencies
+        if: steps.cache-npm-frontend.outputs.cache-hit != 'true'
+        run: npm install
+        
+      - name: Run Linter
+        run: npm run lint
+
+      - name: Run Build
+        run: npm run build
+        
+      # --- NEW: Run Cypress E2E Tests ---
+      - name: Run Cypress Tests
+        uses: cypress-io/github-action@v6
+        with:
+          # We tell Cypress how to build and start the preview server
+          build: npm run build
+          start: npm run preview
+          # Specify the working directory for Cypress
+          working-directory: ./frontend

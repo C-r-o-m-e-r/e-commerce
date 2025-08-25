@@ -27,6 +27,8 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 -   **Product Reviews & Ratings:** Users who have purchased a product can leave a star rating (1-5) and a written review.
 -   **Payment Integration:** Secure payment processing using Stripe Payment Intents and Webhooks.
 -   **Backend Testing:** A robust test suite using Jest and Supertest provides over 50% code coverage for the backend API, ensuring reliability and stability for all major features including authentication, product, and order management.
+-   **Developer Experience & CI/CD:**
+    -   A **Continuous Integration** pipeline using GitHub Actions automatically lints, tests (Jest for backend, Cypress for frontend), and builds the application on every push and pull request to the `main` branch, ensuring code quality and stability.
 
 ### UI/UX Enhancements
 
@@ -53,8 +55,8 @@ This is a monorepo for a full-featured e-commerce marketplace, similar to Etsy o
 | **Payments** | Stripe API |
 | **File Handling**| Multer, Sharp.js |
 | **Authentication**| JSON Web Tokens (JWT) |
-| **Testing** | Jest, Supertest |
-| **DevOps** | Docker, Docker Compose |
+| **Testing** | Jest, Supertest, Cypress |
+| **DevOps** | Docker, Docker Compose, GitHub Actions, ESLint, Prettier |
 
 -----
 
