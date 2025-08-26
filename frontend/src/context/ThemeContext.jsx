@@ -5,11 +5,11 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 // 1. Create the context
 const ThemeContext = createContext();
 
-// 2. Create a custom hook for easy access to the context
+// 2. Create a custom hook for easy access to the context (named export)
 export const useTheme = () => useContext(ThemeContext);
 
-// 3. Create the Provider component
-export const ThemeProvider = ({ children }) => {
+// 3. Create the Provider component (now the default export)
+export default function ThemeProvider({ children }) {
     // This function determines the theme based on the current hour
     const getThemeByTime = () => {
         const currentHour = new Date().getHours();
@@ -30,7 +30,7 @@ export const ThemeProvider = ({ children }) => {
         document.body.classList.add(`${theme}-theme`);
     }, [theme]);
 
-    // We only need to provide the current theme value, no toggle function
+    // We only need to provide the current theme value
     const value = { theme };
 
     return (

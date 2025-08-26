@@ -78,7 +78,7 @@ const AdminCategoriesPage = () => {
             setLoading(true);
             const data = await getCategories();
             setCategories(data);
-        } catch (err) {
+        } catch (_err) { // Changed 'err' to '_err' to fix the no-unused-vars error
             setError('Failed to fetch categories.');
             toast.error('Failed to fetch categories.');
         } finally {

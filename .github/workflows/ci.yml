@@ -102,7 +102,6 @@ jobs:
       - name: Run Build
         run: npm run build
         
-      # --- NEW: Run Cypress E2E Tests ---
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
         with:

@@ -52,7 +52,7 @@ const AdminProductsPage = () => {
                 const cats = await getCategories();
                 setCategories(cats);
                 fetchProducts();
-            } catch (err) {
+            } catch (_err) { // Changed 'err' to '_err' to fix the no-unused-vars error
                 setError("Failed to load initial data.");
             }
         };
@@ -143,7 +143,6 @@ const AdminProductsPage = () => {
                                                 <button onClick={() => handleStatusChange(product.id, 'REJECTED')} className="reject-btn">Reject</button>
                                             </>
                                         )}
-                                        {/* --- FIX: Changed the link to point to the shared seller/admin edit page --- */}
                                         <Link to={`/products/edit/${product.id}`} className="edit-btn">Edit</Link>
                                         <button onClick={() => handleDelete(product.id)} className="delete-btn">Delete</button>
                                     </td>
