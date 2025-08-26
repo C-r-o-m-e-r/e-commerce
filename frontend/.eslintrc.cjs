@@ -8,8 +8,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
-    'plugin:cypress/recommended',
-    'plugin:prettier/recommended', 
+    'plugin:prettier/recommended',
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
@@ -21,4 +20,14 @@ module.exports = {
       { allowConstantExport: true },
     ],
   },
+  
+  overrides: [
+    {
+      files: ['cypress/**/*.cy.{js,jsx}'],
+      extends: ['plugin:cypress/recommended'],
+      env: {
+        'cypress/globals': true
+      }
+    }
+  ]
 }
