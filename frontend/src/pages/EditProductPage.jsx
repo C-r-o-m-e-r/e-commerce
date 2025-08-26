@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../hooks/useAuth.js';
 import { getCategories } from '../api/category.js';
 import ImageDropzone from '../components/ImageDropzone.jsx';
 import './Form.css';

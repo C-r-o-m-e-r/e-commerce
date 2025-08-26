@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../hooks/useAuth.js';
 import { getSellerOrders, updateOrderStatus } from '../api/seller.js';
 import { toast } from 'react-toastify';
 import './SellerOrdersPage.css';

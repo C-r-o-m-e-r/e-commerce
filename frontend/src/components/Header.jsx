@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
-import { useTheme } from '../context/ThemeContext.jsx';
+import { useAuth } from '../hooks/useAuth.js';
+import { useTheme } from '../hooks/useTheme.js';
 import { getCategories } from '../api/category.js';
 import Dropdown from './Dropdown.jsx';
 import CategoryDropdown from './CategoryDropdown.jsx';

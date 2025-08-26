@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'; // <-- 1. Import useCallback
 import { useParams, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../hooks/useAuth.js';
 
 // API Functions
 import { getWishlistById, removeItemByProductId } from '../api/wishlist.js';

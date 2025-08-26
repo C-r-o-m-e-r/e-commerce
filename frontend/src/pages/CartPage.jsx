@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../hooks/useAuth.js';
 import { getCart, removeFromCart, updateCartItemQuantity, applyCoupon } from '../api/cart.js';
 import { toast } from 'react-toastify';
 import './CartPage.css';

@@ -1,7 +1,7 @@
 ﻿// frontend/src/pages/WishlistsPage.jsx
 
 import React, { useState, useEffect, useCallback } from 'react'; // <-- 1. Import useCallback
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../hooks/useAuth.js';
 import { getWishlists, createWishlist, deleteWishlist, updateWishlist } from '../api/wishlist.js';
 import { Link } from 'react-router-dom';
 import './WishlistsPage.css';

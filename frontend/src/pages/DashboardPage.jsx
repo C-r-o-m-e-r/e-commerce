@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 // import { Link } from 'react-router-dom'; // Link поки не використовується в таблиці
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../hooks/useAuth.js';
 import { getDashboardStats } from '../api/admin.js'; // ЗМІНА: Імпорт з admin.js
 // import SalesChart from '../components/SalesChart.jsx'; // ЗМІНА: Видалено, оскільки дані не готові для чарту
 import './DashboardPage.css';

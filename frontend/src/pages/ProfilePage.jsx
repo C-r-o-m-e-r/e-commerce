@@ -1,7 +1,7 @@
 ﻿// frontend/src/pages/ProfilePage.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../hooks/useAuth.js';
 import { updateProfile, changePassword, deleteAccount } from '../api/user.js';
 // The CSS is now handled by AccountLayout.css
 

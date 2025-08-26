@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx'; // 1. Import useAuth
+import { useAuth } from '../hooks/useAuth.js'; // 1. Import useAuth
 import { addToCart } from '../api/cart.js'; // 2. Import addToCart API function
 import { toast } from 'react-toastify'; // For notifications
 import Dropdown from '../components/Dropdown.jsx';

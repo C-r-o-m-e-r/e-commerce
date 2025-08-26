@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 
-import { useAuth } from '../context/AuthContext.jsx';
-import { useTheme } from '../context/ThemeContext.jsx';
+import { useAuth } from '../hooks/useAuth.js';
+import { useTheme } from '../hooks/useTheme.js';
 import { createPaymentIntent } from '../api/payments.js';
 import CheckoutForm from '../components/CheckoutForm.jsx';
 import './CheckoutPage.css';

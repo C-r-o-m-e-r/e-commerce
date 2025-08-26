@@ -1,10 +1,11 @@
-// frontend/src/context/AuthContext.jsx
+// /frontend/src/context/AuthContext.jsx
 
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid'; // Import the uuid generator
+import { v4 as uuidv4 } from 'uuid';
 
-const AuthContext = createContext(null);
+// 1. Create and EXPORT the context so the hook can use it
+export const AuthContext = createContext(null);
 
 const getInitialUser = () => {
     try {
@@ -20,29 +21,20 @@ const getInitialUser = () => {
     return null;
 };
 
-// The useAuth hook remains a named export.
-// Import it like this: import { useAuth } from './context/AuthContext';
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
-
-// The AuthProvider component is now the DEFAULT export to fix the lint error.
-// Import it like this: import AuthProvider from './context/AuthContext';
+// 2. The AuthProvider is the only component exported
 export default function AuthProvider({ children }) {
     const [user, setUser] = useState(getInitialUser);
     const [token, setToken] = useState(() => localStorage.getItem('token'));
     const [guestId, setGuestId] = useState(() => localStorage.getItem('guestId'));
     const navigate = useNavigate();
 
-    // Effect to manage the guestId
     useEffect(() => {
         if (!user && !localStorage.getItem('guestId')) {
-            // If the user is not logged in and has no guestId, create one.
             const newGuestId = uuidv4();
             localStorage.setItem('guestId', newGuestId);
             setGuestId(newGuestId);
         }
-    }, [user]); // This effect runs when the user logs in or out
+    }, [user]);
 
     const login = (authData) => {
         if (authData && authData.token && authData.user) {
@@ -50,8 +42,6 @@ export default function AuthProvider({ children }) {
             localStorage.setItem('user', JSON.stringify(authData.user));
             setToken(authData.token);
             setUser(authData.user);
-
-            // Clear the guestId on successful login
             localStorage.removeItem('guestId');
             setGuestId(null);
         }
@@ -62,12 +52,9 @@ export default function AuthProvider({ children }) {
         localStorage.removeItem('user');
         setToken(null);
         setUser(null);
-
-        // Create a new guestId on logout
         const newGuestId = uuidv4();
         localStorage.setItem('guestId', newGuestId);
         setGuestId(newGuestId);
-
         navigate('/login');
     };
 
