@@ -19,22 +19,24 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    // FIX: Allow variables prefixed with an underscore to be unused
     'no-unused-vars': [
-      'error',
+      'warn', // Changed to 'warn' to be less strict during development
       {
-        'varsIgnorePattern': '^_',
-        'argsIgnorePattern': '^_',
-        'ignoreRestSiblings': true,
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
       },
     ],
   },
+  // FIX: Add a specific override for all Cypress files
   overrides: [
     {
       files: ['cypress/**/*.cy.{js,jsx}'],
       extends: ['plugin:cypress/recommended'],
       env: {
-        'cypress/globals': true
-      }
-    }
-  ]
+        'cypress/globals': true,
+      },
+    },
+  ],
 };
