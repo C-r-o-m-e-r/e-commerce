@@ -1,6 +1,6 @@
 ﻿// frontend/src/pages/WishlistsPage.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // <-- 1. Import useCallback
 import { useAuth } from '../context/AuthContext.jsx';
 import { getWishlists, createWishlist, deleteWishlist, updateWishlist } from '../api/wishlist.js';
 import { Link } from 'react-router-dom';
@@ -12,16 +12,14 @@ const WishlistsPage = () => {
     const [error, setError] = useState(null);
     const { token } = useAuth();
 
-    // State for the "Create" modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newWishlistName, setNewWishlistName] = useState('');
 
-    // --- START: New state for inline editing ---
     const [editingWishlistId, setEditingWishlistId] = useState(null);
     const [editingWishlistName, setEditingWishlistName] = useState('');
-    // --- END: New state ---
 
-    const fetchWishlists = async () => {
+    // --- FIX: Wrap the data fetching function in useCallback ---
+    const fetchWishlists = useCallback(async () => {
         try {
             setLoading(true);
             const data = await getWishlists(token);
@@ -31,13 +29,14 @@ const WishlistsPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [token]); // This function depends on the token
 
+    // --- FIX: Add the memoized fetchWishlists function to the dependency array ---
     useEffect(() => {
         if (token) {
             fetchWishlists();
         }
-    }, [token]);
+    }, [fetchWishlists, token]); // Now the dependencies are correct
 
     const handleCreateWishlist = async (e) => {
         e.preventDefault();
@@ -46,7 +45,7 @@ const WishlistsPage = () => {
             await createWishlist(newWishlistName, token);
             setNewWishlistName('');
             setIsModalOpen(false);
-            fetchWishlists(); // Refresh the list
+            fetchWishlists();
         } catch (err) {
             setError(err.message);
         }
@@ -56,14 +55,13 @@ const WishlistsPage = () => {
         if (window.confirm('Are you sure you want to delete this wishlist?')) {
             try {
                 await deleteWishlist(wishlistId, token);
-                fetchWishlists(); // Refresh the list
+                fetchWishlists();
             } catch (err) {
                 setError(err.message);
             }
         }
     };
-
-    // --- START: Handlers for renaming ---
+    
     const handleRenameClick = (wishlist) => {
         setEditingWishlistId(wishlist.id);
         setEditingWishlistName(wishlist.name);
@@ -80,12 +78,11 @@ const WishlistsPage = () => {
             await updateWishlist(wishlistId, editingWishlistName, token);
             setEditingWishlistId(null);
             setEditingWishlistName('');
-            fetchWishlists(); // Refresh the list with the new name
+            fetchWishlists();
         } catch (err) {
             setError(err.message);
         }
     };
-    // --- END: Handlers for renaming ---
 
     if (loading) return <p>Loading your wishlists...</p>;
     if (error) return <p>Error: {error}</p>;
@@ -104,7 +101,6 @@ const WishlistsPage = () => {
                     wishlists.map(wishlist => (
                         <div key={wishlist.id} className="wishlist-card-wrapper">
                             {editingWishlistId === wishlist.id ? (
-                                // --- EDITING VIEW ---
                                 <div className="wishlist-edit-form">
                                     <input
                                         type="text"
@@ -118,7 +114,6 @@ const WishlistsPage = () => {
                                     </div>
                                 </div>
                             ) : (
-                                // --- DEFAULT VIEW ---
                                 <>
                                     <Link to={`/wishlists/${wishlist.id}`} className="wishlist-card">
                                         <h3>{wishlist.name}</h3>
@@ -149,7 +144,6 @@ const WishlistsPage = () => {
                 )}
             </div>
 
-            {/* Create Wishlist Modal */}
             {isModalOpen && (
                 <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>

@@ -1,6 +1,6 @@
-// frontend/src/pages/ProductDetailPage.jsx
+// /frontend/src/pages/ProductDetailPage.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // <-- 1. Import useCallback
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { addToCart } from '../api/cart.js';
@@ -16,18 +16,15 @@ const HeartIconFilled = () => (<svg xmlns="http://www.w3.org/2000/svg" height="2
 const ProductDetailPage = () => {
     const { id: productId } = useParams();
     const navigate = useNavigate();
-    // 1. Get guestId from the AuthContext
     const { user, token, guestId } = useAuth();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [quantity, setQuantity] = useState(1);
-
     const [reviews, setReviews] = useState([]);
     const [newRating, setNewRating] = useState(0);
     const [newComment, setNewComment] = useState('');
     const [hasReviewed, setHasReviewed] = useState(false);
-
     const [selectedImage, setSelectedImage] = useState(0);
     const [isLightboxOpen, setLightboxOpen] = useState(false);
     const [isInWishlist, setIsInWishlist] = useState(false);
@@ -37,21 +34,23 @@ const ProductDetailPage = () => {
     const [newWishlistName, setNewWishlistName] = useState('');
 
     const COMMENT_MAX_LENGTH = 500;
-
-    // ... (Image gallery and other functions remain the same) ...
-    const goToNextImage = (e) => {
+    
+    // --- FIX: Wrap image navigation functions in useCallback ---
+    const goToNextImage = useCallback((e) => {
         e.stopPropagation();
         if (product && product.images.length > 0) {
             setSelectedImage(prevIndex => (prevIndex + 1) % product.images.length);
         }
-    };
-    const goToPreviousImage = (e) => {
+    }, [product]);
+
+    const goToPreviousImage = useCallback((e) => {
         e.stopPropagation();
         if (product && product.images.length > 0) {
             setSelectedImage(prevIndex => (prevIndex - 1 + product.images.length) % product.images.length);
         }
-    };
+    }, [product]);
 
+    // --- FIX: Add memoized functions to the dependency array ---
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!isLightboxOpen) return;
@@ -63,26 +62,26 @@ const ProductDetailPage = () => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [isLightboxOpen, selectedImage, product]);
+    }, [isLightboxOpen, goToNextImage, goToPreviousImage]);
 
-    const fetchUserWishlists = async (currentProductId) => {
+    // --- FIX: Wrap wishlist fetching function in useCallback ---
+    const fetchUserWishlists = useCallback(async (currentProductId) => {
+        if (!token) return;
         try {
             const wishlistsData = await getWishlists(token);
             setUserWishlists(wishlistsData);
             if (wishlistsData && wishlistsData.length > 0) {
                 const foundInWishlist = wishlistsData.some(list =>
-                    list.items && list.items.some(item => {
-                        const idInWishlistItem = item.product ? item.product.id : item.productId;
-                        return idInWishlistItem === currentProductId;
-                    })
+                    list.items && list.items.some(item => (item.product ? item.product.id : item.productId) === currentProductId)
                 );
                 setIsInWishlist(foundInWishlist);
             }
         } catch (err) {
             console.error("Failed to fetch wishlists:", err);
         }
-    };
+    }, [token]);
 
+    // --- FIX: Add memoized function to the dependency array ---
     useEffect(() => {
         const fetchPageData = async () => {
             try {
@@ -91,19 +90,15 @@ const ProductDetailPage = () => {
                     fetch(`/api/products/${productId}`),
                     getProductReviews(productId)
                 ]);
-
                 if (!productResponse.ok) throw new Error('Product not found');
-
                 const productData = await productResponse.json();
                 setProduct(productData);
                 setReviews(reviewsResponse);
 
-                if (user && token) {
+                if (user) {
                     await fetchUserWishlists(productId);
                     const userReview = reviewsResponse.find(review => review.userId === user.id);
-                    if (userReview) {
-                        setHasReviewed(true);
-                    }
+                    if (userReview) setHasReviewed(true);
                 }
             } catch (err) {
                 setError(err.message);
@@ -112,15 +107,10 @@ const ProductDetailPage = () => {
             }
         };
         fetchPageData();
-    }, [productId, user, token]);
+    }, [productId, user, fetchUserWishlists]);
 
-
-    // 2. Update handleAddToCart to work for guests
     const handleAddToCart = async () => {
-        if (!product || quantity < 1) {
-            return toast.warn('Please enter a valid quantity.');
-        }
-
+        if (!product || quantity < 1) return toast.warn('Please enter a valid quantity.');
         try {
             await addToCart(product.id, quantity, { token, guestId });
             toast.success('Product added to cart!');
@@ -129,8 +119,9 @@ const ProductDetailPage = () => {
             console.error(err);
         }
     };
+    
+    // ... (rest of the component's handler functions)
 
-    // ... (Wishlist and review functions remain the same) ...
     const handleWishlistClick = () => {
         if (!user) return navigate('/login');
         if (isInWishlist) {
@@ -223,13 +214,12 @@ const ProductDetailPage = () => {
     if (!product) return <p>Product not found.</p>;
 
     const averageRating = reviews.length > 0 ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length : 0;
-    const getImageUrl = (imagePath) => imagePath;
+    const getImageUrl = (imagePath) => `http://localhost:3000${imagePath}`;
     const isOutOfStock = product.stock === 0;
 
     return (
         <>
             <div className="product-detail-container">
-                {/* ... (JSX remains the same, except for the Add to Cart button logic) ... */}
                 <div className="product-image-section">
                     <img
                         src={product.images && product.images.length > 0 ? getImageUrl(product.images[selectedImage]) : 'https://via.placeholder.com/400'}

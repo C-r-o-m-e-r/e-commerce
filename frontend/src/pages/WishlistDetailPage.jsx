@@ -1,6 +1,6 @@
-﻿// frontend/src/pages/WishlistDetailPage.jsx
+﻿// /frontend/src/pages/WishlistDetailPage.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // <-- 1. Import useCallback
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -18,8 +18,8 @@ const WishlistDetailPage = () => {
     const [error, setError] = useState(null);
     const { token } = useAuth();
 
-    // Fetches the wishlist data from the API
-    const fetchWishlist = async () => {
+    // --- FIX: Wrap the data fetching function in useCallback ---
+    const fetchWishlist = useCallback(async () => {
         try {
             setLoading(true);
             const data = await getWishlistById(id, token);
@@ -29,21 +29,19 @@ const WishlistDetailPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, token]); // This function depends on id and token
 
-    // Fetch the wishlist when the component mounts or when id/token changes
+    // --- FIX: Add the memoized fetchWishlist function to the dependency array ---
     useEffect(() => {
         if (token && id) {
             fetchWishlist();
         }
-    }, [id, token]);
+    }, [fetchWishlist, id, token]);
 
     // Handler to remove an item from the wishlist
     const handleRemoveItem = async (productId) => {
         try {
-            // Call the API to remove the item
             await removeItemByProductId(productId, token);
-
             // Update the local state to reflect the change in the UI immediately
             setWishlist(prevWishlist => ({
                 ...prevWishlist,
@@ -58,10 +56,7 @@ const WishlistDetailPage = () => {
     // Handler to add an item to the shopping cart
     const handleAddToCart = async (productId) => {
         try {
-            // Call the API to add the item to the cart (quantity: 1)
             await addToCart(productId, 1, token);
-            // The alert has been removed as requested.
-            // You can add a more subtle notification here later if you want.
         } catch (err) {
             console.error('Failed to add to cart:', err);
             setError('Failed to add item to cart.');
@@ -71,11 +66,9 @@ const WishlistDetailPage = () => {
     if (loading) {
         return <p>Loading wishlist...</p>;
     }
-
     if (error) {
         return <p>Error: {error}</p>;
     }
-
     if (!wishlist) {
         return <p>Wishlist not found.</p>;
     }
@@ -89,7 +82,7 @@ const WishlistDetailPage = () => {
                         <div key={item.id} className="wishlist-item-card">
                             <Link to={`/products/${item.product.id}`}>
                                 <img
-                                    src={item.product.images[0]}
+                                    src={`http://localhost:3000${item.product.images[0]}`}
                                     alt={item.product.title}
                                     className="wishlist-item-image"
                                 />
@@ -99,7 +92,6 @@ const WishlistDetailPage = () => {
                                 <p className="wishlist-item-price">${item.product.price}</p>
                             </div>
                             <div className="wishlist-item-actions">
-                                {/* Attach the correct event handlers */}
                                 <button
                                     onClick={() => handleAddToCart(item.product.id)}
                                     className="btn-add-to-cart"

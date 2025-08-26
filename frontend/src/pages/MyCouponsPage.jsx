@@ -1,8 +1,8 @@
-﻿// frontend/src/pages/MyCouponsPage.jsx
+﻿// /frontend/src/pages/MyCouponsPage.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // <-- 1. Import useCallback
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext'; // Import useTheme
+import { useTheme } from '../context/ThemeContext';
 import { getSellerCoupons, createCoupon, updateCoupon, deleteCoupon } from '../api/coupons';
 import { toast } from 'react-toastify';
 import './MyCouponsPage.css';
@@ -19,9 +19,10 @@ const MyCouponsPage = () => {
         expiresAt: '',
     });
     const { token } = useAuth();
-    const { theme } = useTheme(); // Get the current theme
+    const { theme } = useTheme();
 
-    const fetchCoupons = async () => {
+    // --- FIX: Wrap the data fetching function in useCallback ---
+    const fetchCoupons = useCallback(async () => {
         try {
             setLoading(true);
             const data = await getSellerCoupons(token);
@@ -32,13 +33,14 @@ const MyCouponsPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [token]); // This function depends on the token
 
+    // --- FIX: Add the memoized fetchCoupons function to the dependency array ---
     useEffect(() => {
         if (token) {
             fetchCoupons();
         }
-    }, [token]);
+    }, [token, fetchCoupons]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -143,7 +145,6 @@ const MyCouponsPage = () => {
             </div>
 
             {isModalOpen && (
-                // Add the theme class to the modal overlay
                 <div className={`modal-overlay ${theme}-theme`} onClick={closeModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <h3>{editingCoupon ? 'Edit Coupon' : 'Create a New Coupon'}</h3>
