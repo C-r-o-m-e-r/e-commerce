@@ -1,6 +1,6 @@
 ﻿// frontend/src/components/CheckoutForm.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import './CheckoutForm.css';
 

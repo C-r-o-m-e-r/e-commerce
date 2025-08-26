@@ -25,9 +25,6 @@ module.exports = {
     {
       files: ['cypress/**/*.cy.{js,jsx}'],
       extends: ['plugin:cypress/recommended'],
-      env: {
-        'cypress/globals': true
-      }
     }
   ]
 }

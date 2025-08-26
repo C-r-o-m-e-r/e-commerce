@@ -4,32 +4,26 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid'; // Import the uuid generator
 
+// The context itself is not exported directly anymore.
 const AuthContext = createContext(null);
 
-const getInitialUser = () => {
-    try {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser && storedUser !== 'undefined') {
-            return JSON.parse(storedUser);
-        }
-    } catch (e) {
-        console.error("Failed to parse user from localStorage", e);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-    }
-    return null;
+// The custom hook remains a named export.
+// Import it like this: import { useAuth } from './context/AuthContext';
+export const useAuth = () => {
+    return useContext(AuthContext);
 };
 
-export const AuthProvider = ({ children }) => {
+// The provider component is now the default export.
+// Import it like this: import AuthProvider from './context/AuthContext';
+export default function AuthProvider({ children }) {
     const [user, setUser] = useState(getInitialUser);
     const [token, setToken] = useState(() => localStorage.getItem('token'));
-    const [guestId, setGuestId] = useState(() => localStorage.getItem('guestId')); // 1. Add guestId state
+    const [guestId, setGuestId] = useState(() => localStorage.getItem('guestId'));
     const navigate = useNavigate();
 
-    // 2. Effect to manage the guestId
     useEffect(() => {
+        // If the user is not logged in and has no guestId, create one.
         if (!user && !localStorage.getItem('guestId')) {
-            // If the user is not logged in and has no guestId, create one.
             const newGuestId = uuidv4();
             localStorage.setItem('guestId', newGuestId);
             setGuestId(newGuestId);
@@ -43,7 +37,7 @@ export const AuthProvider = ({ children }) => {
             setToken(authData.token);
             setUser(authData.user);
 
-            // 3. Clear the guestId on successful login
+            // Clear the guestId on successful login
             localStorage.removeItem('guestId');
             setGuestId(null);
         }
@@ -55,7 +49,7 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
         setUser(null);
 
-        // 4. Create a new guestId on logout
+        // Create a new guestId on logout
         const newGuestId = uuidv4();
         localStorage.setItem('guestId', newGuestId);
         setGuestId(newGuestId);
@@ -66,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     const value = {
         user,
         token,
-        guestId, // 5. Expose guestId to the rest of the app
+        guestId, // Expose guestId to the rest of the app
         login,
         logout,
     };
@@ -74,6 +68,19 @@ export const AuthProvider = ({ children }) => {
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
-    return useContext(AuthContext);
+// This helper function remains internal to the module.
+const getInitialUser = () => {
+    try {
+        const storedUser = localStorage.getItem('user');
+        // Check for 'undefined' string as well, which can sometimes be stored.
+        if (storedUser && storedUser !== 'undefined') {
+            return JSON.parse(storedUser);
+        }
+    } catch (e) {
+        console.error("Failed to parse user from localStorage", e);
+        // Clear potentially corrupted data
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+    }
+    return null;
 };
