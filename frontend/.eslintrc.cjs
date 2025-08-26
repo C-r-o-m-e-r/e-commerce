@@ -13,8 +13,7 @@ module.exports = {
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: '18.2' } },
-  // FIX: Explicitly add 'cypress' to the plugins array
-  plugins: ['react-refresh', 'cypress'],
+  plugins: ['react-refresh'],
   rules: {
     'react-refresh/only-export-components': [
       'warn',
@@ -29,7 +28,7 @@ module.exports = {
       },
     ],
   },
-  // FIX: Use an override to apply Cypress rules ONLY to test files
+  // This override block is the key to fixing the Cypress errors
   overrides: [
     {
       files: ['cypress/**/*.cy.{js,jsx}'],
