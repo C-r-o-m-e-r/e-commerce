@@ -1,7 +1,8 @@
 ﻿// /backend/tests/setup.js
 
-// This file runs before each test suite.
+// This file now runs before each test suite.
 
+// preventing one test from accidentally affecting another.
 beforeEach(() => {
   jest.clearAllMocks();
 });
