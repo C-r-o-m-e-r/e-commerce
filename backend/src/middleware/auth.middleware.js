@@ -15,28 +15,25 @@ const authMiddleware = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
-        // --- FIX: Ensure the complete user object, including role from token, is used ---
         const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
 
         if (!user) {
             return res.status(401).json({ message: 'Unauthorized: User not found' });
         }
         
-        // The database object is the most up-to-date source of user info
         delete user.password; 
         
-        // Create the req.user object for controllers to use
         req.user = {
             id: user.id,
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
-            role: user.role, // Ensure role from DB is passed
-            status: user.status // Also pass the status
+            role: user.role,
+            status: user.status
         };
 
         next();
-    } catch (error) {
+    } catch (_error) { // FIX: Renamed 'error' to '_error'
         return res.status(401).json({ message: 'Unauthorized: Invalid token' });
     }
 };
@@ -54,17 +51,14 @@ const optionalAuthMiddleware = async (req, res, next) => {
                 delete user.password;
                 req.user = user;
             }
-        } catch (error) {
+        } catch (_error) { // FIX: Renamed 'error' to '_error'
             // Ignore invalid tokens for optional auth
         }
     }
 
     next();
 };
-// --- END: NEW OPTIONAL AUTH MIDDLEWARE ---
 
-
-// Export both middlewares
 module.exports = {
     authMiddleware,
     optionalAuthMiddleware,

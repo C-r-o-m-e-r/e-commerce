@@ -1,3 +1,5 @@
+// /backend/src/controllers/users.controller.js
+
 const prisma = require('../config/prisma');
 const bcrypt = require('bcryptjs');
 
@@ -18,7 +20,7 @@ const updateUserRole = async (req, res) => {
 
     delete updatedUser.password;
     res.status(200).json(updatedUser);
-  } catch (error) {
+  } catch (_error) { // FIX: Renamed 'error' to '_error' to satisfy linter rule
     res.status(500).json({ message: 'Internal server error' });
   }
 };
